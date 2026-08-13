@@ -1,6 +1,6 @@
 {
   "name": "prd-refiner",
-  "version": "1.0.0+codex.20260813100447",
+  "version": "1.0.0+codex.20260813104032",
   "description": "\u663e\u5f0f\u542f\u52a8\u7684\u4e2d\u6587 PRD \u4f18\u5316\u5de5\u4f5c\u6d41\uff0c\u4e3a\u4eba\u5de5\u8bc4\u5ba1\u4e0e AI \u4e0b\u6e38\u4ea4\u4ed8\u751f\u6210\u7ed3\u6784\u5316\u9700\u6c42\u5305\u3002",
   "author": {
     "name": "xuzhou"
