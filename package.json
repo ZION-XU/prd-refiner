@@ -1,0 +1,22 @@
+{
+  "name": "prd-refiner",
+  "version": "1.0.0",
+  "description": "PRD Refiner shared skill and multi-agent plugin adapters",
+  "type": "module",
+  "main": ".opencode/plugins/prd-refiner.js",
+  "keywords": [
+    "pi-package",
+    "skills",
+    "prd",
+    "product-management",
+    "requirements"
+  ],
+  "pi": {
+    "extensions": [
+      "./.pi/extensions/prd-refiner.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+# Operating systems and editors
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*~
+
+# Python / Node caches
+__pycache__/
+*.py[cod]
+node_modules/
+.pytest_cache/
+
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.token
+
+# Local plugin and package output
+dist/
+build/
+*.zip
+*.tar.gz
+*.tgz
+.tmp/
+tmp/
+
+# Generated PRD output and private source material
+ai-ready-prd.md
+clarification-log.md
+quality-report.md
+output/
+outputs/
+private-inputs/
+examples/private/

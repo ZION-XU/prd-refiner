@@ -1,0 +1,14 @@
+{
+  "name": "prd-refiner",
+  "version": "1.0.0",
+  "description": "Explicit PRD clarification and restructuring workflow for product managers.",
+  "author": {
+    "name": "xuzhou"
+  },
+  "keywords": [
+    "prd",
+    "product-management",
+    "requirements",
+    "ai-ready"
+  ]
+}
