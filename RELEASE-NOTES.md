@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+- Standardized the user-facing product name as `PRD Refiner` in Codex plugin and Skill metadata.
+
 ## 1.0.0 — 2026-08-13
 
 Initial private development release.

@@ -1,5 +1,5 @@
 interface:
-  display_name: "PRD 精炼器"
+  display_name: "PRD Refiner"
   short_description: "在 Plan 模式结构化澄清并重构 PRD"
   default_prompt: "使用 $prd-refiner，在 Plan 模式下将现有 PRD 重构为 AI-ready 中文需求文档。"
 
