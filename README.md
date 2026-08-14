@@ -87,18 +87,9 @@ prd-refiner/
 
 安装方式因 Agent 平台而异；如果同时使用多个平台，需要分别安装。当前仅 Codex App / CLI 完成了真实安装与交互验证，其他平台的适配状态见 [docs/installation.md](docs/installation.md)。
 
-### Codex App / CLI
+### Codex App / CLI 源码安装
 
-当前仓库为私有开发源码，安装前需要确保 Git 已具备仓库访问权限。
-
-直接从 GitHub 注册 marketplace 并安装：
-
-```powershell
-codex plugin marketplace add ZION-XU/prd-refiner --ref main
-codex plugin add prd-refiner@prd-refiner-dev
-```
-
-如需在本地修改插件，也可以克隆仓库并把仓库根目录注册为本地 marketplace。两种方式选择一种即可，不要同时注册：
+当前插件未发布到公共插件市场，只提供源码安装。安装前需要确保 Git 已具备仓库访问权限；克隆源码后，将本地仓库目录登记给 Codex 插件安装器并安装：
 
 ```powershell
 git clone https://github.com/ZION-XU/prd-refiner.git
@@ -115,19 +106,14 @@ $prd-refiner
 
 随后提供 PRD 文本或文件，并可附加截图、Figma 链接或 Axure 材料。普通对话仅提及 PRD 时，插件不会自动启动。
 
-从 GitHub 安装的插件按以下方式更新：
-
-```powershell
-codex plugin marketplace upgrade prd-refiner-dev
-codex plugin add prd-refiner@prd-refiner-dev
-```
-
-本地开发安装则在仓库目录拉取最新代码并重新安装：
+更新时在本地仓库目录拉取最新代码并重新安装：
 
 ```powershell
 git pull
 codex plugin add prd-refiner@prd-refiner-dev
 ```
+
+这里的本地 marketplace 只是 Codex 安装源码插件所需的目录登记机制，不表示插件已经发布到公共市场。
 
 ## Figma 扩展方向
 

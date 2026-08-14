@@ -4,16 +4,9 @@ This repository is currently a private development project. Platform installatio
 
 ## Codex App and CLI
 
-Codex is the current validated environment. The repository root contains the marketplace definition in `.agents/plugins/marketplace.json`.
+Codex is the current validated environment. This plugin is not published in a public marketplace and is installed from a local source checkout. The repository root contains the installer descriptor in `.agents/plugins/marketplace.json`.
 
-The repository is currently private, so authenticate Git for the GitHub account that has access. Register the GitHub repository as a marketplace and install the plugin:
-
-```powershell
-codex plugin marketplace add ZION-XU/prd-refiner --ref main
-codex plugin add prd-refiner@prd-refiner-dev
-```
-
-For local development, clone the repository and register the checkout instead. Choose either the GitHub marketplace or the local checkout; do not register both under the same marketplace name.
+The repository is currently private, so authenticate Git for the GitHub account that has access. Clone the source, register the local checkout with the Codex plugin installer, and install the plugin:
 
 ```powershell
 git clone https://github.com/ZION-XU/prd-refiner.git
@@ -30,21 +23,14 @@ $prd-refiner
 
 Switch to Plan mode before the structured clarification phase. Reinstall after a manifest cachebuster update, and use a new task so the updated Skill is loaded.
 
-To update an installation backed by the GitHub marketplace:
-
-```powershell
-codex plugin marketplace upgrade prd-refiner-dev
-codex plugin add prd-refiner@prd-refiner-dev
-```
-
-To update a local development checkout:
+To update the source installation:
 
 ```powershell
 git pull
 codex plugin add prd-refiner@prd-refiner-dev
 ```
 
-The marketplace only needs to be registered once for the same checkout. Start a new Codex task after every install or update so the refreshed Skill is loaded.
+The local marketplace registration is only Codex's mechanism for installing a plugin from the checkout; it does not mean the plugin is published in a public marketplace. The checkout only needs to be registered once. Start a new Codex task after every install or update so the refreshed Skill is loaded.
 
 ## Claude Code
 

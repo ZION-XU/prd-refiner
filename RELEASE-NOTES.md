@@ -11,7 +11,7 @@
 - Added prototype input levels, `UI-xxx` modeling, PRD/prototype conflict rules and conditional asset folders.
 - Expanded the synthetic CAD layer batch-state case to a complete six-document requirement package.
 - Strengthened validation coverage for methodology resources and example artifacts.
-- Documented exact Codex local-marketplace installation and update commands in the README.
+- Documented exact Codex local-source installation and update commands in the README.
 
 ## 1.0.0 — 2026-08-13
 
