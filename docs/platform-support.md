@@ -28,5 +28,5 @@ A prepared platform becomes validated only after confirming:
 3. ordinary PRD conversation does not auto-trigger the workflow;
 4. explicit invocation starts the workflow;
 5. structured or fallback clarification works across multiple turns;
-6. all three output documents can be produced;
+6. all six output documents can be produced;
 7. no platform adapter silently changes product decisions or evidence rules.

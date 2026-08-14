@@ -14,7 +14,7 @@
 - Group only 2–3 independent questions whose answers do not change one another.
 - Never turn model inference into a confirmed product decision.
 - Preserve source links and independent `CL-xxx` records for every decision.
-- Keep the three required outputs: `ai-ready-prd.md`, `clarification-log.md`, and `quality-report.md`.
+- Keep the six required outputs: `ai-ready-prd.md`, `interaction-spec.md`, `clarification-log.md`, `traceability-matrix.md`, `quality-report.md`, and `evaluation-scorecard.md`.
 
 ## Platform adapters
 

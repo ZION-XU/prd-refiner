@@ -33,6 +33,14 @@ Platform manifests make the project installable, versioned and discoverable. The
 
 Supporting references, templates and scripts live beside the Skill so they travel with every plugin distribution.
 
+The method is intentionally more important than the input layout:
+
+- `references/prd-optimization-spec.md` normalizes arbitrary PRD formats into a twelve-dimension information model;
+- `references/interactive-workflow.md` defines the ten-stage clarification and delivery loop;
+- `references/prototype-analysis.md` defines prototype input levels, `UI-xxx` interaction modeling and source-conflict handling;
+- `references/evaluation-standard.md` provides the same weighted scale for before/after comparison;
+- templates and validators make the method repeatable but do not replace product-manager decisions.
+
 ### Integration layer
 
 Future Figma, Axure or internal-system integrations should expose read-only evidence to the shared Skill. They do not override product-manager decisions and do not change the core information model.

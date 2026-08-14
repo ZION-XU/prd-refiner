@@ -4,7 +4,23 @@ This repository is currently a private development project. Platform installatio
 
 ## Codex App and CLI
 
-Codex is the current validated environment. During local development, expose the plugin through a local marketplace whose entry points to this repository root, then install `prd-refiner` from that marketplace.
+Codex is the current validated environment. The repository root contains the marketplace definition in `.agents/plugins/marketplace.json`.
+
+The repository is currently private, so authenticate Git for the GitHub account that has access. Register the GitHub repository as a marketplace and install the plugin:
+
+```powershell
+codex plugin marketplace add ZION-XU/prd-refiner --ref main
+codex plugin add prd-refiner@prd-refiner-dev
+```
+
+For local development, clone the repository and register the checkout instead. Choose either the GitHub marketplace or the local checkout; do not register both under the same marketplace name.
+
+```powershell
+git clone https://github.com/ZION-XU/prd-refiner.git
+cd prd-refiner
+codex plugin marketplace add .
+codex plugin add prd-refiner@prd-refiner-dev
+```
 
 After installation, start a new task and explicitly invoke:
 
@@ -13,6 +29,22 @@ $prd-refiner
 ```
 
 Switch to Plan mode before the structured clarification phase. Reinstall after a manifest cachebuster update, and use a new task so the updated Skill is loaded.
+
+To update an installation backed by the GitHub marketplace:
+
+```powershell
+codex plugin marketplace upgrade prd-refiner-dev
+codex plugin add prd-refiner@prd-refiner-dev
+```
+
+To update a local development checkout:
+
+```powershell
+git pull
+codex plugin add prd-refiner@prd-refiner-dev
+```
+
+The marketplace only needs to be registered once for the same checkout. Start a new Codex task after every install or update so the refreshed Skill is loaded.
 
 ## Claude Code
 

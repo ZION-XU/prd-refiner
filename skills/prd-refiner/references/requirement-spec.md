@@ -1,5 +1,7 @@
 # AI-Ready PRD 信息规范
 
+本文件是执行时的快速参考。完整十二维定义、任意格式输入归一化、问题分级、编号追溯和交付门槛见 [prd-optimization-spec.md](prd-optimization-spec.md)；完整交互流程见 [interactive-workflow.md](interactive-workflow.md)。
+
 ## 证据与优先级
 
 | 标记 | 含义 | 可否直接作为最终规则 |

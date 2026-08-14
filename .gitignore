@@ -39,3 +39,7 @@ output/
 outputs/
 private-inputs/
 examples/private/
+
+# Versioned synthetic example package
+!examples/cad-layer-batch-state/output/
+!examples/cad-layer-batch-state/output/*.md

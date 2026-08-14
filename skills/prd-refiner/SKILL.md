@@ -1,6 +1,6 @@
 ---
 name: prd-refiner
-description: 将既有产品需求文档（PRD）重构为可供产品评审、人类协作、AI coding、测试与下游自动化消费的中文结构化需求文档。用于产品经理明确启动 `$prd-refiner` 后，审查需求歧义与缺失、在 Plan 模式中按影响和依赖关系进行单项或成组澄清、记录决策并产出 AI-ready PRD、澄清日志和质量报告；不要因普通对话提及 PRD 而自动调用。
+description: 将任意格式的既有产品需求文档（PRD）及可选原型重构为可供产品评审、人类协作、AI coding、测试与下游自动化消费的中文结构化需求包。用于产品经理明确启动 `$prd-refiner` 后，执行十二维检查、PRD与原型对齐、Plan模式交互澄清、决策追溯和优化前后评价，并输出AI-ready PRD、交互规格、澄清日志、追溯矩阵、质量报告和评价表；不要因普通对话提及PRD而自动调用。
 ---
 
 # PRD Refiner
@@ -9,6 +9,7 @@ description: 将既有产品需求文档（PRD）重构为可供产品评审、�
 
 ## 启动边界
 
+- 不要因普通对话提及 PRD 而自动调用。
 - 仅在用户显式输入 `$prd-refiner`、`/prd-refiner` 或宿主提供的等效显式命令后启动。
 - 确认已启动，并请求原始 PRD（粘贴文本或文件路径）。原型、截图、Figma 或 Axure 材料可选。
 - 说明工作语言为中文；保留 API、字段名、状态码、代码标识符等必要英文原文。不要生成整篇中英双语镜像，除非用户另有要求。
@@ -19,7 +20,7 @@ description: 将既有产品需求文档（PRD）重构为可供产品评审、�
 
 ### 1. 解析与建模
 
-读取 PRD 和可解析的原型材料，提取并建立内部需求模型。需要字段定义、证据分类和原型冲突处理时，先读 [references/requirement-spec.md](references/requirement-spec.md)；使用或设计 Figma API、MCP、连接器时，再读 [references/figma-integration.md](references/figma-integration.md)：
+读取 PRD 和可解析的原型材料，提取并建立内部需求模型。输入 PRD 不要求采用固定模板；必须按语义而不是原文版式归一化。开始解析和检查前读取 [references/prd-optimization-spec.md](references/prd-optimization-spec.md)，其中定义任意格式输入处理、十二维检查、问题分级、编号追溯和质量门槛；需要快速查阅证据和最小对象结构时读取 [references/requirement-spec.md](references/requirement-spec.md)。输入包含截图、Figma、Axure或其他原型时读取 [references/prototype-analysis.md](references/prototype-analysis.md)；使用或设计Figma API、MCP、连接器时，再读 [references/figma-integration.md](references/figma-integration.md)：
 
 - 目标、业务价值、成功指标与边界；
 - 角色、权限、前置条件、主流程、替代流程和异常流程；
@@ -27,7 +28,7 @@ description: 将既有产品需求文档（PRD）重构为可供产品评审、�
 - 外部依赖、接口、非功能需求、风险与待确认项；
 - 可验证的验收标准和可自动化的实现/测试约束。
 
-按影响优先级建立澄清队列：范围与目标 > 权限和关键业务规则 > 主流程 > 数据与状态 > 异常 > 验收 > 非功能与实现约束。识别来源位置；无法解析的原型要说明限制，继续以 PRD 和用户确认的信息工作。
+按 [references/interactive-workflow.md](references/interactive-workflow.md) 执行十环节工作流。按影响优先级建立澄清队列：范围与目标 > 权限和关键业务规则 > 主流程 > 数据与状态 > 异常 > 验收 > 非功能与实现约束。识别来源位置；无法解析的原型要说明限制，继续以 PRD 和用户确认的信息工作。
 
 将内容严格标记为“原始事实”“原型观察”“产品经理确认”“AI 建议”或“待确认”。只有原始事实、原型观察和产品经理确认可作为结论的来源；原型观察与 PRD 冲突时，必须澄清，不能自行指定 PRD 或原型优先。
 
@@ -66,13 +67,16 @@ description: 将既有产品需求文档（PRD）重构为可供产品评审、�
 
 ### 3. 产出结构化需求基线
 
-在澄清完成、用户停止或风险已透明记录后，默认在用户指定目录（未指定则当前工作目录）生成：
+在澄清完成、用户停止或风险已透明记录后，默认在用户指定目录（未指定则当前工作目录）下建立 `ai-ready-requirement/`，生成六份固定文档：
 
 - `ai-ready-prd.md`：规范化 PRD；
+- `interaction-spec.md`：页面、控件、状态、反馈及PRD—原型对齐结果；
 - `clarification-log.md`：逐项决策和待确认项；
-- `quality-report.md`：完整性、可测试性和下游消费风险报告。
+- `traceability-matrix.md`：来源、需求、原型、澄清和验收的双向映射；
+- `quality-report.md`：完整性、可测试性和下游消费风险报告；
+- `evaluation-scorecard.md`：原始资料与优化后需求包的同尺评价。
 
-若用户只要对话结果或不授权写文件，先在对话中提供同等结构，不写文件。生成文件前，读取并按需复制 [assets/ai-ready-prd-template.md](assets/ai-ready-prd-template.md)、[assets/clarification-log-template.md](assets/clarification-log-template.md) 和 [assets/quality-report-template.md](assets/quality-report-template.md) 的结构；内容必须来自当前任务，不要保留模板占位符。
+存在可保存的原型图片、流程图或状态图时，再创建 `assets/prototype-images/` 和 `assets/diagrams/`；没有资产时不要创建空目录。若用户只要对话结果或不授权写文件，先在对话中提供同等结构，不写文件。生成文件前读取并按需复制 `assets/` 下六份对应模板的结构；内容必须来自当前任务，不要保留模板占位符。
 
 `ai-ready-prd.md` 必须按实际适用性覆盖以下章节；没有信息时标记“待确认”，不要删掉关键章节：
 
@@ -86,13 +90,15 @@ description: 将既有产品需求文档（PRD）重构为可供产品评审、�
 8. 非功能需求：性能、安全、隐私、可用性、可观测性和兼容性（适用时）；
 9. 验收标准：使用 Given/When/Then 或同等可验证表述，并关联需求 ID；
 10. 实现与测试交接：每项需求的影响范围、边界条件、测试关注点和未决假设；
-11. 开放问题、风险、决策记录和可追溯性矩阵。
+11. 开放问题、风险和决策摘要；详细追溯关系写入 `traceability-matrix.md`。
 
-所有规则应使用明确的主体、触发条件、动作、结果与例外。给功能、业务规则、非功能、数据/状态和验收项添加稳定 ID（如 `FR-001`、`BR-001`、`NFR-001`、`DATA-001`、`AC-001`），使 AI coding 与测试可以引用而非猜测。为每项记录原始 PRD、原型和澄清记录的可用来源链接；追溯矩阵可附在 `ai-ready-prd.md`，无须强制拆分为新文件。
+所有规则应使用明确的主体、触发条件、动作、结果与例外。给功能、业务规则、非功能、数据/状态、交互和验收项添加稳定ID（如 `FR-001`、`BR-001`、`NFR-001`、`DATA-001`、`UI-001`、`AC-001`），使AI coding与测试可以引用而非猜测。为每项记录原始PRD、原型和澄清记录的可用来源链接，完整关系必须写入独立的 `traceability-matrix.md`。
 
 ### 4. 质量检查与交付说明
 
 在 `quality-report.md` 中按“通过 / 风险 / 待确认”标示至少：范围边界、规则完备性、流程闭环、权限、数据状态、异常、依赖、验收可测性、非功能需求、可追溯性以及 AI coding 可消费性。说明未决项会阻塞或影响哪些功能、实现或测试。
+
+始终读取 [references/evaluation-standard.md](references/evaluation-standard.md)，并基于 [assets/evaluation-scorecard-template.md](assets/evaluation-scorecard-template.md) 生成 `evaluation-scorecard.md`。必须用同一量表分别评价原始和优化后的资料，附证据和扣分原因；不得按篇幅或格式美观评分，也不得把合成案例分数描述为真实用户验证结果。
 
 文件写入后，在可执行 Python 时运行 `scripts/validate_requirement.py <输出目录>`；按报告修复可修复的章节、ID 和追溯问题。脚本无法运行时，按其规则人工检查，并在交付说明中写明限制。
 

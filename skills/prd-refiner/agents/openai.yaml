@@ -1,7 +1,7 @@
 interface:
   display_name: "PRD Refiner"
-  short_description: "在 Plan 模式结构化澄清并重构 PRD"
-  default_prompt: "使用 $prd-refiner，在 Plan 模式下将现有 PRD 重构为 AI-ready 中文需求文档。"
+  short_description: "对齐PRD与原型并生成六文档需求包和效果评价"
+  default_prompt: "使用 $prd-refiner，按十二维规范分析PRD与可选原型，在Plan模式澄清后生成六文档AI-ready需求包。"
 
 policy:
   allow_implicit_invocation: false

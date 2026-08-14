@@ -36,6 +36,22 @@ REQUIRED_PATHS = (
     "GEMINI.md",
     "package.json",
     "skills/prd-refiner/SKILL.md",
+    "skills/prd-refiner/references/prd-optimization-spec.md",
+    "skills/prd-refiner/references/interactive-workflow.md",
+    "skills/prd-refiner/references/evaluation-standard.md",
+    "skills/prd-refiner/references/prototype-analysis.md",
+    "skills/prd-refiner/assets/interaction-spec-template.md",
+    "skills/prd-refiner/assets/traceability-matrix-template.md",
+    "skills/prd-refiner/assets/evaluation-scorecard-template.md",
+    "examples/cad-layer-batch-state/01-original-prd.md",
+    "examples/cad-layer-batch-state/02-prototype-observations.md",
+    "examples/cad-layer-batch-state/output/ai-ready-prd.md",
+    "examples/cad-layer-batch-state/output/interaction-spec.md",
+    "examples/cad-layer-batch-state/output/clarification-log.md",
+    "examples/cad-layer-batch-state/output/traceability-matrix.md",
+    "examples/cad-layer-batch-state/output/quality-report.md",
+    "examples/cad-layer-batch-state/output/evaluation-scorecard.md",
+    "examples/cad-layer-batch-state/04-improvement-log.md",
 )
 
 
@@ -61,7 +77,13 @@ def main() -> int:
 
     codex_path = ROOT / ".codex-plugin/plugin.json"
     if codex_path.is_file():
-        codex = json.loads(codex_path.read_text(encoding="utf-8"))
+        codex_bytes = codex_path.read_bytes()
+        if b"\r\n" in codex_bytes:
+            errors.append("Codex manifest must use LF line endings")
+        codex_text = codex_bytes.decode("utf-8")
+        if re.search(r"\\u[0-9a-fA-F]{4}", codex_text):
+            errors.append("Codex manifest must keep non-ASCII text readable instead of using Unicode escapes")
+        codex = json.loads(codex_text)
         version = codex.get("version", "").split("+", 1)[0]
         if version != BASE_VERSION:
             errors.append(f"Codex base version is {version!r}, expected {BASE_VERSION!r}")
@@ -77,6 +99,14 @@ def main() -> int:
     skill_text = (ROOT / "skills/prd-refiner/SKILL.md").read_text(encoding="utf-8")
     if "不要因普通对话提及 PRD 而自动调用" not in skill_text:
         errors.append("core Skill lost the explicit-invocation guard")
+    for required_reference in (
+        "references/prd-optimization-spec.md",
+        "references/interactive-workflow.md",
+        "references/evaluation-standard.md",
+        "references/prototype-analysis.md",
+    ):
+        if required_reference not in skill_text:
+            errors.append(f"core Skill does not reference {required_reference}")
 
     if errors:
         print("Cross-platform validation failed:")

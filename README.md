@@ -25,8 +25,22 @@ PRD Refiner 是一个面向产品经理的多平台 Agent 插件，用于把传�
 ## 输出
 
 - `ai-ready-prd.md`：结构化、可追溯的需求正文；
+- `interaction-spec.md`：页面、控件、状态、反馈及PRD—原型对齐；
 - `clarification-log.md`：问题、候选项、产品经理回答、结论和影响；
-- `quality-report.md`：完整性、清晰性、可测试性及下游消费风险。
+- `traceability-matrix.md`：来源、需求、原型、澄清和验收的双向映射；
+- `quality-report.md`：完整性、清晰性、原型一致性、可测试性及下游消费风险；
+- `evaluation-scorecard.md`：使用同一量表评价原始资料和优化后需求包。
+
+有原型图片、流程图或状态图时，需求包还会包含 `assets/prototype-images/` 和 `assets/diagrams/`；没有实际资产时不创建空目录。
+
+## 方法成果
+
+- [PRD 优化规范](skills/prd-refiner/references/prd-optimization-spec.md)：面向任意格式人工 PRD 的十二维检查、证据边界、问题分级和追溯规则；
+- [交互式工作流](skills/prd-refiner/references/interactive-workflow.md)：显式启动到校验交付的十环节流程；
+- [评价标准](skills/prd-refiner/references/evaluation-standard.md)：八维、100 分、同尺评价和过程红线；
+- [原型分析规范](skills/prd-refiner/references/prototype-analysis.md)：输入分级、`UI-xxx`、PRD—原型冲突和资产规则；
+- [评价表模板](skills/prd-refiner/assets/evaluation-scorecard-template.md)：优化前后评分与客观计数模板；
+- [CAD 图层批量状态案例](examples/cad-layer-batch-state/01-original-prd.md)：从非固定格式原始PRD、原型观察和澄清到六文档需求包及前后评分的完整合成案例。
 
 ## 项目架构
 
@@ -35,6 +49,7 @@ PRD Refiner 是一个面向产品经理的多平台 Agent 插件，用于把传�
 ```text
 prd-refiner/
 ├── skills/prd-refiner/       # 单一核心 Skill
+├── examples/                 # 合成案例与效果评价
 ├── .codex-plugin/            # Codex
 ├── .claude-plugin/           # Claude Code
 ├── .cursor-plugin/           # Cursor
@@ -70,15 +85,49 @@ prd-refiner/
 
 ## 安装与使用
 
-当前仓库为私有开发源码。Codex 本地开发安装及其他平台的适配入口见 [docs/installation.md](docs/installation.md)。
+安装方式因 Agent 平台而异；如果同时使用多个平台，需要分别安装。当前仅 Codex App / CLI 完成了真实安装与交互验证，其他平台的适配状态见 [docs/installation.md](docs/installation.md)。
 
-在 Codex 新任务中显式调用：
+### Codex App / CLI
+
+当前仓库为私有开发源码，安装前需要确保 Git 已具备仓库访问权限。
+
+直接从 GitHub 注册 marketplace 并安装：
+
+```powershell
+codex plugin marketplace add ZION-XU/prd-refiner --ref main
+codex plugin add prd-refiner@prd-refiner-dev
+```
+
+如需在本地修改插件，也可以克隆仓库并把仓库根目录注册为本地 marketplace。两种方式选择一种即可，不要同时注册：
+
+```powershell
+git clone https://github.com/ZION-XU/prd-refiner.git
+cd prd-refiner
+codex plugin marketplace add .
+codex plugin add prd-refiner@prd-refiner-dev
+```
+
+安装完成后新建 Codex 任务并显式调用：
 
 ```text
 $prd-refiner
 ```
 
 随后提供 PRD 文本或文件，并可附加截图、Figma 链接或 Axure 材料。普通对话仅提及 PRD 时，插件不会自动启动。
+
+从 GitHub 安装的插件按以下方式更新：
+
+```powershell
+codex plugin marketplace upgrade prd-refiner-dev
+codex plugin add prd-refiner@prd-refiner-dev
+```
+
+本地开发安装则在仓库目录拉取最新代码并重新安装：
+
+```powershell
+git pull
+codex plugin add prd-refiner@prd-refiner-dev
+```
 
 ## Figma 扩展方向
 

@@ -3,6 +3,15 @@
 ## Unreleased
 
 - Standardized the user-facing product name as `PRD Refiner` in Codex plugin and Skill metadata.
+- Added a standalone twelve-dimension PRD optimization specification for arbitrary source formats.
+- Added the ten-stage interactive clarification workflow and a weighted before/after evaluation standard.
+- Added a reusable evaluation scorecard template.
+- Added `interaction-spec.md` and `traceability-matrix.md` as required outputs, with templates and deterministic validation.
+- Made `evaluation-scorecard.md` a required output instead of an optional case-only artifact.
+- Added prototype input levels, `UI-xxx` modeling, PRD/prototype conflict rules and conditional asset folders.
+- Expanded the synthetic CAD layer batch-state case to a complete six-document requirement package.
+- Strengthened validation coverage for methodology resources and example artifacts.
+- Documented exact Codex local-marketplace installation and update commands in the README.
 
 ## 1.0.0 — 2026-08-13
 

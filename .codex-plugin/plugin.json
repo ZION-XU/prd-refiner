@@ -1,18 +1,18 @@
 {
   "name": "prd-refiner",
-  "version": "1.0.0+codex.20260813104032",
-  "description": "显式启动的中文 PRD 优化工作流，为人工评审与 AI 下游交付生成结构化需求包。",
+  "version": "1.0.0+codex.20260814060439",
+  "description": "按十二维规范处理PRD与可选原型，通过交互澄清生成六文档需求包和效果评价。",
   "author": {
     "name": "xuzhou"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "PRD Refiner",
-    "shortDescription": "在 Plan 模式结构化澄清并优化 PRD。",
-    "longDescription": "PRD Refiner 引导产品经理在 Plan 模式按影响和依赖关系单项或成组确认歧义与缺失信息，生成面向人工和 AI 下游交付的中文需求文档、决策记录和质量报告。",
+    "shortDescription": "对齐PRD与原型并生成六文档需求包。",
+    "longDescription": "PRD Refiner不要求输入采用固定模板。它按十二维规范归一化人工PRD和原型证据，引导产品经理在Plan模式确认缺失、歧义与冲突，输出AI-ready PRD、交互规格、澄清日志、追溯矩阵、质量报告和优化前后评价表。",
     "developerName": "xuzhou",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": "使用 $prd-refiner，并在 Plan 模式下优化现有 PRD 及可选原型资料。"
+    "defaultPrompt": "使用 $prd-refiner，按十二维规范分析PRD与可选原型，在Plan模式澄清后生成六文档AI-ready需求包。"
   }
 }
