@@ -32,6 +32,26 @@ codex plugin add prd-refiner@prd-refiner-dev
 
 The local marketplace registration is only Codex's mechanism for installing a plugin from the checkout; it does not mean the plugin is published in a public marketplace. The checkout only needs to be registered once. Start a new Codex task after every install or update so the refreshed Skill is loaded.
 
+### Company Confluence MCP
+
+The Codex manifest references the root `.mcp.json`, so installing the plugin also registers the `prd-refiner-confluence` stdio server. Credential collection is intentionally a separate, explicit step because plugin installation must not execute arbitrary scripts or capture secrets automatically.
+
+Prerequisites:
+
+- Windows PowerShell;
+- `uv` on `PATH`;
+- access to `https://confluence.zwcad.com`;
+- a personal Confluence username and PAT.
+
+Run once from the plugin root:
+
+```powershell
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass `
+  -File .\integrations\confluence-mcp\configure.ps1
+```
+
+The script prompts without echoing the PAT, stores it with Windows current-user DPAPI protection in `%APPDATA%\PRDRefiner\confluence.json`, and warms the pinned MCP runtime. Start a new Agent task afterward. See the root README for PAT creation and manual registration examples for other Agents.
+
 ## Claude Code
 
 The repository contains `.claude-plugin/plugin.json` and a development marketplace file. Live installation and slash-command behavior have not yet been verified.
@@ -50,6 +70,8 @@ The root `package.json` points to `.opencode/plugins/prd-refiner.js`. The plugin
 
 After the repository is accessible from the target environment, install it using OpenCode's supported Git/package plugin mechanism and explicitly load or invoke `prd-refiner`.
 
+OpenCode does not currently receive the Confluence server from the Codex manifest. Register the shared `integrations/confluence-mcp/launch.ps1` command as a local stdio MCP server, using the example in the root README. The same encrypted user configuration is reused.
+
 ## Pi
 
 The root `package.json` declares the Pi extension and shared Skill path. The extension registers `skills/` through resource discovery and does not auto-inject the workflow.
@@ -60,4 +82,4 @@ Initial manifests and registration adapters are present. Complete a real client 
 
 ## Security
 
-Do not store private PRDs, Figma tokens, API keys or generated customer outputs in this repository. Host applications should own authentication and secret storage.
+Do not store private PRDs, Figma tokens, PATs, API keys or generated customer outputs in this repository. The Confluence setup stores only DPAPI-protected material outside the checkout. Do not copy that file between Windows users; rerun setup for each user instead.

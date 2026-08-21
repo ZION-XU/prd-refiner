@@ -15,6 +15,7 @@ description: 将任意格式的既有产品需求文档（PRD）及可选原型�
 - 说明工作语言为中文；保留 API、字段名、状态码、代码标识符等必要英文原文。不要生成整篇中英双语镜像，除非用户另有要求。
 - 在开始结构化澄清前，检查当前是否为 **Plan 模式**。若不是，明确请用户先切换到 Plan 模式，并暂停在此处。不要在非 Plan 模式提出结构化候选项，也不要假装完成了澄清。
 - 用户明确说“结束本次 PRD 优化”、要求直接交付或已经没有待处理项时，结束澄清并进入交付；在同一任务结束后，不要将无关的普通对话误当作后续输入。
+- 用户要求写入公司 Confluence 时，将其视为需求包生成后的可选交付步骤。开始在线写入前读取 [references/confluence-delivery.md](references/confluence-delivery.md)，并严格执行写入预览、产品经理确认和回读校验。不要在对话中索要或显示 PAT。
 
 ## 工作流
 
@@ -103,3 +104,9 @@ description: 将任意格式的既有产品需求文档（PRD）及可选原型�
 文件写入后，在可执行 Python 时运行 `scripts/validate_requirement.py <输出目录>`；按报告修复可修复的章节、ID 和追溯问题。脚本无法运行时，按其规则人工检查，并在交付说明中写明限制。
 
 交付时简要说明：已完成的澄清数量、仍待确认的高风险项、生成的文件以及建议的下一步。不要声称输出保证实现正确或替代产品、技术、安全或合规评审。
+
+### 5. 可选 Confluence 企业交付
+
+仅当用户明确要求且本地需求包已经形成时执行。按 [references/confluence-delivery.md](references/confluence-delivery.md) 先解析目标空间、父页面和现有页面，再展示页面与附件写入预览。产品经理确认后调用宿主提供的 Confluence MCP 写工具；写入后必须回读页面及附件清单，并把页面 URL、ID、版本和写入状态写入交付说明与 `traceability-matrix.md`。
+
+如果 `prd-refiner-confluence` 不可用或报告尚未配置，指导用户在插件根目录运行 `integrations/confluence-mcp/configure.ps1`，然后新建 Agent 任务。不要尝试从仓库、聊天记录或其他文件中寻找明文 PAT。MCP 不可用时仍交付完整本地需求包和待执行写入计划，并明确在线交付未完成。

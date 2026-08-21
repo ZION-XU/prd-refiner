@@ -24,6 +24,7 @@ JSON_VERSIONS = {
 
 REQUIRED_PATHS = (
     ".codex-plugin/plugin.json",
+    ".mcp.json",
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
     ".devin-plugin/plugin.json",
@@ -40,6 +41,11 @@ REQUIRED_PATHS = (
     "skills/prd-refiner/references/interactive-workflow.md",
     "skills/prd-refiner/references/evaluation-standard.md",
     "skills/prd-refiner/references/prototype-analysis.md",
+    "skills/prd-refiner/references/confluence-delivery.md",
+    "integrations/confluence-mcp/common.ps1",
+    "integrations/confluence-mcp/configure.ps1",
+    "integrations/confluence-mcp/launch.ps1",
+    "integrations/confluence-mcp/server.py",
     "skills/prd-refiner/assets/interaction-spec-template.md",
     "skills/prd-refiner/assets/traceability-matrix-template.md",
     "skills/prd-refiner/assets/evaluation-scorecard-template.md",
@@ -89,6 +95,8 @@ def main() -> int:
             errors.append(f"Codex base version is {version!r}, expected {BASE_VERSION!r}")
         if codex.get("skills") != "./skills/":
             errors.append("Codex manifest must reference ./skills/")
+        if codex.get("mcpServers") != "./.mcp.json":
+            errors.append("Codex manifest must reference ./.mcp.json")
 
     hermes_path = ROOT / ".hermes-plugin/plugin.yaml"
     if hermes_path.is_file():

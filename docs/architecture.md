@@ -43,7 +43,9 @@ The method is intentionally more important than the input layout:
 
 ### Integration layer
 
-Future Figma, Axure or internal-system integrations should expose read-only evidence to the shared Skill. They do not override product-manager decisions and do not change the core information model.
+Figma and prototype integrations should expose read-only evidence to the shared Skill. They do not override product-manager decisions and do not change the core information model.
+
+The Confluence integration is an optional delivery adapter. The plugin ships a stdio MCP descriptor plus a Windows launcher. The launcher reads a current-user DPAPI-protected PAT from `%APPDATA%\PRDRefiner\confluence.json`, fixes the company URL to `https://confluence.zwcad.com`, and starts a dependency-pinned `mcp-atlassian` runtime through a process-local wrapper that disables generated heading Anchor macros. Credentials stay outside the repository and requirement packages. Confluence writes occur only after local package generation, a write preview and explicit product-manager confirmation.
 
 ## Explicit invocation
 

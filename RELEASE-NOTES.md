@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Added a bundled `prd-refiner-confluence` stdio MCP descriptor and a dependency-pinned launcher for the company Confluence 7.19.4 instance.
+- Added first-time Windows setup that prompts for the company username and PAT, protects the PAT with current-user DPAPI, and stores configuration outside the repository.
+- Verified Confluence page search, read, existing-page update, child-page creation/update, hierarchy, Markdown-table rendering, and native cross-page attachment images in tables/body. Authenticated attachment download URLs failed as external images and were replaced with `ri:attachment` plus `ri:page`; local image upload remains pending.
+- Added Confluence write-preview, explicit-confirmation, read-back and partial-failure rules to the shared Skill.
+- Disabled upstream automatic heading Anchor macros so MCP-generated headings match native Confluence editor headings.
+- Documented PAT creation, first-time setup and reusable MCP commands for Codex, Claude Code, Cursor, OpenCode, ZCode and other stdio-capable Agents.
+
 - Standardized the user-facing product name as `PRD Refiner` in Codex plugin and Skill metadata.
 - Added a standalone twelve-dimension PRD optimization specification for arbitrary source formats.
 - Added the ten-stage interactive clarification workflow and a weighted before/after evaluation standard.
