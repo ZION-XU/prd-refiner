@@ -22,6 +22,9 @@ node_modules/
 *.p12
 *.token
 
+# Analysis caches (never commit)
+.understand-anything/
+
 # Local plugin and package output
 dist/
 build/

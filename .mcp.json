@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "prd-refiner-confluence": {
+      "command": "powershell.exe",
+      "args": [
+        "-NoLogo",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./integrations/confluence-mcp/launch.ps1"
+      ]
+    }
+  }
+}
