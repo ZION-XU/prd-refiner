@@ -1,5 +1,6 @@
 """Behavioral regression tests; all documents are synthetic, in temporary folders."""
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -155,11 +156,75 @@ class ValidatorTests(unittest.TestCase):
         img.unlink()
         self.assertFalse(validate(self.prd)['passed'])
 
-    def test_undefined_image_reference_fails_and_remote_is_unverified(self):
+    def test_remote_images_fail_local_output_but_remain_input_and_draft_warnings(self):
         self.assertFalse(self.run_doc(COMPLETE + '\n![x][missing]')['passed'])
-        result = self.run_doc(COMPLETE + '\n![x](https://example.invalid/image.png)')
-        self.assertTrue(result['passed'])
-        self.assertTrue(result['warnings'])
+        for image in ('![x](https://example.invalid/image.png?token=secret)',
+                      '![x](//example.invalid/image.png)',
+                      '![x][remote]\n[remote]: https://example.invalid/image.png',
+                      '<img alt="x" src="https://example.invalid/image.png" />',
+                      '![x](data:image/png;base64,AAAA)'):
+            with self.subTest(image=image):
+                text = COMPLETE + '\n' + image
+                result = self.run_doc(text)
+                self.assertFalse(result['passed'])
+                self.assertNotIn('token=secret', str(result))
+                self.assertTrue(any('must be saved locally' in e for e in result['errors']))
+                for profile in ('draft', 'existing'):
+                    result = self.run_doc(text, profile)
+                    self.assertTrue(result['passed'])
+                    self.assertTrue(result['warnings'])
+                result = validate(self.prd, image_policy='external')
+                self.assertTrue(result['passed'])
+                self.assertTrue(result['warnings'])
+
+    def test_local_asset_package_survives_move_and_missing_asset_fails(self):
+        assets = self.root / 'assets' / 'images'
+        assets.mkdir(parents=True)
+        image = assets / '界 面.png'
+        image.write_bytes(b'nonempty existence fixture; image decoding is a visual check')
+        text = COMPLETE + '\n![界面](<assets/images/界 面.png>)\n<img src="assets/images/界 面.png" />'
+        self.assertTrue(self.run_doc(text)['passed'])
+        with tempfile.TemporaryDirectory() as destination:
+            moved = Path(destination) / 'package'
+            shutil.copytree(self.root, moved)
+            self.assertTrue(validate(moved / self.prd.name)['passed'])
+            (moved / 'assets/images/界 面.png').unlink()
+            self.assertFalse(validate(moved / self.prd.name)['passed'])
+
+    def test_absolute_and_parent_paths_do_not_qualify_portable_output(self):
+        image = self.root / 'image.png'
+        image.write_bytes(b'nonempty existence fixture')
+        text = COMPLETE + f'\n![x](<{image.as_posix()}>)'
+        self.assertFalse(self.run_doc(text)['passed'])
+        self.assertTrue(validate(self.prd, image_policy='external')['passed'])
+        child = self.root / 'document'
+        child.mkdir()
+        doc = child / 'prd.md'
+        doc.write_text(COMPLETE + '\n![x](../image.png)', encoding='utf-8')
+        self.assertFalse(validate(doc)['passed'])
+
+    def test_html_missing_empty_assets_and_srcset_are_not_silent_success(self):
+        self.assertFalse(self.run_doc(COMPLETE + '\n<img src="missing.png">')['passed'])
+        self.assertFalse(self.run_doc(COMPLETE + '\n<img alt="missing source">')['passed'])
+        image = self.root / 'empty.png'
+        image.write_bytes(b'')
+        self.assertFalse(self.run_doc(COMPLETE + '\n![x](empty.png)')['passed'])
+        image.write_bytes(b'nonempty existence fixture')
+        self.assertFalse(self.run_doc(COMPLETE + '\n<img src="empty.png" srcset="https://example.invalid/high.png 2x">')['passed'])
+
+    def test_source_urls_and_fenced_image_examples_do_not_require_downloads(self):
+        text = COMPLETE + '\n[来源](https://example.invalid/image.png)\n```markdown\n![示例](https://example.invalid/sample.png)\n```'
+        self.assertTrue(self.run_doc(text)['passed'])
+
+    def test_cli_requires_explicit_external_image_policy_for_remote_output(self):
+        self.prd.write_text(COMPLETE + '\n![x](https://example.invalid/image.png)', encoding='utf-8')
+        script = Path(__file__).with_name('validate_prd.py')
+        command = [sys.executable, str(script), str(self.prd), '--json']
+        default = subprocess.run(command, capture_output=True, encoding='utf-8')
+        self.assertEqual(default.returncode, 1)
+        explicit = subprocess.run(command + ['--image-policy', 'external'], capture_output=True, encoding='utf-8')
+        self.assertEqual(explicit.returncode, 0)
+        self.assertEqual(json.loads(explicit.stdout)['image_policy'], 'external')
 
     def test_missing_or_invalid_file_has_controlled_error(self):
         self.assertFalse(validate(self.root / 'missing.md')['passed'])
