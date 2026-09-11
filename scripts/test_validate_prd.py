@@ -9,10 +9,24 @@ from pathlib import Path
 from validate_prd import validate
 
 
-COMPLETE = '''---
-status: 初版待核对
----
-# 直线计数（合成案例）
+COMPLETE = '''# 直线计数（合成案例）
+文件密级：■1-NS　□2-S　□3-2S　□4-3S　□5-4S
+|  |  |
+|---|---|
+| 文件版本： | V 0.1 |
+| 首版发布日期： | 未发布 |
+| 编制： | 合成作者 |
+| 审核： | |
+| 批准： | |
+| 需求文档状态： | 初版待核对 |
+**ZWSoft版权所有**
+**内部资料 注意保密**
+版本修订记录：
+| 版本 | 修订人 | 修订时间 | 审核人 | 审核时间 | 修订说明 |
+|---|---|---|---|---|---|
+| v0.1 | 合成作者 | 2026/09/11 | | | 首次建立 FR-001。 |
+## 目录
+- [背景、用户与目标](#1-背景用户与目标)
 ## 1. 背景、用户与目标
 用户需要核对当前选择集中的直线数量。
 ## 2. 范围与边界
@@ -31,8 +45,10 @@ status: 初版待核对
 - AC-001：FR-001 / BR-001：选择两条直线和一个圆，点击计数，显示 2；对象不变。
 ## 8. 风险与开放问题
 暂无需要共同判断的事项。
-## 9. 核对与版本记录
-初版待产品核对；尚未评审。
+## 9. 来源与参考资料
+| 来源 ID | 资料名称与位置 | 版本/日期及性质 | 本文使用位置 |
+|---|---|---|---|
+| SRC-001 | 合成输入 | 本轮输入 | FR-001 |
 '''
 
 
@@ -51,7 +67,7 @@ class ValidatorTests(unittest.TestCase):
 
     def test_complete_output_requires_template_headings(self):
         self.assertTrue(self.run_doc()['passed'])
-        for current, historical in [('核对与版本记录', '评审结论与版本记录'),
+        for current, historical in [('来源与参考资料', '核对与版本记录'),
                                     ('功能与交互规格', '命令与交互规格')]:
             with self.subTest(heading=historical):
                 legacy = COMPLETE.replace(current, historical)
@@ -92,7 +108,7 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(self.run_doc(text)['passed'])
 
     def test_dangling_and_duplicate_ids(self):
-        self.assertFalse(self.run_doc(COMPLETE + '\n参考 BR-999。')['passed'])
+        self.assertFalse(self.run_doc(COMPLETE + '\n## 补充规则\n参考 BR-999。')['passed'])
         self.assertFalse(self.run_doc(COMPLETE + '\n- BR-001：另一个规则。')['passed'])
 
     def test_table_and_formatted_definitions(self):
@@ -106,14 +122,14 @@ class ValidatorTests(unittest.TestCase):
                             '行为规则与边界：\n  - BR-001：计数规则')
         text = text.replace('暂无需要共同判断的事项。',
                             '| DEC-001 | 显示位置待确认 |')
-        text += '\n### 9.1 产品侧核对与后续讨论\n1. `DEC-001`：显示位置\n'
+        text = text.replace('初版待核对 |', '初版待核对，遗留问题参见 DEC-001 |')
         self.assertTrue(self.run_doc(text)['passed'])
 
     def test_reference_lists_do_not_define_missing_ids(self):
         for section, reference in [
             ('## 2. 范围与边界', '- FR-999 功能'),
             ('## 3. 功能与交互规格', '- BR-999：规则\n- NFR-999：约束'),
-            ('## 9. 核对与版本记录', '1. DEC-999：待确认'),
+            ('# 直线计数（合成案例）', '当前核对情况：DEC-999 待确认'),
         ]:
             with self.subTest(section=section):
                 result = self.run_doc(COMPLETE.replace(section, section + '\n' + reference))
@@ -178,15 +194,41 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(result['passed'])
 
     def test_historical_and_revision_id_references_are_exempt(self):
-        # 1. Historical references in Section 9.2 should not trigger undefined error
-        doc_with_revision = COMPLETE + '\n### 9.2 版本修订记录\n- v0.2: 废弃 BR-999，更新 FR-001。\n'
+        # Older revision layouts remain valid as source/history, not current rules.
+        doc_with_revision = COMPLETE + '\n## 历史记录\n### 9.2 版本修订记录\n- v0.2: 废弃 BR-999，更新 FR-001。\n'
         result = self.run_doc(doc_with_revision)
         self.assertTrue(result['passed'])
 
         # 2. Historical prefix in prose (e.g. 原 BR-888) should not trigger undefined error
-        doc_with_old_ref = COMPLETE + '\n本规则由原 BR-888 重构而来。\n'
+        doc_with_old_ref = COMPLETE + '\n## 补充说明\n本规则由原 BR-888 重构而来。\n'
         result = self.run_doc(doc_with_old_ref)
         self.assertTrue(result['passed'])
+
+    def test_front_revision_references_do_not_hide_current_errors(self):
+        text = COMPLETE.replace('首次建立 FR-001。', '迁移 FR-999、BR-998，当前功能见 FR-001。')
+        self.assertTrue(self.run_doc(text)['passed'])
+        # The end of the history table must restore checking, even without a heading.
+        text = text.replace('## 目录', '当前待确认：DEC-997。\n## 目录')
+        result = self.run_doc(text)
+        self.assertTrue(any('DEC-997' in e for e in result['errors']))
+
+    def test_historical_definitions_cannot_satisfy_current_requirements(self):
+        text = COMPLETE.replace('### FR-001 直线计数', '### 直线计数')
+        text = text.replace('| FR-001 | 直线计数 |', '| 直线计数 | 统计数量 |')
+        # A past definition must neither satisfy the current FR requirement nor
+        # make references to that missing current function valid.
+        text += '\n## 历史记录\n### 版本修订记录\n- FR-001：旧版功能。\n'
+        result = self.run_doc(text)
+        self.assertTrue(any('no FR- definition' in e for e in result['errors']))
+        self.assertTrue(any('IDs referenced but not defined: FR-001' in e for e in result['errors']))
+
+    def test_source_ids_remain_definitions_but_external_ids_are_exempt(self):
+        text = COMPLETE.replace('按 BR-001 显示数量。', '按 BR-001 显示数量，依据 SRC-001。')
+        text = text.replace('| 合成输入 |', '| 合成输入的 FR-999 / BR-999 |')
+        self.assertTrue(self.run_doc(text)['passed'])
+        # Only the reference section is exempt; later product rules still count.
+        result = self.run_doc(text + '\n## 补充规则\n本期还要求 FR-998。\n')
+        self.assertTrue(any('FR-998' in e for e in result['errors']))
 
 
 if __name__ == '__main__':

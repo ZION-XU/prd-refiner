@@ -22,7 +22,7 @@ CORE_HEADINGS = (
     ('## 4. 业务规则与异常处理',),
     ('## 5. 验收标准',),
     ('## 8. 风险与开放问题',),
-    ('## 9. 核对与版本记录',),
+    ('## 9. 来源与参考资料',),
 )
 ID_EXPR = r'(?:FR|BR|AC|DEC|NFR|RK|DEP|SRC|VAR)-\d{3}'
 ID_PATTERN = re.compile(r'\b' + ID_EXPR + r'\b')
@@ -63,6 +63,8 @@ def body_without_metadata(text: str) -> str:
 
 
 def definitions_in(text: str) -> list[str]:
+    # Revision records describe older versions; they do not define current rules.
+    text = without_record_sections(text, include_sources=False)
     # Markdown inline emphasis/code around IDs is only formatting.
     lines = [line.replace('**', '').replace('`', '') for line in text.splitlines()]
     heading_ids = [m.group(1) for line in lines if (m := HEADING_DEF.match(line))]
@@ -110,20 +112,39 @@ def template_markers_in(text: str) -> list[str]:
     return sorted(set(TEMPLATE_TAG_PATTERN.findall(text)))
 
 
-def filter_historical_and_source_references(text: str) -> str:
-    """Exclude version revision history, sources section, and historical prefixes from undefined ID checks."""
+def without_record_sections(text: str, *, include_sources: bool = True) -> str:
+    """Exclude headed records and the company's unheaded front revision table."""
     lines = []
-    in_history_or_sources = False
+    skip_level = None
+    in_front_revision_table = False
     for line in text.splitlines():
-        stripped = line.strip()
-        # Detect Section 9.2 (版本修订记录) and 9.3 (来源与参考资料)
-        if re.match(r'^#{2,3}\s+(?:9\.[23]|版本修订记录|来源与参考资料)\b', stripped):
-            in_history_or_sources = True
-        elif in_history_or_sources and re.match(r'^#{1,3}\s+', stripped):
-            in_history_or_sources = False
-        if not in_history_or_sources:
-            lines.append(line)
-    filtered = '\n'.join(lines)
+        stripped = line.replace('**', '').replace('`', '').strip()
+        heading = re.match(r'^(#{1,6})\s+(.+)$', stripped)
+        if heading:
+            level = len(heading.group(1))
+            if skip_level is not None and level <= skip_level:
+                skip_level = None
+            in_front_revision_table = False
+            title = re.sub(r'^\d+(?:\.\d+)*\.?\s*', '', heading.group(2)).rstrip('：:')
+            if skip_level is None and (title == '版本修订记录' or
+                                       (include_sources and title == '来源与参考资料')):
+                skip_level = level
+        if skip_level is not None:
+            continue
+        if stripped.rstrip('：:') == '版本修订记录':
+            in_front_revision_table = True
+            continue
+        if in_front_revision_table:
+            if not stripped or stripped.startswith('|'):
+                continue
+            in_front_revision_table = False
+        lines.append(line)
+    return '\n'.join(lines)
+
+
+def filter_historical_and_source_references(text: str) -> str:
+    """Exclude record sections and explicit historical prefixes from ID checks."""
+    filtered = without_record_sections(text)
     # Exclude historical ID patterns like "原 BR-002", "旧编号 BR-001", "废弃 FR-001", "历史 DEC-001"
     filtered = re.sub(r'(?:原|旧|废弃|历史|参考外部)(?:规则|功能|需求|决策|编号)?[:：\s]*' + ID_EXPR, '', filtered)
     return filtered
