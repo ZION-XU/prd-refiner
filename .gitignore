@@ -1,4 +1,4 @@
-# Operating systems and editors
+# OS and editors
 .DS_Store
 Thumbs.db
 Desktop.ini
@@ -7,42 +7,29 @@ Desktop.ini
 *.swp
 *~
 
-# Python / Node caches
+# Python and local execution
 __pycache__/
 *.py[cod]
-node_modules/
 .pytest_cache/
+.venv/
+.tmp/
+tmp/
 
-# Credentials and local configuration
+# Credentials and host-local configuration
 .env
 .env.*
 !.env.example
+*-PAT.txt
+credentials/
 *.pem
 *.key
 *.p12
 *.token
+.mcp.json
 
-# Analysis caches (never commit)
-.understand-anything/
-
-# Local plugin and package output
-dist/
-build/
-*.zip
-*.tar.gz
-*.tgz
-.tmp/
-tmp/
-
-# Generated PRD output and private source material
-ai-ready-prd.md
-clarification-log.md
-quality-report.md
+# Generated documents, private input and analysis caches
+/prd.md
 output/
 outputs/
 private-inputs/
-examples/private/
-
-# Versioned synthetic example package
-!examples/cad-layer-batch-state/output/
-!examples/cad-layer-batch-state/output/*.md
+.understand-anything/

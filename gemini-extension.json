@@ -1,6 +1,0 @@
-{
-  "name": "prd-refiner",
-  "description": "Explicit PRD clarification and restructuring workflow for product managers",
-  "version": "1.0.0",
-  "contextFileName": "GEMINI.md"
-}

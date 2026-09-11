@@ -1,34 +1,29 @@
-# PRD Refiner Repository Instructions
+# PRD Refiner 仓库维护说明
 
-## Source of truth
+本文件指导 AI 修改和维护仓库；Skill 的使用流程与业务规则统一在 `SKILL.md` 及其引用文件中维护。
 
-- Treat `skills/prd-refiner/` as the only business-logic source of truth.
-- Never copy or fork `SKILL.md`, requirement rules, or output templates into platform adapter directories.
-- Put platform-specific installation, tool mapping, and skill-registration logic in the corresponding adapter directory.
+## 产品基线
 
-## Product invariants
+- 功能与范围以用户最新要求及[产品 PRD](/D:/proposal/PRD-Refiner-产品需求文档.md)为依据；该链接是当前开发环境中的基线位置。
+- 产品行为、澄清责任或完成口径变化时，同步核对[课题母本](/D:/proposal/开题报告配套文档-母本-20260904.md)、产品 PRD 与 Skill；涉及填写或内容状态表达时同步模板。各文件按职责维护同一基线，历史记录不改写为当前验收证据。
+- 本产品辅助编写、优化 PRD 初版；团队协作定稿、正式评审和企业系统录入不属于当前范围。
+- 编写和优化统一使用 PRD 模板：模板定框架，Skill 辅助内容。旧稿映射后保留有效要求；局部修改限制内容变更范围，仅检查不改稿。
 
-- Require explicit user invocation. Do not add automatic PRD-context triggering or session-start injection.
-- Require Plan mode before Codex structured clarification.
-- Ask high-impact or dependent decisions individually.
-- Group only 2–3 independent questions whose answers do not change one another.
-- Never turn model inference into a confirmed product decision.
-- Preserve source links and independent `CL-xxx` records for every decision.
-- Keep the six required outputs: `ai-ready-prd.md`, `interaction-spec.md`, `clarification-log.md`, `traceability-matrix.md`, `quality-report.md`, and `evaluation-scorecard.md`.
+## 文件职责
 
-## Platform adapters
+- `SKILL.md`：运行入口、任务路由和关键决策规则。
+- `assets/prd-template.md`：唯一 PRD 模板，维护章节、字段、编号位置与简短填写提示；不放提问、工具调用或文件交付流程。
+- `references/`：按需读取的内容检查与操作规范；引用模板，不复制章节和字段清单。
+- `scripts/`：校验工具及回归测试；`agents/openai.yaml`：调用元数据。
+- `README.md`：面向使用者的简要说明。仓库根目录即完整独立的 Agent Skill，无需额外适配层或多套实现。
 
-- A platform adapter may register the shared `skills/` directory and map native tools.
-- Do not claim a platform is verified until a real installation and interaction test has been completed.
-- Do not add a manifest field for a connector, MCP server, hook, or app unless the corresponding implementation exists.
-- Keep Figma and other prototype integrations read-only by default; authentication belongs to the host environment.
+## 修改与验证
 
-## Validation
+- 保留与本次任务无关的用户改动；功能、模板或调用方式变化时，同步检查相关规则和说明。
+- 修改核心 Skill 后检查元信息与引用，并用代表性文稿验证受影响的行为；修改脚本后运行相关回归与语法检查。
+- 如实区分结构检查、模拟调用和实际宿主验证；未实测的能力不标为已验证。
 
-After changing core Skill content, run the Skill validator and cross-platform validator. After changing the Codex manifest, also run the Codex plugin validator. Run syntax checks for any adapter code changed.
+## 仓库清洁
 
-## Repository hygiene
-
-- Never commit credentials, access tokens, private PRDs, generated customer requirement packages, or local installation caches.
-- Keep examples synthetic or fully anonymized.
-- Update `RELEASE-NOTES.md` for user-visible behavior changes.
+- 不提交凭据、私有需求、生成文稿、安装缓存或分析缓存；测试材料使用合成或脱敏内容。
+- 版本历史由 Git 维护，不重新堆积重复文档、历史方案或无用配置。

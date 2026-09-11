@@ -1,0 +1,7 @@
+interface:
+  display_name: "PRD Refiner"
+  short_description: "辅助中望 CAD 产品人员编写、检查和优化可供团队讨论的 PRD 初版"
+  default_prompt: "使用 $prd-refiner，按本次目标编写或优化 PRD 初版，保留有效要求并标清待讨论事项。"
+
+policy:
+  allow_implicit_invocation: false
