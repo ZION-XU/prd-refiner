@@ -116,6 +116,60 @@ class ValidatorTests(unittest.TestCase):
         text = '# 旧稿\n| 功能 | 规则 |\n|---|---|\n| FR-002 | 计数 |\n- **BR-002**：FR-002 只计直线。\n- `AC-002`：BR-002 空集为零。'
         self.assertTrue(self.run_doc(text, 'existing')['passed'])
 
+    def test_name_first_output_with_linked_index_and_rule_anchor(self):
+        text = COMPLETE.replace('| FR-001 | 直线计数 |',
+                                '| [直线计数（FR-001）](#fr-001) | 显示数量 |')
+        text = text.replace('### FR-001 直线计数',
+                            '<a id="fr-001"></a>\n### 直线计数（FR-001）')
+        text = text.replace('用户点击计数，按 BR-001 显示数量。',
+                            '用户点击计数，显示所选直线数量，其他对象不计入；'
+                            '详见[计数对象范围（BR-001）](#br-001)。')
+        text = text.replace('| BR-001 |', '| <a id="br-001"></a>计数对象范围（BR-001） |')
+        text = text.replace('- AC-001：FR-001 / BR-001：',
+                            '- 混合对象计数（AC-001）：[直线计数（FR-001）](#fr-001)／'
+                            '[计数对象范围（BR-001）](#br-001)：')
+        text = text.replace('| SRC-001 |', '| 合成需求（SRC-001） |')
+        result = self.run_doc(text)
+        self.assertTrue(result['passed'], result)
+        # An unlinked name-first function index is also not a second definition.
+        text = text.replace('[直线计数（FR-001）](#fr-001) |', '直线计数（FR-001） |')
+        self.assertTrue(self.run_doc(text)['passed'])
+
+    def test_name_first_definitions_keep_duplicate_detection(self):
+        for definition in ('### 另一功能（FR-001）',
+                           '| 另一规则（BR-001） | 内容 |',
+                           '- 另一验收（AC-001）：结果',
+                           '| 1 | **另一规则(BR-001)** | 内容 |'):
+            with self.subTest(definition=definition):
+                result = self.run_doc(COMPLETE + '\n## 补充定义\n' + definition)
+                self.assertTrue(any('duplicate ID definition:' in e for e in result['errors']))
+
+    def test_named_references_do_not_define_missing_targets(self):
+        for reference in ('[未定义规则（BR-999）](#br-999)',
+                          '| [未定义规则（BR-999）](#br-999) | 概述 |',
+                          '- [未定义规则（BR-999）](#br-999)：概述',
+                          '| 关联内容 | 未定义规则（BR-999） |',
+                          '### [未定义规则（BR-999）](#br-999)'):
+            with self.subTest(reference=reference):
+                result = self.run_doc(COMPLETE + '\n## 补充引用\n' + reference)
+                self.assertTrue(any('IDs referenced but not defined: BR-999' in e
+                                    for e in result['errors']))
+        for section, reference in [('## 2. 范围与边界', '- 未定义功能（FR-999）'),
+                                   ('## 3. 功能与交互规格', '- 未定义规则（BR-999）')]:
+            result = self.run_doc(COMPLETE.replace(section, section + '\n' + reference))
+            self.assertTrue(any('IDs referenced but not defined:' in e for e in result['errors']))
+
+    def test_name_first_complex_rule_and_acceptance_headings(self):
+        text = COMPLETE.replace('| BR-001 | 只统计选择集中的直线；其他对象不计入；没有直线显示 0。 |',
+                                '### 4.1 计数对象范围（BR-001）\n仅计直线，空集显示 0。')
+        text = text.replace('- AC-001：', '### 混合对象计数(AC-001)\n')
+        text += ('\n## 6. 数据、系统变量与接口\n| 数据规则（BR-002） | 不保存计数结果 |'
+                 '\n## 7. 性能与非功能要求\n| 显示兼容（NFR-001） | 沿用产品显示规范 |'
+                 '\n## 8. 风险与开放问题\n- 显示位置（DEC-001）：待确认。'
+                 '\n- 理解偏差（RK-001）：需核对。')
+        result = self.run_doc(text)
+        self.assertTrue(result['passed'], result)
+
     def test_template_lists_are_references_not_definitions(self):
         text = COMPLETE.replace('仅统计直线，不修改对象。',
                                 '本期包含：\n  - **FR-001** 直线计数')

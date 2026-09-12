@@ -35,6 +35,13 @@ TEMPLATE_TAG_PATTERN = re.compile(r'【(?:核心|按需|多功能时填写)[^】
 HEADING_DEF = re.compile(r'^#{2,6}\s+(?:\d+(?:\.\d+)*\.?\s+)?(' + ID_EXPR + r')\b')
 LIST_DEF = re.compile(r'^\s*(?:[-*]|\d+\.)\s+(' + ID_EXPR + r')(?=\s|[:：]|$)')
 TABLE_DEF = re.compile(r'^\|\s*(?:(?:\d+|[-*#])\s*\|\s*)?(' + ID_EXPR + r')(?=\s|[:：]|\|)')
+# Name-first declarations are bounded to a heading, list label or first data cell.
+# Linked labels are references, so they must not satisfy missing definitions.
+NAMED_ID = r'[^|\[\]\n]+?[（(](' + ID_EXPR + r')[）)]'
+NAMED_HEADING_DEF = re.compile(r'^#{2,6}\s+' + NAMED_ID + r'\s*(?:#+\s*)?$')
+NAMED_LIST_DEF = re.compile(r'^\s*(?:[-*]|\d+\.)\s+' + NAMED_ID + r'(?=\s|[:：]|$)')
+NAMED_TABLE_DEF = re.compile(r'^\|\s*(?:(?:\d+|[-*#])\s*\|\s*)?' + NAMED_ID + r'\s*\|')
+EMPTY_ANCHOR = re.compile(r'<a\s+(?:id|name)\s*=\s*["\'][^"\']*["\']\s*>\s*</a>', re.IGNORECASE)
 INLINE_IMAGE = re.compile(r'!\[[^\]\n]*\]\(\s*(<[^>\n]+>|[^\s)]+)(?:\s+["\'][^\n]*?["\'])?\s*\)')
 REFERENCE_IMAGE = re.compile(r'!\[([^\]\n]*)\]\[([^\]\n]*)\]')
 REFERENCE_LINK = re.compile(r'^\s*\[([^\]]+)\]:\s*(<[^>\n]+>|\S+)', re.MULTILINE)
@@ -67,15 +74,17 @@ def definitions_in(text: str) -> list[str]:
     # Revision records describe older versions; they do not define current rules.
     text = without_record_sections(text, include_sources=False)
     # Markdown inline emphasis/code around IDs is only formatting.
-    lines = [line.replace('**', '').replace('`', '') for line in text.splitlines()]
-    heading_ids = [m.group(1) for line in lines if (m := HEADING_DEF.match(line))]
+    lines = [EMPTY_ANCHOR.sub('', line).replace('**', '').replace('`', '')
+             for line in text.splitlines()]
+    heading_ids = [m.group(1) for line in lines
+                   if (m := HEADING_DEF.match(line) or NAMED_HEADING_DEF.match(line))]
     definitions = list(heading_ids)
     section = ''
     for line in lines:
         heading = re.match(r'^##\s+(?:\d+\.\s*)?(.+)$', line)
         if heading:
             section = heading.group(1).split('【', 1)[0].strip()
-        match = LIST_DEF.match(line)
+        match = LIST_DEF.match(line) or NAMED_LIST_DEF.match(line)
         if match:
             item = match.group(1)
             # These template sections list references, not new definitions.
@@ -86,7 +95,7 @@ def definitions_in(text: str) -> list[str]:
             }.get(section, ())
             if not item.startswith(reference_prefixes):
                 definitions.append(item)
-        match = TABLE_DEF.match(line)
+        match = TABLE_DEF.match(line) or NAMED_TABLE_DEF.match(line)
         if match:
             item = match.group(1)
             # A functional heading is authoritative; its FR table row is an index.
