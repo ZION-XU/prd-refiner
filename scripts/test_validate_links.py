@@ -41,6 +41,59 @@ STORAGE = '''<h2>2. 范围与边界</h2>
 
 
 class ReferenceTests(unittest.TestCase):
+    def location_document(self):
+        return MARKDOWN.replace('[直线计数（FR-001）](#fr-001)',
+                                '〔直线计数（FR-001）；位置：3. 功能与交互规格〕').replace(
+                                    '[计数对象范围（BR-001）](#br-001)',
+                                    '〔计数对象范围（BR-001）；位置：4. 业务规则与异常处理〕')
+
+    def test_location_fallback_requires_explicit_policy(self):
+        text = self.location_document()
+        self.assertTrue(any('unlinked reference' in f for f in inspect(text)))
+        self.assertEqual(inspect(text, reference_policy='location'), [])
+
+    def test_location_fallback_checks_name_definition_and_heading(self):
+        text = self.location_document()
+        cases = [
+            text.replace('〔直线计数（FR-001）', '〔错误名称（FR-001）'),
+            text.replace('位置：3. 功能与交互规格', '位置：2. 范围与边界'),
+            text.replace('位置：3. 功能与交互规格', '位置：不存在的章节'),
+            text.replace('〔直线计数（FR-001）', '〔直线计数（FR-999）'),
+            text + '\n## 3. 功能与交互规格\n同名章。',
+            text + '\n### 直线计数（FR-001）\n重复定义。',
+        ]
+        for candidate in cases:
+            with self.subTest(candidate=candidate):
+                self.assertTrue(inspect(candidate, reference_policy='location'))
+
+    def test_location_mode_does_not_allow_bare_ids_or_broken_links(self):
+        for suffix in ('\n引用 FR-001。', '\n直线计数（FR-001）。',
+                       '\n[直线计数（FR-001）](#missing)',
+                       '\n〔直线计数（FR-001）〕'):
+            with self.subTest(suffix=suffix):
+                self.assertTrue(inspect(self.location_document() + suffix, reference_policy='location'))
+
+    def test_location_storage_and_exact_subsection(self):
+        text = STORAGE + '<p>〔直线计数（FR-001）；位置：3. 功能与交互规格〕</p>'
+        self.assertEqual(inspect(text, 'storage', 'location'), [])
+        self.assertEqual(inspect(self.location_document().replace(
+            '位置：3. 功能与交互规格', '位置：3.2 直线计数（FR-001）'),
+            reference_policy='location'), [])
+
+    def test_location_cli_reports_limitation_and_does_not_modify_document(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'prd.md'
+            path.write_text(self.location_document(), encoding='utf-8')
+            before = path.read_bytes()
+            command = [sys.executable, '-B', str(Path(__file__).with_name('validate_links.py')),
+                       str(path), '--reference-policy', 'location', '--json']
+            output = subprocess.run(command, capture_output=True, encoding='utf-8')
+            self.assertEqual(output.returncode, 0, output.stderr)
+            result = json.loads(output.stdout)
+            self.assertTrue(result['passed'], result)
+            self.assertTrue(result['warnings'])
+            self.assertEqual(path.read_bytes(), before)
+
     def assert_finding(self, text, finding, format='markdown'):
         result = inspect(text, format)
         self.assertTrue(any(finding in message for message in result), result)

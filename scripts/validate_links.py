@@ -25,6 +25,7 @@ REF_DEF = re.compile(r'^\s*\[([^\]]+)\]:\s*(<[^>\n]+>|\S+)\s*.*$')
 REF_USE = re.compile(r'(?<!!)\[([^\]\n]+)\]\[([^\]\n]*)\]')
 SHORT_REF = re.compile(r'(?<!!)\[([^\]\n]+)\]')
 NAMED_LABEL = re.compile(r'^(.+?)[（(](' + ID_EXPR + r')[）)]$')
+LOCATION_REF = re.compile(r'〔([^〔〕\n]+?)[；;]\s*位置[：:]\s*([^〔〕\n]+)〕')
 
 
 def plain(text: str) -> str:
@@ -135,7 +136,9 @@ def active_lines(text: str) -> list[str]:
     return lines
 
 
-def inspect(text: str, format: str = 'markdown') -> list[str]:
+def inspect(text: str, format: str = 'markdown', reference_policy: str = 'linked') -> list[str]:
+    if reference_policy not in {'linked', 'location'}:
+        raise ValueError('unsupported reference policy: ' + reference_policy)
     if format == 'storage':
         text = storage_markdown(text)
     lines = active_lines(text)
@@ -144,6 +147,7 @@ def inspect(text: str, format: str = 'markdown') -> list[str]:
     definition_names = {}
     line_definitions = {}
     headings = []
+    heading_titles = defaultdict(list)
     anchors = defaultdict(list)
     links = []
     refs = {}
@@ -164,6 +168,7 @@ def inspect(text: str, format: str = 'markdown') -> list[str]:
         if heading:
             level = len(heading[1])
             headings.append((i, level))
+            heading_titles[heading[2]].append((i, level))
             if level == 2:
                 section = re.sub(r'^\d+\.?\s*', '', heading[2]).strip()
             if format == 'markdown':
@@ -229,6 +234,30 @@ def inspect(text: str, format: str = 'markdown') -> list[str]:
 
         remainder = SHORT_REF.sub(take_short, remainder)
         remainder = re.sub(r'<[^>]*>|https?://\S+', '', remainder)
+
+        def take_location(match):
+            label, title = plain(match[1]), plain(match[2])
+            named = NAMED_LABEL.fullmatch(label)
+            if not named or not named[1].strip() or len(ID_PATTERN.findall(label)) != 1:
+                findings.append(f'line {i + 1}: location reference must use one name (ID): {label}')
+                return ''
+            name, item = named[1].strip(), named[2]
+            locations = definitions.get(item, [])
+            if len(locations) != 1 or definition_names.get(item) != name:
+                findings.append(f'line {i + 1}: location reference name or unique definition mismatch: {item}')
+                return ''
+            targets = heading_titles.get(title, [])
+            if len(targets) != 1:
+                findings.append(f'line {i + 1}: missing or ambiguous location heading: {title}')
+                return ''
+            start, level = targets[0]
+            end = next((n for n, depth in headings if n > start and depth <= level), len(lines))
+            if not start <= locations[0] < end:
+                findings.append(f'line {i + 1}: location does not contain definition {item}: {title}')
+            return ''
+
+        if reference_policy == 'location':
+            remainder = LOCATION_REF.sub(take_location, remainder)
         bare = ID_PATTERN.findall(remainder)
         if i in line_definitions and line_definitions[i] in bare:
             bare.remove(line_definitions[i])
@@ -275,13 +304,17 @@ def inspect(text: str, format: str = 'markdown') -> list[str]:
     return findings
 
 
-def validate(target: Path, format: str = 'markdown', profile: str = 'template') -> dict:
+def validate(target: Path, format: str = 'markdown', profile: str = 'template',
+             reference_policy: str = 'linked') -> dict:
     result = {'document': str(target), 'format': format, 'profile': profile,
+              'reference_policy': reference_policy,
               'errors': [], 'warnings': [],
               'scope': 'Static PRD references only; no name semantics, remote access or rendered navigation verification.'}
     try:
-        findings = inspect(target.read_text(encoding='utf-8-sig'), format)
+        findings = inspect(target.read_text(encoding='utf-8-sig'), format, reference_policy)
         result['errors' if profile == 'template' else 'warnings'] = findings
+        if reference_policy == 'location':
+            result['warnings'].append('Location fallback enabled: verify reader limitation; clickable navigation is not certified.')
     except (OSError, UnicodeError, ValueError, ET.ParseError) as exc:
         result['errors'].append(f'cannot inspect document: {exc}')
     result['passed'] = not result['errors']
@@ -293,9 +326,11 @@ def main() -> int:
     parser.add_argument('document', type=Path)
     parser.add_argument('--format', choices=('markdown', 'storage'), default='markdown')
     parser.add_argument('--profile', choices=('template', 'draft', 'existing'), default='template')
+    parser.add_argument('--reference-policy', choices=('linked', 'location'), default='linked',
+                        help='location only when navigation is unavailable; requires named references with exact heading locations')
     parser.add_argument('--json', action='store_true')
     args = parser.parse_args()
-    result = validate(args.document, args.format, args.profile)
+    result = validate(args.document, args.format, args.profile, args.reference_policy)
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

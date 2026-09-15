@@ -21,6 +21,24 @@ BODY = LAYOUT.replace('{{FRONT_MATTER_STORAGE}}', '<p>合成文档信息</p>').r
 
 
 class DeliveryTests(unittest.TestCase):
+    def test_source_images_checked_in_both_outputs_and_remote_only(self):
+        source = self.root / 'source.html'
+        source.write_text('<img src="https://example.invalid/prototype.png"/>', encoding='utf-8')
+        result = self.check(source=source)
+        self.assertFalse(result['passed'])
+        self.assertEqual(result['markdown_image_comparison']['output_references'], 0)
+        self.assertEqual(result['storage_image_comparison']['output_references'], 0)
+        self.assertFalse(validate(self.xml, self.root, remote_only=True, source=source)['passed'])
+
+    def test_markdown_images_lost_during_storage_conversion_are_detected(self):
+        self.md.write_text(MD + '\n![prototype](https://example.invalid/a.png)', encoding='utf-8')
+        result = self.check(image_policy='external')
+        self.assertFalse(result['passed'])
+        self.assertEqual(result['format_image_comparison']['source_references'], 1)
+        self.assertTrue(any('output has none' in e for e in result['errors']))
+        self.xml.write_text(BODY + '<ac:image><ri:attachment ri:filename="a.png"/></ac:image>', encoding='utf-8')
+        self.assertTrue(self.check(image_policy='external')['passed'])
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -39,6 +57,18 @@ class DeliveryTests(unittest.TestCase):
         self.assertTrue(result['passed'], result)
         self.assertEqual(result['rendered'], 'unverified')
         self.assertEqual(before, (self.md.read_bytes(), self.xml.read_bytes()))
+
+    def test_location_policy_reaches_markdown_and_storage_checks(self):
+        note = '〔直线计数（FR-001）；位置：3. 功能与交互规格〕'
+        self.md.write_text(MD.replace('[直线计数（FR-001）](#fr-001)', note), encoding='utf-8')
+        self.xml.write_text(BODY + '<p>' + note + '</p>', encoding='utf-8')
+        self.assertFalse(self.check()['passed'])
+        result = self.check(reference_policy='location')
+        self.assertTrue(result['passed'], result)
+        self.assertTrue(result['warnings'])
+        self.assertEqual(result['rendered'], 'unverified')
+        self.xml.write_text(BODY + '<p>' + note.replace('3. 功能与交互规格', '2. 范围与边界') + '</p>', encoding='utf-8')
+        self.assertFalse(self.check(reference_policy='location')['passed'])
 
     def test_converter_heading_slug_does_not_match_short_id(self):
         self.xml.write_text(BODY.replace('>fr-001</ac:parameter>', '>直线计数fr-001</ac:parameter>'), encoding='utf-8')

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from validate_prd import validate
+from validate_prd import validate, image_reference_count
 
 
 COMPLETE = '''# 直线计数（合成案例）
@@ -54,6 +54,56 @@ COMPLETE = '''# 直线计数（合成案例）
 
 
 class ValidatorTests(unittest.TestCase):
+    def test_source_images_cannot_all_disappear_in_complete_output(self):
+        source = self.root / 'source.html'
+        source.write_text('<table><tr><td><img src="https://example.invalid/prototype.png"/></td></tr></table>', encoding='utf-8')
+        self.prd.write_text(COMPLETE, encoding='utf-8')
+        before = self.prd.read_bytes()
+        result = validate(self.prd, source=source)
+        self.assertFalse(result['passed'])
+        self.assertEqual(result['image_comparison']['source_references'], 1)
+        self.assertTrue(any('output has none' in e for e in result['errors']))
+        self.assertEqual(self.prd.read_bytes(), before)
+        draft = validate(self.prd, 'draft', source=source)
+        self.assertTrue(draft['passed'], draft)
+        self.assertTrue(any('output has none' in w for w in draft['warnings']))
+
+    def test_image_count_understands_markup_but_not_examples_or_filenames(self):
+        text = '''![main](a.png)
+![detail][shot]
+[shot]: b.png
+<table><tr><td><img src="c.png"/></td></tr></table>
+<ac:image><ri:attachment ri:filename="d.png"/></ac:image>
+only-a-filename.png
+<!-- <img src="hidden.png"/> -->
+```html
+<img src="example.png"/>
+```
+'''
+        self.assertEqual(image_reference_count(text), 4)
+
+    def test_source_image_reduction_is_reported_without_assuming_one_to_one(self):
+        source = self.root / 'source.md'
+        source.write_text('![a](a.png)\n![b](b.png)', encoding='utf-8')
+        self.prd.write_text(COMPLETE + '\n![combined](https://example.invalid/combined.png)', encoding='utf-8')
+        result = validate(self.prd, image_policy='external', source=source)
+        self.assertTrue(result['passed'], result)
+        self.assertTrue(any('fewer image references' in w for w in result['warnings']))
+        source.write_text('No pictures in this source.', encoding='utf-8')
+        self.prd.write_text(COMPLETE, encoding='utf-8')
+        self.assertTrue(validate(self.prd, source=source)['passed'])
+        self.assertFalse(validate(self.prd, source=self.root / 'missing.md')['passed'])
+
+    def test_source_image_cli_rejects_lost_images(self):
+        source = self.root / 'source.md'
+        source.write_text('![prototype](https://example.invalid/a.png)', encoding='utf-8')
+        self.prd.write_text(COMPLETE, encoding='utf-8')
+        output = subprocess.run([sys.executable, '-B', str(Path(__file__).with_name('validate_prd.py')),
+                                 str(self.prd), '--source', str(source), '--json'],
+                                capture_output=True, encoding='utf-8')
+        self.assertEqual(output.returncode, 1, output.stderr)
+        self.assertTrue(any('output has none' in e for e in json.loads(output.stdout)['errors']))
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)

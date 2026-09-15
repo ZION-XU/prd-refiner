@@ -167,12 +167,46 @@ class HTMLImages(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.targets = []
         self.has_srcset = False
+        self.native_count = 0
 
     def handle_starttag(self, tag, attrs):
+        if tag.casefold() == 'ac:image':
+            self.native_count += 1
         if tag.casefold() == 'img':
             values = dict(attrs)
             self.targets.append(values.get('src') or '')
             self.has_srcset |= 'srcset' in values
+
+
+def image_reference_count(text: str) -> int:
+    """Count embedded references, not attachments or filenames in prose."""
+    text = without_fenced_code(re.sub(r'<!--[\s\S]*?-->', '', text))
+    images = HTMLImages()
+    images.feed(text)
+    return (len(images.targets) + images.native_count +
+            len(INLINE_IMAGE.findall(text)) + len(REFERENCE_IMAGE.findall(text)))
+
+
+def compare_image_counts(source_count: int, output_count: int, errors: list[str],
+                         warnings: list[str], profile: str = 'template') -> dict:
+    if source_count and not output_count:
+        (errors if profile == 'template' else warnings).append(
+            'source contains images but output has none; preserve source images or report an explicit omission')
+    elif output_count < source_count:
+        warnings.append('fewer image references than source; reconcile retained, replaced and omitted images individually')
+    return {'source_references': source_count, 'output_references': output_count,
+            'scope': 'Counts only; image identity, justified omissions and visual content require review.'}
+
+
+def compare_source_images(source: Path, output: str, errors: list[str],
+                          warnings: list[str], profile: str = 'template') -> dict | None:
+    try:
+        original = source.read_text(encoding='utf-8-sig')
+    except (OSError, UnicodeError) as exc:
+        errors.append(f'cannot read source image baseline: {type(exc).__name__}: {source}')
+        return None
+    return compare_image_counts(image_reference_count(original), image_reference_count(output),
+                                errors, warnings, profile)
 
 
 def check_images(text: str, parent: Path, errors: list[str], warnings: list[str],
@@ -237,7 +271,8 @@ def check_images(text: str, parent: Path, errors: list[str], warnings: list[str]
                 errors.append(f'local image could not be inspected: {file_path}')
 
 
-def validate(target: Path, profile: str = 'template', image_policy: str | None = None) -> dict:
+def validate(target: Path, profile: str = 'template', image_policy: str | None = None,
+             *, source: Path | None = None) -> dict:
     if profile not in {'template', 'draft', 'existing'}:
         raise ValueError(f'unknown profile: {profile}')
     if image_policy is None:
@@ -294,6 +329,8 @@ def validate(target: Path, profile: str = 'template', image_policy: str | None =
     if undefined:
         errors.append('IDs referenced but not defined: ' + ', '.join(undefined))
     check_images(body, prd.parent, errors, warnings, image_policy=image_policy, profile=profile)
+    if source is not None:
+        result['image_comparison'] = compare_source_images(source, text, errors, warnings, profile)
     result['passed'] = not errors
     return result
 
@@ -304,12 +341,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--profile', choices=('template', 'draft', 'existing'), default='template',
                         help='template: new/optimized output; draft: unfinished output; existing: input-only diagnostic')
     parser.add_argument('--json', action='store_true', help='emit machine-readable results')
+    parser.add_argument('--source', type=Path, help='original Markdown/HTML/Storage snapshot for image-retention checks')
     parser.add_argument('--image-policy', choices=('local', 'external'), default=None,
                         help='default: local for output, external for existing input; external output requires an explicit user choice')
     args = parser.parse_args(argv)
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
-    result = validate(args.target, args.profile, args.image_policy)
+    result = validate(args.target, args.profile, args.image_policy, source=args.source)
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

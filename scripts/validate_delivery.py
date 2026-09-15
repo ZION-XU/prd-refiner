@@ -16,6 +16,7 @@ import xml.etree.ElementTree as ET
 
 from validate_links import active_lines, inspect, parse_storage, storage_markdown
 from validate_prd import validate as validate_prd, definitions_in, ID_PATTERN
+from validate_prd import compare_source_images, compare_image_counts, image_reference_count
 
 AC = '{urn:ac}'
 
@@ -122,11 +123,15 @@ def inspect_toc(text: str, layout: str = 'floating') -> list[str]:
 
 def validate(storage: Path, workspace: Path, markdown: Path | None = None, *,
              output_dir: Path | None = None, remote_only: bool = False,
-             layout: str = 'floating', image_policy: str = 'local') -> dict:
+             layout: str = 'floating', image_policy: str = 'local',
+             reference_policy: str = 'linked', source: Path | None = None) -> dict:
     result = {'storage': str(storage), 'markdown': str(markdown) if markdown else None,
               'errors': [], 'warnings': [], 'rendered': 'unverified',
               'scope': 'Static delivery checks only; verify content parity, authorized diff and rendered behavior separately.'}
     errors = result['errors']
+    result['reference_policy'] = reference_policy
+    if reference_policy == 'location':
+        result['warnings'].append('Location fallback enabled: verify reader limitation; clickable navigation is not certified.')
     md_text = None
     if remote_only and markdown is not None:
         errors.append('remote-only conflicts with a supplied Markdown delivery')
@@ -144,19 +149,26 @@ def validate(storage: Path, workspace: Path, markdown: Path | None = None, *,
                 errors.append('hidden artifact paths are not local Markdown delivery')
             if actual.suffix.lower() != '.md':
                 errors.append('local delivery must be a .md file')
-            checked = validate_prd(markdown, 'template', image_policy)
+            checked = validate_prd(markdown, 'template', image_policy, source=source)
+            if source is not None:
+                result['markdown_image_comparison'] = checked.get('image_comparison')
             errors.extend('Markdown: ' + e for e in checked['errors'])
             result['warnings'].extend('Markdown: ' + w for w in checked['warnings'])
             try:
                 md_text = markdown.read_text(encoding='utf-8-sig')
-                errors.extend('Markdown: ' + e for e in inspect(md_text))
+                errors.extend('Markdown: ' + e for e in inspect(md_text, reference_policy=reference_policy))
             except (OSError, UnicodeError) as exc:
                 errors.append(f'cannot read Markdown: {exc}')
     try:
         body = storage.read_text(encoding='utf-8-sig')
         if not body.strip():
             errors.append('empty Storage body')
-        errors.extend('Storage: ' + e for e in inspect(body, 'storage'))
+        if source is not None:
+            result['storage_image_comparison'] = compare_source_images(source, body, errors, result['warnings'])
+        if md_text is not None:
+            result['format_image_comparison'] = compare_image_counts(
+                image_reference_count(md_text), image_reference_count(body), errors, result['warnings'])
+        errors.extend('Storage: ' + e for e in inspect(body, 'storage', reference_policy))
         errors.extend(inspect_native_references(body))
         for node in parse_storage(body).iter(AC + 'structured-macro'):
             if node.get(AC + 'name') in {'code', 'noformat'}:
@@ -180,10 +192,13 @@ def main() -> int:
     parser.add_argument('storage', type=Path)
     parser.add_argument('--workspace', required=True, type=Path)
     parser.add_argument('--markdown', type=Path)
+    parser.add_argument('--source', type=Path, help='original Markdown/HTML/Storage snapshot for image-retention checks')
     parser.add_argument('--output-dir', type=Path, help='Only for a user-selected output folder')
     parser.add_argument('--remote-only', action='store_true', help='Only when user explicitly requests no local output')
     parser.add_argument('--layout', choices=('floating', 'inline'), default='floating', help='inline only for an explicit user choice')
     parser.add_argument('--image-policy', choices=('local', 'external'), default='local')
+    parser.add_argument('--reference-policy', choices=('linked', 'location'), default='linked',
+                        help='location only when actual navigation is unavailable')
     args = parser.parse_args()
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
