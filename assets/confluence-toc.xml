@@ -1,0 +1,22 @@
+<ac:layout>
+  <ac:layout-section ac:type="two_right_sidebar">
+    <ac:layout-cell>{{FRONT_MATTER_STORAGE}}</ac:layout-cell>
+    <ac:layout-cell>
+      <div class="zwFloatingTocRight">
+        <ac:structured-macro ac:name="expand" ac:schema-version="1">
+          <ac:parameter ac:name="title">页面目录（展开／折叠）</ac:parameter>
+          <ac:rich-text-body>
+            <ac:structured-macro ac:name="toc" ac:schema-version="1">
+              <ac:parameter ac:name="minLevel">2</ac:parameter>
+              <ac:parameter ac:name="maxLevel">3</ac:parameter>
+              <ac:parameter ac:name="exclude">^目录$</ac:parameter>
+            </ac:structured-macro>
+          </ac:rich-text-body>
+        </ac:structured-macro>
+      </div>
+    </ac:layout-cell>
+  </ac:layout-section>
+  <ac:layout-section ac:type="single">
+    <ac:layout-cell>{{BODY_STORAGE}}</ac:layout-cell>
+  </ac:layout-section>
+</ac:layout>
