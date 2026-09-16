@@ -1,7 +1,7 @@
 interface:
   display_name: "PRD Refiner"
   short_description: "辅助中望 CAD 产品人员编写、检查和优化可供团队讨论的 PRD 初版"
-  default_prompt: "使用 $prd-refiner 优化这份 PRD：Confluence 来源先下载正文和引用图片并通过本地快照门禁，再审查资料；仅对需要我决定的实质问题提问。写回 Confluence 前将 Mermaid 渲染为 PNG，并把全部本地图片转为已上传的附件引用后核对。"
+  default_prompt: "使用 $prd-refiner 优化这份 PRD：Confluence 来源先下载正文和引用图片并通过本地快照门禁，再审查资料；仅对需要我决定的实质问题提问，有可用的宿主原生提问工具时用工具发问。写回 Confluence 前将 Mermaid 渲染为 PNG，并把全部本地图片转为已上传的附件引用后核对。"
 
 policy:
   allow_implicit_invocation: false

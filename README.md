@@ -17,9 +17,9 @@ $prd-refiner 修改 FR-002，保持其他功能并检查相关验收。
 
 ## 文件与加载
 
-- [SKILL.md](SKILL.md)：对话节奏、修改边界、读取时机。
-- [内容规范](references/prd-standard.md)：首次分析读取；依据、规则、验收和内容复核。
-- [模板](assets/prd-template.md)与 [交付规范](references/delivery.md)：成稿、保存与检查时读取。
+- [SKILL.md](SKILL.md)：任务入口、必要澄清和按阶段读取／写入路由。
+- [内容规范](references/prd-standard.md)与 [模板](assets/prd-template.md)：完整稿任务首次分析时同时读取；前者规定依据、适用性、澄清和内容复核，后者提示覆盖范围并承载最终章节与字段。讨论仍按业务场景，成稿时才映射章节。
+- [交付规范](references/delivery.md)：成稿保存与交付检查时读取。
 - [图片规范](references/prototype-analysis.md)：涉及图片／原型时读取。
 - [Confluence 规范](references/publish-confluence.md)：仅明确写入平台时读取，复用 [布局骨架](assets/confluence-toc.xml)。
 - `scripts/`：结构、引用及组合交付检查、Mermaid PNG 渲染与回归测试；执行无需通读源码。
