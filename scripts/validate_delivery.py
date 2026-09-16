@@ -8,17 +8,86 @@ Exceptions describe explicit user choices; the script cannot verify consent.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
 import sys
 import xml.etree.ElementTree as ET
 
+from build_snapshot import valid_image
 from validate_links import active_lines, inspect, parse_storage, storage_markdown
 from validate_prd import validate as validate_prd, definitions_in, ID_PATTERN
 from validate_prd import compare_source_images, compare_image_counts, image_reference_count
 
 AC = '{urn:ac}'
+
+
+def mermaid_blocks(text: str) -> tuple[list[str], bool]:
+    """Extract active Mermaid fenced blocks and report an unclosed block."""
+    blocks = []
+    marker = None
+    capture = False
+    buffered = []
+    for line in text.splitlines(keepends=True):
+        fence = re.match(r'^\s{0,3}(`{3,}|~{3,})(.*)$', line.rstrip('\r\n'))
+        if marker is None and fence:
+            marker = fence.group(1)
+            info = fence.group(2).strip().split(None, 1)
+            capture = bool(info and info[0].casefold() == 'mermaid')
+            buffered = []
+        elif marker and fence and fence.group(1)[0] == marker[0] and len(fence.group(1)) >= len(marker) and not fence.group(2).strip():
+            if capture:
+                blocks.append(''.join(buffered).replace('\r\n', '\n').strip())
+            marker = None
+            capture = False
+            buffered = []
+        elif marker and capture:
+            buffered.append(line)
+    return blocks, bool(marker and capture)
+
+
+def mermaid_asset_stem(source: str) -> str:
+    digest = hashlib.sha256(source.encode('utf-8')).hexdigest()[:12]
+    return f'mermaid-{digest}'
+
+
+def inspect_mermaid_delivery(markdown: str, storage: str, workspace: Path) -> tuple[dict, list[str]]:
+    blocks, unclosed = mermaid_blocks(markdown)
+    stems = sorted({mermaid_asset_stem(block) for block in blocks})
+    local_files = {
+        path.name: path for path in workspace.rglob('*')
+        if path.is_file() and path.suffix.casefold() == '.png'
+    }
+    attachment_names = set(re.findall(
+        r'<ri:attachment\b[^>]*\bri:filename=["\']([^"\']+)["\']', storage, re.IGNORECASE))
+    errors = []
+    if unclosed:
+        errors.append('Markdown contains an unclosed Mermaid fenced block')
+    for stem in stems:
+        expected = stem + '.png'
+        local = expected in local_files and valid_image(local_files[expected])
+        remote = expected in attachment_names
+        if not local:
+            errors.append(f'Mermaid diagram lacks rendered local PNG: {expected}')
+        if not remote:
+            errors.append(f'Mermaid diagram lacks Confluence PNG attachment reference: {expected}')
+    if re.search(r'(?:```|~~~)\s*mermaid\b', storage, re.IGNORECASE):
+        errors.append('Storage must replace Mermaid fences with uploaded attachment images')
+    try:
+        for node in parse_storage(storage).iter(AC + 'structured-macro'):
+            if node.get(AC + 'name') not in {'code', 'noformat'}:
+                continue
+            parameters = ' '.join(''.join(p.itertext()) for p in node.findall(AC + 'parameter'))
+            if 'mermaid' in parameters.casefold():
+                errors.append('Storage must not publish Mermaid as a code/noformat macro')
+    except (ValueError, ET.ParseError):
+        pass
+    return {
+        'source_blocks': len(blocks),
+        'expected_assets': [stem + '.png' for stem in stems],
+        'attachment_references': sorted(attachment_names),
+    }, errors
 
 
 def inspect_native_references(text: str) -> list[str]:
@@ -98,6 +167,16 @@ def inspect_toc(text: str, layout: str = 'floating') -> list[str]:
         if re.search(r'(?:^|;)\s*(?:position|top|right|left|bottom|inset(?:-[\w-]+)?)\s*:',
                      container.get('style', ''), re.I):
             errors.append('floating container must not depend on inline positioning')
+        styles = {}
+        for declaration in container.get('style', '').split(';'):
+            if ':' not in declaration:
+                continue
+            name, value = declaration.split(':', 1)
+            styles[name.strip().casefold()] = value.strip().casefold()
+        if styles.get('background-color') != '#ffffff':
+            errors.append('floating container must keep opaque background-color: #ffffff')
+        if styles.get('z-index') != '1000':
+            errors.append('floating container must keep z-index: 1000')
         cell = next((a for a in ancestors(container) if a.tag == AC + 'layout-cell'), None)
         section = parents.get(cell)
         native_layout = parents.get(section)
@@ -168,11 +247,15 @@ def validate(storage: Path, workspace: Path, markdown: Path | None = None, *,
         if md_text is not None:
             result['format_image_comparison'] = compare_image_counts(
                 image_reference_count(md_text), image_reference_count(body), errors, result['warnings'])
+            result['mermaid_delivery'], mermaid_errors = inspect_mermaid_delivery(
+                md_text, body, workspace.resolve())
+            errors.extend(mermaid_errors)
         errors.extend('Storage: ' + e for e in inspect(body, 'storage', reference_policy))
         errors.extend(inspect_native_references(body))
-        for node in parse_storage(body).iter(AC + 'structured-macro'):
-            if node.get(AC + 'name') in {'code', 'noformat'}:
-                errors.append('avoid code/noformat macros in PRD delivery; render diagrams or preserve necessary code separately')
+        if layout == 'floating':
+            for node in parse_storage(body).iter(AC + 'structured-macro'):
+                if node.get(AC + 'name') in {'code', 'noformat'}:
+                    errors.append('floating directory layout cannot contain code/noformat macros')
         errors.extend(inspect_toc(body, layout))
         normalized = storage_markdown(body)
         storage_ids = set(definitions_in('\n'.join(active_lines(normalized))))

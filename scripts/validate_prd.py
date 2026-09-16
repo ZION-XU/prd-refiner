@@ -122,6 +122,32 @@ def template_markers_in(text: str) -> list[str]:
     return sorted(set(TEMPLATE_TAG_PATTERN.findall(text)))
 
 
+def check_empty_echo_headings(body: str, errors: list[str]) -> None:
+    """Detect and forbid empty echo headings like '见上表详细定义'."""
+    lines = body.splitlines()
+    i = 0
+    n = len(lines)
+    while i < n:
+        line = lines[i].strip()
+        # Look for section headings defining an ID
+        if re.match(r'^#{2,6}\s+[^|\n]+?[（(](' + ID_EXPR + r')[）)]\s*#*$', line):
+            heading_title = line
+            prose_lines = []
+            j = i + 1
+            while j < n and not re.match(r'^#{1,6}\s+', lines[j].strip()):
+                cleaned = lines[j].strip()
+                if cleaned and not cleaned.startswith('<!--') and not EMPTY_ANCHOR.match(cleaned):
+                    prose_lines.append(cleaned)
+                j += 1
+            if prose_lines:
+                combined = ''.join(prose_lines).replace(' ', '')
+                if re.match(r'^(?:(?:详?见|参考|按)?(?:上表|上述表格|前表)(?:详细(?:定义|用例|说明|记录|内容|规格))?[。.]?|见上[。.]?)$', combined):
+                    errors.append(f'empty echo heading without substantive rules: "{heading_title}" -> "{combined}"; use table anchor instead of empty heading')
+            i = j
+        else:
+            i += 1
+
+
 def without_record_sections(text: str, *, include_sources: bool = True) -> str:
     """Exclude headed records and the company's unheaded front revision table."""
     lines = []
@@ -310,6 +336,10 @@ def validate(target: Path, profile: str = 'template', image_policy: str | None =
     markers = template_markers_in(prose)
     if markers:
         errors.append('unresolved template markers: ' + ', '.join(markers[:5]))
+
+    # Complete outputs reject empty echo headings; drafts and source documents
+    # report them without turning an input diagnostic into a failed deliverable.
+    check_empty_echo_headings(body, errors if profile == 'template' else warnings)
 
     definitions = definitions_in(body)
     for item, count in Counter(definitions).items():

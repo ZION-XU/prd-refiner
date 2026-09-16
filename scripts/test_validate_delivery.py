@@ -9,10 +9,10 @@ import unittest
 
 from test_validate_links import MARKDOWN, STORAGE
 from test_validate_prd import COMPLETE
-from validate_delivery import inspect_toc, validate
+from validate_delivery import inspect_toc, mermaid_asset_stem, validate
 
 LAYOUT = (Path(__file__).resolve().parents[1] / 'assets/confluence-toc.xml').read_text(encoding='utf-8')
-TOC = re.search(r'<div class="zwFloatingTocRight">[\s\S]*?</div>', LAYOUT)[0]
+TOC = re.search(r'<div class="zwFloatingTocRight"[^>]*>[\s\S]*?</div>', LAYOUT)[0]
 MD = (COMPLETE.split('## 目录')[0] + '## 1. 背景、用户与目标\n核对直线。\n' + MARKDOWN +
       '\n## 8. 风险与开放问题\n暂无。\n## 9. 来源与参考资料\n本轮合成输入。\n')
 CHAPTERS = ('<h2>目录</h2>' + STORAGE +
@@ -100,12 +100,59 @@ class DeliveryTests(unittest.TestCase):
                 text = BODY + '<ac:structured-macro ac:name="' + name + '"><ac:plain-text-body><![CDATA[ASCII diagram]]></ac:plain-text-body></ac:structured-macro>'
                 self.xml.write_text(text, encoding='utf-8')
                 result = self.check()
-                self.assertTrue(any('avoid code/noformat' in e for e in result['errors']))
+                self.assertTrue(any('cannot contain code/noformat' in e for e in result['errors']))
+
+    def test_inline_layout_does_not_apply_floating_code_macro_invariant(self):
+        text = (TOC.replace('class="zwFloatingTocRight"', '') + CHAPTERS +
+                '<ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[x]]></ac:plain-text-body></ac:structured-macro>')
+        self.xml.write_text(text, encoding='utf-8')
+        self.assertTrue(self.check(layout='inline')['passed'])
 
     def test_native_diagram_and_inline_code_remain_allowed(self):
         text = BODY + '<table><tbody><tr><th>用户活动</th></tr><tr><td>选择对象并计数</td></tr></tbody></table><p>命令：<code>COUNT</code></p>'
         self.xml.write_text(text, encoding='utf-8')
         self.assertTrue(self.check()['passed'])
+
+    def test_mermaid_requires_rendered_file_and_confluence_attachment(self):
+        diagram = 'flowchart LR\nA-->B'
+        self.md.write_text(MD + f'\n```mermaid\n{diagram}\n```\n', encoding='utf-8')
+        result = self.check()
+        self.assertFalse(result['passed'])
+        self.assertTrue(any('rendered local PNG' in e for e in result['errors']))
+        self.assertTrue(any('PNG attachment reference' in e for e in result['errors']))
+
+        filename = mermaid_asset_stem(diagram) + '.png'
+        asset_dir = self.root / 'assets' / 'images'
+        asset_dir.mkdir(parents=True)
+        (asset_dir / filename).write_bytes(
+            b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR' + b'\x00' * 24)
+        self.xml.write_text(
+            BODY + f'<ac:image><ri:attachment ri:filename="{filename}"/></ac:image>',
+            encoding='utf-8')
+        self.assertTrue(self.check()['passed'])
+
+    def test_mermaid_svg_does_not_satisfy_png_delivery(self):
+        diagram = 'flowchart LR\nA-->B'
+        self.md.write_text(MD + f'\n```mermaid\n{diagram}\n```\n', encoding='utf-8')
+        filename = mermaid_asset_stem(diagram) + '.svg'
+        asset_dir = self.root / 'assets' / 'images'
+        asset_dir.mkdir(parents=True)
+        (asset_dir / filename).write_text('<svg xmlns="http://www.w3.org/2000/svg"/>', encoding='utf-8')
+        self.xml.write_text(
+            BODY + f'<ac:image><ri:attachment ri:filename="{filename}"/></ac:image>',
+            encoding='utf-8')
+        result = self.check()
+        self.assertFalse(result['passed'])
+        self.assertTrue(any('local PNG' in error for error in result['errors']))
+
+    def test_mermaid_code_macro_is_rejected_for_every_layout(self):
+        text = (BODY + '<ac:structured-macro ac:name="code">'
+                '<ac:parameter ac:name="language">mermaid</ac:parameter>'
+                '<ac:plain-text-body><![CDATA[flowchart LR]]></ac:plain-text-body>'
+                '</ac:structured-macro>')
+        self.xml.write_text(text, encoding='utf-8')
+        result = self.check(layout='inline')
+        self.assertTrue(any('must not publish Mermaid' in e for e in result['errors']))
 
     def test_plain_list_and_standalone_toc_are_not_floating_collapsible(self):
         for replacement in ('<ul><li>范围</li></ul>',
@@ -117,15 +164,29 @@ class DeliveryTests(unittest.TestCase):
     def test_original_inline_and_editor_stripped_versions_both_fail(self):
         for style in ('position: fixed; top: 120px; right: 20px; width: 280px;', 'width: 280px;'):
             with self.subTest(style=style):
-                old = TOC.replace('<div class="zwFloatingTocRight">',
-                                  '<div class="zwFloatingTocRight" style="' + style + '">') + CHAPTERS
+                old = re.sub(r'<div class="zwFloatingTocRight"[^>]*>',
+                             '<div class="zwFloatingTocRight" style="' + style + '">', TOC) + CHAPTERS
                 self.xml.write_text(old, encoding='utf-8')
                 self.assertFalse(self.check()['passed'])
 
     def test_inline_coordinates_are_rejected_even_in_correct_layout(self):
-        self.xml.write_text(BODY.replace('<div class="zwFloatingTocRight">',
-                                        '<div class="zwFloatingTocRight" style="top: 120px; right: 20px;">'), encoding='utf-8')
+        self.xml.write_text(re.sub(r'<div class="zwFloatingTocRight"[^>]*>',
+                                   '<div class="zwFloatingTocRight" style="top: 120px; right: 20px;">', BODY), encoding='utf-8')
         self.assertTrue(any('inline positioning' in e for e in self.check()['errors']))
+
+    def test_floating_container_requires_opaque_background_and_z_index(self):
+        replacements = (
+            '<div class="zwFloatingTocRight">',
+            '<div class="zwFloatingTocRight" style="z-index: 1000;">',
+            '<div class="zwFloatingTocRight" style="background-color: #ffffff;">',
+            '<div class="zwFloatingTocRight" style="background-color: transparent; z-index: 999;">',
+        )
+        for replacement in replacements:
+            with self.subTest(replacement=replacement):
+                text = re.sub(r'<div class="zwFloatingTocRight"[^>]*>', replacement, BODY)
+                errors = inspect_toc(text)
+                self.assertTrue(any('background-color' in error or 'z-index' in error
+                                    for error in errors), errors)
 
     def test_floating_group_must_be_in_right_cell(self):
         text = ('<ac:layout><ac:layout-section ac:type="two_right_sidebar">'
@@ -147,8 +208,8 @@ class DeliveryTests(unittest.TestCase):
         self.assertTrue(any('entire expand/toc' in e for e in inspect_toc(text)))
 
     def test_editor_cursor_paragraphs_do_not_break_native_layout(self):
-        text = BODY.replace('<div class="zwFloatingTocRight">',
-                            '<div class="zwFloatingTocRight"><p class="auto-cursor-target"><br/></p>')
+        text = re.sub(r'(<div class="zwFloatingTocRight"[^>]*>)',
+                      r'\1<p class="auto-cursor-target"><br/></p>', BODY)
         self.assertEqual(inspect_toc(text), [])
 
     def test_unreplaced_front_matter_placeholder_fails(self):

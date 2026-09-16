@@ -399,6 +399,16 @@ only-a-filename.png
         result = self.run_doc(text + '\n## 补充规则\n本期还要求 FR-998。\n')
         self.assertTrue(any('FR-998' in e for e in result['errors']))
 
+    def test_empty_echo_headings_rejected(self):
+        echo_doc = COMPLETE + '\n### 业务规则（BR-099）\n见上表详细定义。\n### 验收测试（AC-099）\n见上表详细用例。\n'
+        result = self.run_doc(echo_doc)
+        self.assertFalse(result['passed'])
+        self.assertTrue(any('empty echo heading' in e for e in result['errors']))
+        for profile in ('draft', 'existing'):
+            result = self.run_doc(echo_doc, profile)
+            self.assertTrue(result['passed'])
+            self.assertTrue(any('empty echo heading' in w for w in result['warnings']))
+
 
 if __name__ == '__main__':
     unittest.main()
