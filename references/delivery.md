@@ -1,6 +1,6 @@
 # 成稿与交付
 
-仅在成稿、保存或检查交付结果时读取；讨论节奏与修改边界见入口。
+仅在成稿、保存或检查交付结果时读取。
 
 ## 整理与保存
 
@@ -30,7 +30,7 @@ Confluence 默认先保存并核对本地 Markdown 和图片，再写入；用�
 
 ## 校验
 
-完成内容规范中的复核，再对实际保存的本地 Markdown 执行（路径相对 Skill 根目录）：
+对实际保存的完整本地 Markdown 执行（路径相对 Skill 根目录）：
 
 ```text
 python scripts/validate_prd.py <稿件> --profile template
@@ -43,7 +43,7 @@ python scripts/validate_links.py <稿件> --format markdown --profile template
 
 脚本不能识别合理删图依据：有依据地移除全部源图时，保留原始报错并人工核对，不加回无关图片来换取通过。未提供源稿时只报告已做的输出图片检查。
 
-正文使用图片时默认 `local`，文件须在 `.assets/<需求名>/images/` 中存在且可读，并由正文以有效相对路径引用；仅用户明确外链时使用 `--image-policy external`。仅目标阅读器确实无法跳转时，给引用检查加 `--reference-policy location`：接受内容规范中的“〔名称（编号）；位置：准确章节标题〕”，仍检查名称、唯一完整定义和章节归属，并披露未验证跳转。普通裸编号、错误链接或错误位置仍失败，不能为消除错误擅自降级。
+正文使用图片时默认 `local`，文件须在 `.assets/<需求名>/images/` 中存在且可读，并由正文以有效相对路径引用；仅用户明确外链时使用 `--image-policy external`。仅目标阅读器确实无法跳转时，给引用检查加 `--reference-policy location`：接受“〔名称（编号）；位置：准确章节标题〕”，仍检查名称、唯一完整定义和章节归属，并披露未验证跳转。普通裸编号、错误链接或错误位置仍失败，不能为消除错误擅自降级。
 
 Confluence 最终待提交和回读的 Storage 分别运行：
 

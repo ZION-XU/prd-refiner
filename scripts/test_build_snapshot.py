@@ -62,6 +62,51 @@ class SnapshotTests(unittest.TestCase):
         self.assertIn('<!-- ![comment](a.png) -->', rewritten)
         self.assertIn('```markdown\n![example](a.png)\n```', rewritten)
 
+    def test_confluence_url_image_is_downloaded_and_rewritten(self):
+        text = '<ac:image><ri:url ri:value="https://example.invalid/prototype.png"/></ac:image>'
+        self.assertEqual(extract_referenced_filenames(text), ['prototype.png'])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / 'prototype.png'
+            image.write_bytes(PNG)
+            result = create_snapshot_from_data(
+                text, [], root, {'prototype.png': image},
+                source_metadata={'page_id': '123', 'version': '7'})
+            self.assertTrue(result['passed'], result)
+            source = Path(result['snapshot_file']).read_text(encoding='utf-8')
+            self.assertIn('![prototype.png](./images/prototype.png)', source)
+
+    def test_unknown_confluence_image_macro_fails_closed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = create_snapshot_from_data(
+                '<ac:image><ri:shortcut ri:value="x"/></ac:image>', [], Path(tmp),
+                source_metadata={'page_id': '123', 'version': '7'})
+            self.assertFalse(result['passed'])
+            self.assertTrue(result['unsafe_images'])
+
+    def test_unclosed_confluence_image_macro_fails_closed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = create_snapshot_from_data(
+                '<ac:image><ri:attachment ri:filename="x.png"/>', [], Path(tmp),
+                source_metadata={'page_id': '123', 'version': '7'})
+            self.assertFalse(result['passed'])
+            self.assertTrue(result['unsafe_images'])
+
+    def test_same_name_from_different_pages_fails_closed(self):
+        text = ('<ac:image><ri:attachment ri:filename="same.png">'
+                '<ri:page ri:content-title="Page A"/></ri:attachment></ac:image>'
+                '<ac:image><ri:attachment ri:filename="same.png">'
+                '<ri:page ri:content-title="Page B"/></ri:attachment></ac:image>')
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / 'same.png'
+            image.write_bytes(PNG)
+            result = create_snapshot_from_data(
+                text, [], root, {'same.png': image},
+                source_metadata={'page_id': '123', 'version': '7'})
+            self.assertFalse(result['passed'])
+            self.assertEqual(len(result['ambiguous_images'][0]['sources']), 2)
+
     def test_missing_or_invalid_image_fails_without_snapshot(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

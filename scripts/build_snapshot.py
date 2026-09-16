@@ -27,9 +27,17 @@ IMAGE_PATTERN = re.compile(
 HTML_IMG_PATTERN = re.compile(
     r'<img\s+[^>]*?src=["\']([^"\']+)["\'][^>]*?>', re.IGNORECASE
 )
-AC_IMAGE_PATTERN = re.compile(
-    r'<ac:image\b[^>]*>[\s\S]*?<ri:attachment\b[^>]*\bri:filename=["\']([^"\']+)["\'][^>]*/?>[\s\S]*?</ac:image>',
-    re.IGNORECASE,
+AC_IMAGE_BLOCK_PATTERN = re.compile(
+    r'<ac:image\b[^>]*>[\s\S]*?</ac:image>', re.IGNORECASE,
+)
+RI_ATTACHMENT_PATTERN = re.compile(
+    r'<ri:attachment\b[^>]*\bri:filename=["\']([^"\']+)["\']', re.IGNORECASE,
+)
+RI_URL_PATTERN = re.compile(
+    r'<ri:url\b[^>]*\bri:value=["\']([^"\']+)["\']', re.IGNORECASE,
+)
+RI_PAGE_PATTERN = re.compile(
+    r'<ri:page\b[^>]*\bri:content-title=["\']([^"\']+)["\']', re.IGNORECASE,
 )
 
 
@@ -107,27 +115,49 @@ def extract_filename_from_target(target: str) -> str:
     return filename
 
 
+def image_macro_target(block: str) -> tuple[str, str, str] | None:
+    """Return target, kind and source identity for a Confluence image macro."""
+    attachment = RI_ATTACHMENT_PATTERN.search(block)
+    url = RI_URL_PATTERN.search(block)
+    if bool(attachment) == bool(url):
+        return None
+    if attachment:
+        page = RI_PAGE_PATTERN.search(block)
+        origin = page.group(1) if page else '<current-page>'
+        return attachment.group(1), 'confluence-attachment', f'attachment:{origin}/{attachment.group(1)}'
+    target = url.group(1)
+    parsed = urlsplit(target)
+    return target, 'confluence-url', f'url:{parsed.netloc}{unquote(parsed.path)}?{parsed.query}'
+
+
 def extract_referenced_items(text: str) -> list[dict]:
-    """Return unique referenced images with their original targets."""
+    """Return referenced images with source identities, grouped by local name."""
     active = without_fenced_code(re.sub(r'<!--[\s\S]*?-->', '', text))
     found: dict[str, dict] = {}
 
-    def add(target: str, kind: str) -> None:
+    def add(target: str, kind: str, identity: str | None = None) -> None:
         filename = extract_filename_from_target(target)
         if not filename:
             return
-        item = found.setdefault(filename, {'filename': filename, 'targets': [], 'kinds': []})
+        if identity is None:
+            parsed = urlsplit(target)
+            identity = f'url:{parsed.netloc}{unquote(parsed.path)}?{parsed.query}'
+        item = found.setdefault(filename, {'filename': filename, 'targets': [], 'kinds': [], 'sources': []})
         if target not in item['targets']:
             item['targets'].append(target)
         if kind not in item['kinds']:
             item['kinds'].append(kind)
+        if identity not in item['sources']:
+            item['sources'].append(identity)
 
     for match in IMAGE_PATTERN.finditer(active):
         add(match.group(2).strip('<>'), 'markdown')
     for match in HTML_IMG_PATTERN.finditer(active):
         add(match.group(1), 'html')
-    for match in AC_IMAGE_PATTERN.finditer(active):
-        add(match.group(1), 'confluence-attachment')
+    for match in AC_IMAGE_BLOCK_PATTERN.finditer(active):
+        parsed = image_macro_target(match.group(0))
+        if parsed:
+            add(*parsed)
     return list(found.values())
 
 
@@ -136,14 +166,20 @@ def invalid_referenced_targets(text: str) -> list[dict]:
     active = without_fenced_code(re.sub(r'<!--[\s\S]*?-->', '', text))
     candidates = (
         [(m.group(2).strip('<>'), 'markdown') for m in IMAGE_PATTERN.finditer(active)] +
-        [(m.group(1), 'html') for m in HTML_IMG_PATTERN.finditer(active)] +
-        [(m.group(1), 'confluence-attachment') for m in AC_IMAGE_PATTERN.finditer(active)]
+        [(m.group(1), 'html') for m in HTML_IMG_PATTERN.finditer(active)]
     )
-    return [
+    invalid = [
         {'target': target, 'kind': kind}
         for target, kind in candidates
         if not extract_filename_from_target(target)
     ]
+    for match in AC_IMAGE_BLOCK_PATTERN.finditer(active):
+        parsed = image_macro_target(match.group(0))
+        if parsed is None or not extract_filename_from_target(parsed[0]):
+            invalid.append({'target': match.group(0), 'kind': 'confluence-image'})
+    if len(re.findall(r'<ac:image\b', active, re.IGNORECASE)) != len(AC_IMAGE_BLOCK_PATTERN.findall(active)):
+        invalid.append({'target': '<ac:image>', 'kind': 'incomplete-confluence-image'})
+    return invalid
 
 
 def extract_referenced_filenames(text: str) -> list[str]:
@@ -181,15 +217,16 @@ def rewrite_image_paths_to_local(text: str, relative_dir: str = './images',
 
     rewritten = HTML_IMG_PATTERN.sub(replace_html, rewritten)
 
-    def replace_attachment(match):
+    def replace_confluence_image(match):
         nonlocal count
-        filename = extract_filename_from_target(match.group(1))
+        parsed = image_macro_target(match.group(0))
+        filename = extract_filename_from_target(parsed[0]) if parsed else ''
         if not allowed(filename):
             return match.group(0)
         count += 1
         return f'![{filename}]({prefix}{filename})'
 
-    rewritten = AC_IMAGE_PATTERN.sub(replace_attachment, rewritten)
+    rewritten = AC_IMAGE_BLOCK_PATTERN.sub(replace_confluence_image, rewritten)
     return restore_ignored_blocks(rewritten, protected), count
 
 
@@ -270,6 +307,11 @@ def create_snapshot_from_data(content: str, attachments: list[dict], workspace_d
         }
 
     references = extract_referenced_items(content)
+    collisions = [item for item in references if len(item['sources']) > 1]
+    if collisions:
+        return {'passed': False, 'errors': ['different image sources share a local filename'],
+                'snapshot_dir': str(target), 'ambiguous_images': collisions,
+                'missing_images': [], 'invalid_images': []}
     cached = {key: Path(value) for key, value in (cached_files or {}).items()}
     attachment_by_name = {item.get('title', ''): item for item in attachments if item.get('title')}
     missing, invalid, sources = [], [], {}
