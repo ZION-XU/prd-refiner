@@ -19,8 +19,10 @@ $prd-refiner 修改 FR-002，保持其他功能并检查相关验收。
 
 - [SKILL.md](SKILL.md)：按任务加载真正需要的约束，不附通用审稿步骤。
 - [内容约定](references/prd-standard.md)与 [模板](assets/prd-template.md)：每次调用本 Skill 处理 PRD 内容时，在首次分析前同步读取，作为编写、检查和局部修改的共同标准；一句话需求也一样。前者规定依据、状态和团队特有边界，后者承载输出框架与字段编写提示。只使用相关维度，检查或片段修改不扩展成完整稿。
+- [下游视角审查](references/downstream-review.md)：只检查、实质优化或完整稿交付前按实际影响加载；从产品、研发、品质、产品设计和产品化交付视角发现会造成下游追问的缺口，不替代正式评审。
 - [交付规范](references/delivery.md)：成稿保存与交付检查时读取。
-- [图片规范](references/prototype-analysis.md)：涉及图片／原型时读取。
+- [来源快照](references/snapshot.md)：Confluence 页面或远程来源下载封装时读取。
+- [原型规范](references/prototype-analysis.md)：涉及图片／原型分析时读取。
 - [Confluence 规范](references/publish-confluence.md)：仅明确写入平台时读取，复用 [布局骨架](assets/confluence-toc.xml)。
 - `scripts/`：结构、引用及组合交付检查、Mermaid PNG 渲染与回归测试；执行无需通读源码。
 - [AGENTS.md](AGENTS.md)：维护说明；`agents/openai.yaml`：宿主元数据。

@@ -268,11 +268,8 @@ def inspect(text: str, format: str = 'markdown', reference_policy: str = 'linked
         items = ID_PATTERN.findall(label)
         if not items:
             continue  # TOCs and general source links are outside this checker.
-        named = NAMED_LABEL.fullmatch(label)
-        if not named or not named[1].strip() or len(items) != 1:
-            findings.append(f'line {i + 1}: reference must use one name (ID): {label}')
-        elif named[2] in definition_names and named[1].strip() != definition_names[named[2]]:
-            findings.append(f'line {i + 1}: reference name differs from definition: {named[2]}')
+        if len(items) > 1:
+            findings.append(f'line {i + 1}: reference must not combine multiple IDs in one link: {label}')
         if not target.startswith('#'):
             findings.append(f'line {i + 1}: external/unsupported reference target requires verification: {", ".join(items)}')
             continue

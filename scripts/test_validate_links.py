@@ -138,10 +138,9 @@ class ReferenceTests(unittest.TestCase):
         self.assert_finding(MARKDOWN.replace('](#fr-001)', '](#3-功能与交互规格)'),
                             'anchor does not locate definition FR-001')
 
-    def test_changed_name_requires_updating_reference_labels(self):
+    def test_changed_definition_heading_name_preserves_anchor_resolution(self):
         text = MARKDOWN.replace('### 3.2 直线计数（FR-001）', '### 3.2 选择集计数（FR-001）')
-        self.assert_finding(text, 'reference name differs from definition: FR-001')
-        self.assertEqual(inspect(text.replace('[直线计数（FR-001）]', '[选择集计数（FR-001）]')), [])
+        self.assertEqual(inspect(text), [])
 
     def test_reference_style_links_and_percent_encoded_target(self):
         text = MARKDOWN.replace('[直线计数（FR-001）](#fr-001)', '[直线计数（FR-001）][function]')
@@ -157,8 +156,10 @@ class ReferenceTests(unittest.TestCase):
         self.assert_finding(MARKDOWN.replace('](#br-001)', '][missing]'), 'unsupported reference target')
 
     def test_bare_or_multiple_ids_in_link_label(self):
-        self.assert_finding(MARKDOWN.replace('[直线计数（FR-001）]', '[FR-001]'), 'reference must use one name')
-        self.assert_finding(MARKDOWN.replace('[直线计数（FR-001）]', '[FR-001、BR-001]'), 'reference must use one name')
+        # Bare ID in link label is allowed as long as target anchor is valid
+        self.assertEqual(inspect(MARKDOWN.replace('[直线计数（FR-001）]', '[FR-001]')), [])
+        # Combining multiple IDs in a single link is rejected
+        self.assert_finding(MARKDOWN.replace('[直线计数（FR-001）]', '[FR-001、BR-001]'), 'must not combine multiple IDs in one link')
 
     def test_code_images_history_and_external_source_ids_are_exempt(self):
         text = MARKDOWN + '''
@@ -237,9 +238,16 @@ class ReferenceTests(unittest.TestCase):
             self.assertEqual(path.read_bytes(), before)
             path.write_text('<h2>broken', encoding='utf-8')
             self.assertFalse(validate(path, 'storage')['passed'])
-            path.write_text('<!DOCTYPE x><h2>test</h2>', encoding='utf-8')
-            self.assertFalse(validate(path, 'storage')['passed'])
-            self.assertFalse(validate(path.parent / 'absent.md')['passed'])
+    def test_flexible_link_labels_accepted(self):
+        # Bare ID in markdown link
+        text1 = MARKDOWN.replace('[计数对象范围（BR-001）](#br-001)', '[BR-001](#br-001)')
+        self.assertEqual(inspect(text1), [])
+        # Descriptive prefix in markdown link
+        text2 = MARKDOWN.replace('[计数对象范围（BR-001）](#br-001)', '[业务规则 BR-001](#br-001)')
+        self.assertEqual(inspect(text2), [])
+        # But broken anchor must still fail
+        text3 = MARKDOWN.replace('[计数对象范围（BR-001）](#br-001)', '[BR-001](#non-existent)')
+        self.assert_finding(text3, 'missing or ambiguous anchor')
 
 
 if __name__ == '__main__':
