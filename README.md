@@ -18,7 +18,7 @@ $prd-refiner 修改 FR-002，保持其他功能并检查相关验收。
 ## 文件与加载
 
 - [SKILL.md](SKILL.md)：按任务加载真正需要的约束，不附通用审稿步骤。
-- [内容约定](references/prd-standard.md)与 [模板](assets/prd-template.md)：输出完整稿或按团队模板检查时首次分析同步读取；前者只规定证据、状态和团队特有内容边界，后者承载内容覆盖与最终结构。普通问题检查无需加载整套模板。
+- [内容约定](references/prd-standard.md)与 [模板](assets/prd-template.md)：每次调用本 Skill 处理 PRD 内容时，在首次分析前同步读取，作为编写、检查和局部修改的共同标准；一句话需求也一样。前者规定依据、状态和团队特有边界，后者承载输出框架与字段编写提示。只使用相关维度，检查或片段修改不扩展成完整稿。
 - [交付规范](references/delivery.md)：成稿保存与交付检查时读取。
 - [图片规范](references/prototype-analysis.md)：涉及图片／原型时读取。
 - [Confluence 规范](references/publish-confluence.md)：仅明确写入平台时读取，复用 [布局骨架](assets/confluence-toc.xml)。
@@ -31,4 +31,4 @@ $prd-refiner 修改 FR-002，保持其他功能并检查相关验收。
 python -B -m unittest discover -s scripts -p "test_*.py"
 ```
 
-文稿校验命令、降级条件与检查边界见交付规范。静态测试不证明需求正确或宿主对话行为。改动后核对三条路由：Confluence 只读检查需要图片；完整稿需要内容约定和模板；写入 Confluence 需要平台格式与图片映射。业务资料、生成文稿和分析材料存放仓库外。
+文稿校验命令、降级条件与检查边界见交付规范。静态测试不证明需求正确或宿主对话行为。改动后核对三条路由：所有 PRD 内容任务先读内容约定和模板；Confluence 来源检查需要图片；写入 Confluence 需要平台格式与图片映射。业务资料、生成文稿和分析材料存放仓库外。
