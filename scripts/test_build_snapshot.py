@@ -114,7 +114,7 @@ class SnapshotTests(unittest.TestCase):
             missing = create_snapshot_from_data(
                 '![x](missing.png)', [], root, source_metadata=metadata)
             self.assertFalse(missing['passed'])
-            self.assertFalse((root / '.assets' / 'source_snapshot').exists())
+            self.assertFalse((root / '.assets' / 'manifest.json').exists())
             bad = root / 'bad.png'
             bad.write_text('<html>login</html>', encoding='utf-8')
             invalid = create_snapshot_from_data(
@@ -130,17 +130,17 @@ class SnapshotTests(unittest.TestCase):
             result = create_snapshot_from_data(
                 '![界面](https://example.invalid/screen.png)',
                 [{'title': 'screen.png', 'id': 'att-1'}], root,
-                {'screen.png': image}, snapshot_name='page-123',
+                {'screen.png': image},
                 source_metadata={'page_id': '123', 'version': '7'})
             self.assertTrue(result['passed'], result)
-            snapshot = root / '.assets' / 'page-123'
+            snapshot = root / '.assets'
             manifest = json.loads((snapshot / 'manifest.json').read_text(encoding='utf-8'))
             self.assertEqual(manifest['status'], 'complete')
             self.assertEqual(manifest['source']['version'], '7')
             self.assertEqual(manifest['images'][0]['attachment_id'], 'att-1')
             self.assertEqual(len(manifest['images'][0]['sha256']), 64)
             self.assertIn('./images/screen.png', (snapshot / 'source.md').read_text(encoding='utf-8'))
-            again = create_snapshot_from_data('', [], root, snapshot_name='page-123')
+            again = create_snapshot_from_data('', [], root)
             self.assertFalse(again['passed'])
 
     def test_cli_returns_failure_for_incomplete_snapshot(self):

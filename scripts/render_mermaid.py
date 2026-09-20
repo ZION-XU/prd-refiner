@@ -141,7 +141,7 @@ def process_markdown(markdown_path: Path, output_dir: Path | None = None, *,
     """Render every distinct Mermaid block and return a machine-readable report."""
     text = markdown_path.read_text(encoding='utf-8-sig')
     blocks = list(dict.fromkeys(mermaid_blocks(text)))
-    target_dir = output_dir or (markdown_path.parent / '.assets' / markdown_path.stem / 'images')
+    target_dir = output_dir or (markdown_path.parent / '.assets' / 'images')
     results = []
     renderer: list[str] | None = None
     browser: str | None = None

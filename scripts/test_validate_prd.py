@@ -143,7 +143,7 @@ only-a-filename.png
     def test_names_and_unrelated_neighbor_files_are_preserved(self):
         (self.root / 'quality-report.md').write_text('AC-999 为其他项目内容', encoding='utf-8')
         (self.root / 'attachments').mkdir()
-        content = COMPLETE + '\n参考 AutoCAD 的说明，未采纳为当前行为。'
+        content = COMPLETE + '\n参考竞品的说明，未采纳为当前行为。'
         self.run_doc(content)
         before = {p: p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
         self.assertTrue(validate(self.prd)['passed'])

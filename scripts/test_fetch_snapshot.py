@@ -8,7 +8,12 @@ from fetch_snapshot import (
     parse_page_id,
     read_pat_token,
     discover_confluence_mcp_config,
+    fetch_and_build_snapshot,
+    fetch_current_user,
+    create_ssl_context,
 )
+from unittest.mock import MagicMock
+import json
 
 
 class FetchSnapshotTests(unittest.TestCase):
@@ -36,6 +41,51 @@ class FetchSnapshotTests(unittest.TestCase):
             self.assertEqual(url, 'https://mock.com')
             self.assertEqual(token, 'mock_token')
             self.assertEqual(src, 'environment variable')
+
+    @patch('urllib.request.urlopen')
+    def test_fetch_current_user_success(self, mock_urlopen):
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = json.dumps({
+            'username': 'xuzhou',
+            'displayName': '徐舟',
+            'userKey': 'key_123'
+        }).encode('utf-8')
+        mock_urlopen.return_value.__enter__.return_value = mock_resp
+
+        user = fetch_current_user('https://mock.confluence.com', 'fake_pat', create_ssl_context())
+        self.assertEqual(user['username'], 'xuzhou')
+        self.assertEqual(user['display_name'], '徐舟')
+        self.assertEqual(user['user_key'], 'key_123')
+
+    @patch('urllib.request.urlopen')
+    def test_fetch_current_user_error(self, mock_urlopen):
+        mock_urlopen.side_effect = Exception('Network error')
+        user = fetch_current_user('https://mock.confluence.com', 'fake_pat', create_ssl_context())
+        self.assertEqual(user, {})
+
+    def test_force_overwrites_snapshot_files_only(self):
+        # `.assets/` is shared and flat: forcing a fresh snapshot must not delete
+        # Storage bodies, rendered diagrams or any other machine asset.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            assets = root / '.assets'
+            (assets / 'images').mkdir(parents=True)
+            for name in ('manifest.json', 'source.md', 'source.original.txt'):
+                (assets / name).write_text('stale', encoding='utf-8')
+            storage = assets / 'page.storage.html'
+            storage.write_text('submitted body', encoding='utf-8')
+            rendered = assets / 'images' / 'mermaid-abc123.png'
+            rendered.write_bytes(b'\x89PNG\r\n\x1a\n')
+
+            with patch('fetch_snapshot.discover_confluence_mcp_config',
+                       return_value=('https://mock.invalid', '', 'none')):
+                result = fetch_and_build_snapshot('123', root, force=True)
+
+            self.assertFalse(result['passed'])  # no PAT configured in this test
+            self.assertFalse((assets / 'manifest.json').exists())
+            self.assertFalse((assets / 'source.md').exists())
+            self.assertTrue(storage.is_file())
+            self.assertTrue(rendered.is_file())
 
 
 if __name__ == '__main__':

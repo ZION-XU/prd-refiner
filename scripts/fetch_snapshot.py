@@ -11,7 +11,6 @@ import json
 import os
 from pathlib import Path
 import re
-import shutil
 import ssl
 import sys
 import tempfile
@@ -138,6 +137,22 @@ def fetch_page_content(base_url: str, page_id: str, pat: str,
     return content, version, web_url, attachments
 
 
+def fetch_current_user(base_url: str, pat: str, ctx: ssl.SSLContext) -> dict:
+    """Fetch current user profile (username, displayName) associated with the PAT."""
+    url = f'{base_url.rstrip("/")}/rest/api/user/current'
+    req = urllib.request.Request(url, headers={'Authorization': f'Bearer {pat}'})
+    try:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            return {
+                'username': data.get('username', ''),
+                'display_name': data.get('displayName', ''),
+                'user_key': data.get('userKey', ''),
+            }
+    except Exception:
+        return {}
+
+
 def download_attachment_direct(base_url: str, page_id: str, filename: str, pat: str,
                                dest: Path, ctx: ssl.SSLContext) -> bool:
     """Download image directly by filename using Confluence attachment endpoint."""
@@ -158,19 +173,22 @@ def download_attachment_direct(base_url: str, page_id: str, filename: str, pat: 
 
 
 def fetch_and_build_snapshot(page_id: str, workspace: Path,
-                             snapshot_name: str = 'source_snapshot',
                              base_url: str | None = None,
                              pat: str | None = None,
                              force: bool = False) -> dict:
     workspace = workspace.resolve()
-    target_dir = workspace / '.assets' / snapshot_name
-    if target_dir.exists():
+    target_dir = workspace / '.assets'
+    marker = target_dir / 'manifest.json'
+    if marker.exists():
         if force:
-            shutil.rmtree(target_dir)
+            # Overwrite only the snapshot's own files; never remove the shared
+            # `.assets` tree or assets belonging to other artifacts.
+            for name in ('manifest.json', 'source.md', 'source.original.txt'):
+                (target_dir / name).unlink(missing_ok=True)
         else:
             return {
                 'passed': False,
-                'errors': [f'snapshot directory already exists: {target_dir}. Use --force to overwrite.'],
+                'errors': [f'snapshot already exists: {marker}. Use --force to overwrite.'],
                 'snapshot_dir': str(target_dir),
             }
 
@@ -197,6 +215,8 @@ def fetch_and_build_snapshot(page_id: str, workspace: Path,
             'errors': [f'{type(exc).__name__}: {exc}'],
         }
 
+    author_info = fetch_current_user(url, token, ctx)
+
     images = extract_referenced_filenames(content)
     missing_downloads = []
 
@@ -219,23 +239,36 @@ def fetch_and_build_snapshot(page_id: str, workspace: Path,
                 'missing_images': missing_downloads,
             }
 
+        source_meta = {
+            'page_id': page_id,
+            'version': version,
+            'url': web_url,
+        }
+        if author_info and (author_info.get('display_name') or author_info.get('username')):
+            source_meta['author'] = author_info
+
         result = create_snapshot_from_data(
             content=content,
             attachments=attachments,
             workspace_dir=workspace,
             cached_files=cached_files,
-            snapshot_name=snapshot_name,
-            source_metadata={'page_id': page_id, 'version': version, 'url': web_url},
+            source_metadata=source_meta,
         )
         result['pat_source'] = src_desc
+        if author_info:
+            result['author'] = author_info
         return result
 
 
 def main() -> int:
+    if hasattr(sys.stdout, 'reconfigure'):
+        try:
+            sys.stdout.reconfigure(encoding='utf-8')
+        except Exception:
+            pass
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--page-id', required=True, help='Confluence page ID or full page URL')
     parser.add_argument('--workspace', type=Path, default=Path.cwd(), help='Target workspace directory')
-    parser.add_argument('--snapshot-name', default='source_snapshot', help='Name of the snapshot directory')
     parser.add_argument('--url', help='Confluence base URL (overrides MCP config)')
     parser.add_argument('--pat', help='Confluence PAT (overrides MCP config)')
     parser.add_argument('--pat-file', type=Path, help='File containing Confluence PAT')
@@ -250,7 +283,6 @@ def main() -> int:
     result = fetch_and_build_snapshot(
         page_id=page_id,
         workspace=args.workspace,
-        snapshot_name=args.snapshot_name,
         base_url=args.url,
         pat=pat,
         force=args.force,

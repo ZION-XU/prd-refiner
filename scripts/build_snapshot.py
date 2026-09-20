@@ -263,28 +263,20 @@ def valid_image(path: Path) -> bool:
     return False
 
 
-def safe_snapshot_name(value: str) -> str:
-    name = re.sub(r'[^\w.-]+', '-', value.strip(), flags=re.UNICODE).strip('.-')
-    if not name or name in {'.', '..'}:
-        raise ValueError('snapshot name must contain a letter, number or underscore')
-    return name
-
-
 def create_snapshot_from_data(content: str, attachments: list[dict], workspace_dir: Path,
                               cached_files: dict[str, Path] | None = None, *,
-                              snapshot_name: str = 'source_snapshot',
                               source_metadata: dict | None = None) -> dict:
-    """Create an immutable verified snapshot; return passed=False on any gap."""
+    """Create an immutable verified snapshot flat in `.assets`; passed=False on any gap.
+
+    `.assets/manifest.json` is the completion marker and is written last, so an
+    interrupted run never leaves a snapshot that looks complete.
+    """
     workspace = Path(workspace_dir).resolve()
     assets_root = workspace / '.assets'
-    name = safe_snapshot_name(snapshot_name)
-    target = (assets_root / name).resolve()
-    try:
-        target.relative_to(assets_root.resolve())
-    except ValueError as exc:
-        raise ValueError('snapshot path leaves .assets') from exc
-    if target.exists():
-        return {'passed': False, 'errors': [f'snapshot already exists: {target}'],
+    target = assets_root
+    marker = target / 'manifest.json'
+    if marker.exists():
+        return {'passed': False, 'errors': [f'snapshot already exists: {marker}'],
                 'snapshot_dir': str(target), 'missing_images': [], 'invalid_images': []}
 
     metadata = source_metadata or {}
@@ -334,7 +326,7 @@ def create_snapshot_from_data(content: str, attachments: list[dict], workspace_d
                 'missing_images': missing, 'invalid_images': invalid}
 
     assets_root.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix=f'.{name}-', dir=assets_root) as temp_name:
+    with tempfile.TemporaryDirectory(prefix='.snapshot-', dir=assets_root) as temp_name:
         temp = Path(temp_name)
         images_dir = temp / 'images'
         image_records = []
@@ -371,7 +363,15 @@ def create_snapshot_from_data(content: str, attachments: list[dict], workspace_d
         }
         (temp / 'manifest.json').write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
-        temp.replace(target)
+        if images_dir.exists():
+            images_target = assets_root / 'images'
+            images_target.mkdir(exist_ok=True)
+            for rendered in images_dir.iterdir():
+                rendered.replace(images_target / rendered.name)
+        (temp / 'source.original.txt').replace(assets_root / 'source.original.txt')
+        (temp / 'source.md').replace(assets_root / 'source.md')
+        # Completion marker last: its presence means the snapshot is complete.
+        (temp / 'manifest.json').replace(assets_root / 'manifest.json')
 
     return {
         'passed': True,
@@ -421,7 +421,6 @@ def main() -> int:
     source.add_argument('--source-file', type=Path, help='Saved page body')
     parser.add_argument('--asset-dir', type=Path, help='Directory containing downloaded referenced images')
     parser.add_argument('--workspace', type=Path, default=Path.cwd())
-    parser.add_argument('--snapshot-name', default='source_snapshot')
     parser.add_argument('--page-id', required=True)
     parser.add_argument('--page-version', required=True)
     parser.add_argument('--page-url')
@@ -440,7 +439,6 @@ def main() -> int:
         else:
             result = create_snapshot_from_data(
                 content, attachments, args.workspace, cached,
-                snapshot_name=args.snapshot_name,
                 source_metadata={'page_id': args.page_id, 'version': args.page_version,
                                  'url': args.page_url})
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
