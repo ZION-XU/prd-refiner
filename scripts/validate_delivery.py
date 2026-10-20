@@ -173,7 +173,8 @@ def inspect_toc(text: str, layout: str = 'floating') -> list[str]:
                 continue
             name, value = declaration.split(':', 1)
             styles[name.strip().casefold()] = value.strip().casefold()
-        if styles.get('background-color') != '#ffffff':
+        bg = styles.get('background-color', '').replace(' ', '')
+        if bg not in {'#ffffff', '#fff', 'rgb(255,255,255)', 'white'}:
             errors.append('floating container must keep opaque background-color: #ffffff')
         if styles.get('z-index') != '1000':
             errors.append('floating container must keep z-index: 1000')

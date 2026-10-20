@@ -155,6 +155,20 @@ class SnapshotTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1, result.stdout)
             self.assertFalse(json.loads(result.stdout)['passed'])
 
+    def test_cli_refuses_to_infer_the_workspace(self):
+        # The snapshot is a machine asset of the requirement workspace; an
+        # implicit current directory could write it into the skill checkout.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / 'source.md'
+            source.write_text('body', encoding='utf-8')
+            command = [sys.executable, '-B', str(Path(__file__).with_name('build_snapshot.py')),
+                       '--source-file', str(source), '--page-id', '123', '--page-version', '7']
+            result = subprocess.run(command, capture_output=True, encoding='utf-8')
+            self.assertEqual(result.returncode, 2)
+            self.assertIn('--workspace', result.stderr)
+            self.assertFalse((Path.cwd() / '.assets' / 'manifest.json').exists())
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -5,7 +5,7 @@ The caller obtains the page body, complete attachment metadata and referenced
 image files through the available host tools. This script does not access
 Confluence or credentials; it packages downloaded inputs into
 an immutable local baseline and fails if any referenced image is missing,
-invalid or unsafe.
+invalid or unsafe. The requirement workspace must be passed explicitly.
 """
 from __future__ import annotations
 
@@ -115,7 +115,7 @@ def extract_filename_from_target(target: str) -> str:
     return filename
 
 
-def image_macro_target(block: str) -> tuple[str, str, str] | None:
+def image_macro_target(block: str, current_page_id: str | None = None) -> tuple[str, str, str] | None:
     """Return target, kind and source identity for a Confluence image macro."""
     attachment = RI_ATTACHMENT_PATTERN.search(block)
     url = RI_URL_PATTERN.search(block)
@@ -123,14 +123,20 @@ def image_macro_target(block: str) -> tuple[str, str, str] | None:
         return None
     if attachment:
         page = RI_PAGE_PATTERN.search(block)
-        origin = page.group(1) if page else '<current-page>'
+        origin = page.group(1) if page else (current_page_id if current_page_id else '<current-page>')
         return attachment.group(1), 'confluence-attachment', f'attachment:{origin}/{attachment.group(1)}'
     target = url.group(1)
     parsed = urlsplit(target)
+    m = re.search(r'/download/attachments/([^/]+)/([^/?#]+)', parsed.path)
+    if m:
+        page_id = m.group(1)
+        if current_page_id and (page_id == current_page_id or page_id == '<current-page>'):
+            page_id = current_page_id
+        return target, 'confluence-url', f'attachment:{page_id}/{unquote(m.group(2))}'
     return target, 'confluence-url', f'url:{parsed.netloc}{unquote(parsed.path)}?{parsed.query}'
 
 
-def extract_referenced_items(text: str) -> list[dict]:
+def extract_referenced_items(text: str, current_page_id: str | None = None) -> list[dict]:
     """Return referenced images with source identities, grouped by local name."""
     active = without_fenced_code(re.sub(r'<!--[\s\S]*?-->', '', text))
     found: dict[str, dict] = {}
@@ -141,7 +147,14 @@ def extract_referenced_items(text: str) -> list[dict]:
             return
         if identity is None:
             parsed = urlsplit(target)
-            identity = f'url:{parsed.netloc}{unquote(parsed.path)}?{parsed.query}'
+            m = re.search(r'/download/attachments/([^/]+)/([^/?#]+)', parsed.path)
+            if m:
+                page_id = m.group(1)
+                if current_page_id and (page_id == current_page_id or page_id == '<current-page>'):
+                    page_id = current_page_id
+                identity = f'attachment:{page_id}/{unquote(m.group(2))}'
+            else:
+                identity = f'url:{parsed.netloc}{unquote(parsed.path)}?{parsed.query}'
         item = found.setdefault(filename, {'filename': filename, 'targets': [], 'kinds': [], 'sources': []})
         if target not in item['targets']:
             item['targets'].append(target)
@@ -155,7 +168,7 @@ def extract_referenced_items(text: str) -> list[dict]:
     for match in HTML_IMG_PATTERN.finditer(active):
         add(match.group(1), 'html')
     for match in AC_IMAGE_BLOCK_PATTERN.finditer(active):
-        parsed = image_macro_target(match.group(0))
+        parsed = image_macro_target(match.group(0), current_page_id)
         if parsed:
             add(*parsed)
     return list(found.values())
@@ -298,7 +311,7 @@ def create_snapshot_from_data(content: str, attachments: list[dict], workspace_d
             'unsafe_images': unsafe,
         }
 
-    references = extract_referenced_items(content)
+    references = extract_referenced_items(content, current_page_id=metadata.get('page_id'))
     collisions = [item for item in references if len(item['sources']) > 1]
     if collisions:
         return {'passed': False, 'errors': ['different image sources share a local filename'],
@@ -414,17 +427,18 @@ def cached_files_from(directory: Path | None) -> tuple[dict[str, Path], list[str
     return found, errors
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument('--json-file', type=Path, help='Saved page JSON containing content and attachments')
     source.add_argument('--source-file', type=Path, help='Saved page body')
     parser.add_argument('--asset-dir', type=Path, help='Directory containing downloaded referenced images')
-    parser.add_argument('--workspace', type=Path, default=Path.cwd())
+    parser.add_argument('--workspace', required=True, type=Path,
+                        help='Requirement workspace root (absolute path); snapshot lands in <workspace>/.assets')
     parser.add_argument('--page-id', required=True)
     parser.add_argument('--page-version', required=True)
     parser.add_argument('--page-url')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     try:
         if args.json_file:
