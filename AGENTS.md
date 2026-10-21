@@ -6,7 +6,7 @@
 
 - **语言**：规范、文档、模板与交付物全部为中文。本技能针对中望 CAD。
 - **入口**：`SKILL.md` 定义硬约束、落盘契约与内容地图；规范分布在各 `references/*.md`，每个规范只有一个「家」，其余文件只写指针——改规范先找到归属文件。
-- **纯标准库**：`scripts/*.py` 只用 Python 标准库与互导（无第三方依赖，无 lockfile、无构建）。Python 3.10 已验证。
+- **Python 侧纯标准库**：`scripts/*.py` 只用 Python 标准库与互导（无第三方导入、无 lockfile、无构建），Python 3.10 已验证。运行期另有外部依赖：`render_mermaid.py` 经 npx 拉取 `@mermaid-js/mermaid-cli@11.17.0`，两个渲染脚本都需要本机 Chrome/Edge。
 - **运行前提**：脚本在导入时互引（如 `validate_links.py` 从 `validate_prd.py` 导入），命令一律在**技能仓库根目录**执行；工作区、稿件、输出路径一律用绝对路径显式传入，写入型脚本不按当前目录推断目标。
 - **测试**：`python -B -m unittest discover -s scripts -p "test_*.py"`。改动脚本、模板或文档后均需执行回归测试验证。
 - **模板纯洁与规范隔离**：`assets/prd-template.md` 纯粹是字段骨架，告诉读者“格子填什么”，严禁包含具体实现方案、工具脚本名称（如 `*.py`）或规范要求；所有关于“应当怎么写、必须怎样、工具如何调用”的规范一律且只能写在 `references/prd-standard.md`，模板只写超链接指针。依靠 Agent 架构规则与语义审查保障纯洁性，不为特定中文语句在测试中维护脆弱且易膨胀的字符串白名单。
@@ -22,7 +22,7 @@
 | `gate_state.py` | 门禁台账（`macro→fr→scope→review` 顺序） | `--workspace` 必填，`--read`/`--clear <gate>`/`--waive`/`--reset`，写入必带 `--evidence` |
 | `fetch_snapshot.py` | 在线抓 Confluence 快照 | `--page-id`、`--workspace`；自动复用 MCP/环境凭据 |
 | `build_snapshot.py` | 离线对账建快照 | `--json-file`/`--source-file`、`--workspace`、`--page-id`、`--page-version`；缺图/重名/不安全引用一律失败不降级 |
-| `render_mermaid.py` | Mermaid 渲染为哈希命名 PNG | `--output-dir`、`--force` |
+| `render_mermaid.py` | Mermaid 渲染为哈希命名 PNG | `--output-dir`、`--force`；依赖 npx 拉取的 mermaid-cli 与本机无头浏览器 |
 | `render_story_map.py` | 二维用户故事地图 JSON 渲染为 PNG | `--data` 必填，`--output` 默认 `.assets/images/story-map.png`；字段契约见 `assets/story-map-schema.md`；依赖本机无头浏览器 |
 | `lookup_term.py` | 界面串按字典精确查表，不产出译文 | `--mapping`（绝对路径）、`--terms`/`--terms-file` |
 
