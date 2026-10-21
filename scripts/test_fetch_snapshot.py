@@ -3,6 +3,8 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+import subprocess
+import sys
 
 from fetch_snapshot import (
     parse_page_id,
@@ -86,6 +88,18 @@ class FetchSnapshotTests(unittest.TestCase):
             self.assertFalse((assets / 'source.md').exists())
             self.assertTrue(storage.is_file())
             self.assertTrue(rendered.is_file())
+
+    def test_cli_refuses_to_infer_the_workspace(self):
+        # Omitting --workspace used to fall back to the current directory, which
+        # would drop the snapshot into the skill checkout instead of the
+        # requirement workspace.
+        with tempfile.TemporaryDirectory() as tmp:
+            command = [sys.executable, '-B', str(Path(__file__).with_name('fetch_snapshot.py')),
+                       '--page-id', '272269546']
+            result = subprocess.run(command, capture_output=True, encoding='utf-8', cwd=tmp)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn('--workspace', result.stderr)
+            self.assertFalse((Path(tmp) / '.assets').exists())
 
 
 if __name__ == '__main__':

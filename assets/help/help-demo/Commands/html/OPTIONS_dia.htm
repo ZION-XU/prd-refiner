@@ -1,0 +1,563 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>“选项”对话框</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" href="../../styles/style.css" rel="stylesheet" />
+<link type="text/css" href="../../styles/zwcadcss.css" rel="StyleSheet" />
+<script language="javascript" src="../../scripts/jquery-1.7.2.min.js"></script>
+<script language="javascript" src="../../scripts/table-odd-even.js"></script>
+</head>
+<body>
+<div id="main" class="main">
+    <div class="Tophead"><span class="Tophead_text">“选项”对话框</span><span class="Toplink"> &raquo; <a href="OPTIONS.htm">返回</a></span></div>
+<div class="clr"></div>
+<div id="content" class="content">
+    <div class="content_resize">
+    <div class="article">
+    <div class="clr"></div>
+<!--main-->
+<p class="body_text">指定程序所有使用的预设设置。</p>
+<p class="body_text"><b>当前配置</b>：显示当前配置的名称。</p>
+<p class="body_text"><b>当前图形</b>：显示当前图形文件的名称。</p>
+<p class="body_text">此对话框中包含以下选项卡。</p>
+<ul class="command_ul">
+<li><p><a href="#Open and Save">打开和保存</a></p></li>
+<li><p><a href="#File">文件</a></p></li>
+<li><p><a href="#Display">显示</a></p></li>
+<li><p><a href="#Drafting">草图</a></p></li>
+<li><p><a href="#Selection">选择集</a></p></li>
+<li><p><a href="#User Preferences">用户系统配置</a></p></li>
+<li><p><a href="#Profiles">配置</a></p></li>
+<li><p><a href="#Plot">打印</a></p></li>
+<li><p><a href="#Online">在线</a></p></li>
+</ul>
+<!---option...--->
+<a name="Open and Save"></a>
+<hr algin="left" />
+<p class="define_head_1">打开和保存</p>
+<p class="define_text_1">设置与打开、保存相关的选项。</p>
+<p class="define_head_2">文件保存</p>
+<p class="define_text_1">设置文件保存时的相关选项。</p>
+<p class="define_head_3">缺省保存格式</p>
+<p class="define_text_2">在下拉框中选择并设置文件保存的缺省格式。此时选定的文件格式是用 <a href="SAVE.htm">SAVE</a>、<a href="SAVEAS.htm">SAVEAS</a>、<a href="QSAVE.htm">QSAVE</a> 和 <a href="WBLOCK.htm">WBLOCK</a> 保存所有图形时的默认格式。</p>
+<p class="define_head_3">使用高精度缩略图</p>
+<p class="define_text_2">保存文件时，控制是否以高精度保存文件的缩略图。提升缩略图精度会影响保存效率。</p>
+<p class="define_text_2">该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_THUMBQUALITY.htm">THUMBQUALITY</a>。</p>
+<p class="define_head_3">保存缩略预览图像</p>
+<p class="define_text_2">保存文件时，控制是否在“图形另存为”对话框的“预览”区域更新保存文件的预览图像。</p>
+<p class="define_head_3">增量保存百分比</p>
+<p class="define_text_2">控制图形文件中所允许耗损的空间总量。</p>
+<p class="define_text_2">该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_ISAVEPERCENT.htm">ISAVEPERCENT</a>。</p>
+<p class="define_head_2">文件安全措施</p>
+<p class="define_text_1">为了避免数据丢失，设置文件自动备份等措施。</p>
+<p class="define_head_3">自动保存</p>
+<p class="define_text_2">勾选此选项后，将以指定的时间间隔自动保存图形文件。</p>
+<p class="define_text_2">可以使用系统变量 <a href="../../SystemVariables/html/VAR_SAVEFILEPATH.htm">SAVEFILEPATH</a> 设置自动保存文件的位置，自动保存文件名由系统变量 <a href="../../SystemVariables/html/VAR_SAVEFILE.htm">SAVEFILE</a> 指定，该系统变量为只读属性。</p>
+<p class="define_head_4">仅保存当前图</p>
+<p class="define_text_3">勾选该选项，只自动保存当前图纸。</p>
+<p class="define_head_4">保存间隔分钟数</p>
+<p class="define_text_3">设置自动保存文件的时间间隔，时间单位为“分钟”。</p>
+<p class="define_text_3">该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_SAVETIME.htm">SAVETIME</a>。</p>
+<p class="define_head_3">每次保存均创建备份</p>
+<p class="define_text_2">勾选此项，将在每次保存图形时创建图形的备份副本。</p>
+<p class="define_text_2">该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_ISAVEBAK.htm">ISAVEBAK</a>。</p>
+<p class="define_head_3">维护日志文件</p>
+<p class="define_text_2">将文本窗口的内容写入日志文件，用户可通过日志文件查看每天的工作内容。</p>
+<p class="define_text_2">该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_LOGFILEMODE.htm">LOGFILEMODE</a>。</p>
+<p class="define_head_3">临时文件的扩展名</p>
+<p class="define_text_2">指定临时文件的扩展名。默认的扩展名是 .zw$。</p>
+<p class="define_head_3">数字签名</p>
+<p class="define_text_2">开启“<a href="DIGITALSIGN_dia.htm">数字签名</a>”对话框，将数字签名证书附着到当前图形文件。</p>
+<p class="define_head_3">显示数字签名信息</p>
+<p class="define_text_2">勾选此项，在打开附着有数字签名证书的文件时，不论数字证书是否有效都将显示数字签名状态；否则仅在数字签名失效时显示数字签名状态。</p>
+<p class="define_text_2">该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_SIGWARN.htm">SIGWARN</a>。</p>
+<p class="define_head_2">外部参照</p>
+<p class="define_text_1">控制外部参照的有关设置。</p>
+<p class="define_head_3">按需加载外部参照</p>
+<p class="define_text_2">控制外部参照的按需加载。</p>
+<ul class="command_ul">
+	<li class="list_text">禁用：关闭外部参照的按需加载。</li>
+	<li class="list_text">启用：按需加载外部参照，并锁定外部参照文件。使用按需加载外部参照可以提升文件加载性能，特别是对包含空间索引或图层索引的裁剪外部参照。</li>
+	<li class="list_text">使用副本：打开按需参照，但加载外部参照文件的副本。因此，在编辑外部参照期间，允许其他用户修改外部参照文件。</li>
+</ul>
+<p class="define_text_2">该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_XLOADCTL.htm">XLOADCTL</a>。</p>
+<p class="define_head_3">保留外部参照图层的修改</p>
+<p class="define_text_2">确定是否保存对依赖外部参照图层的图层特性和状态的修改。</p>
+<p class="define_text_2">该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_VISRETAIN.htm">VISRETAIN</a>。</p>
+<p class="define_head_3">允许其他用户参照编辑当前图形</p>
+<p class="define_text_2">勾选此项，将在前图形被另一个或多个图形参照时，用户可在位编辑当前图形文件。</p>
+<p class="define_text_2">该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_XEDIT.htm">XEDIT</a>。</p>
+<p class="define_head_2">文件打开</p>
+<p class="define_text_1">设置最近使用过的文件及打开的文件。</p>
+<p class="define_head_3">要列出的最近使用文件数</p>
+<p class="define_text_2">设置“最近使用的文档”中所列出的最近使用过的文件清单和数目，数目有效值为 0 - 9。</p>
+<p class="define_head_3">在标题中显示完整路径</p>
+<p class="define_text_2">勾选此项，最大化图形后，在标题栏显示当前图形文件的完整路径。</p>
+<p class="define_head_2">每个图形均加载 zwcad.lsp</p>
+<p class="define_text_1">指定是否为每个图形加载 zwcad.lsp 文件。</p>
+<p class="define_head_2">自定义对象的代理图形</p>
+<p class="define_text_1">控制代理图形的显示。该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_PROXYSHOW.htm">PROXYSHOW</a>。</p>
+<p class="define_head_3">显示“代理信息”对话框</p>
+<p class="define_text_2">勾选此项，创建代理对象时将显示“代理信息”对话框。该设置保存在系统变量 <a href="../../SystemVariables/html/VAR_PROXYNOTICE.htm">PROXYNOTICE</a>。</p>
+<!---option...--->
+<a name="File"></a>
+<hr algin="left" />
+<p class="define_head_1">文件</p>
+<p class="define_text_1">设置各种文件的储存路径。</p>
+<p class="define_head_2">搜索路径，文件名和文件位置</p>
+<p class="define_text_1">显示或修改各种文件的保存路径。</p>
+<p class="define_head_2">提示</p>
+<p class="define_text_1">为指定的搜索路径或文件名，提供提示信息。</p>
+<p class="define_head_2">浏览</p>
+<p class="define_text_1">为搜索路径中指定的文件名和文件位置，开启相对应的对话框并设定新位置。</p>
+<p class="define_head_2">添加</p>
+<p class="define_text_1">为指定的文件名添加新的搜索路径。</p>
+<p class="define_head_2">删除</p>
+<p class="define_text_1">删除指定文件名的搜索路径或设置。</p>
+<p class="define_head_2">上移</p>
+<p class="define_text_1">在一个文件名对应多个搜索路径时，将选定的搜索路径移动到前一个搜索路径之上。</p>
+<p class="define_head_2">下移</p>
+<p class="define_text_1">在一个文件名对应多个搜索路径时，将选定的搜索路径移动到下一个搜索路径之下。</p>
+<!---option...--->
+<a name="Display"></a>
+<hr algin="left" />
+<p class="define_head_1">显示</p>
+<p class="define_text_1">设置窗口元素、布局元素、十字光标大小、显示精度、显示性能以及参照编辑的褪色度等选项。</p>
+<p class="define_head_2">窗口元素</p>
+<p class="define_text_1">为绘图区域设置相关的窗口元素选项。</p>
+<p class="define_head_3">配色方案</p>
+<p class="define_text_2">设置用户界面风格为明（白色）或暗（黑色）。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_COLORTHEME.htm">COLORTHEME</a>。</p>
+<p class="define_head_3">图形窗口中显示滚动条</p>
+<p class="define_text_2">在绘图区域的右边和下边显示滚动条。</p>
+<!-- <p class="define_head_3">显示屏幕菜单</p>
+<p class="define_text_2">在绘图区域的右边显示屏幕菜单。</p>
+ -->
+<p class="define_head_3">工具栏使用大按钮</p>
+<p class="define_text_2">以大按钮显示工具栏中的每个按钮。</p>
+<p class="define_head_3">显示工具提示</p>
+<p class="define_text_2">在功能区显示工具提示。</p>
+<p class="define_head_4">显示需等待的秒数</p>
+<p class="define_text_3">显示简单工具提示需等待的时间。</p>
+<p class="define_head_4">显示扩展工具提示</p>
+<p class="define_text_3">在功能区显示扩展的工具提示。</p>
+<p class="define_head_4">延迟等待的秒数</p>
+<p class="define_text_3">由简单工具提示跳转到扩展的工具提示需等待的时间。</p>
+<p class="define_head_3">自动菜单装载</p>
+<p class="define_text_2">在开启图形文件时，自动加载菜单文件。</p>
+<p class="define_head_3">显示文件选项卡</p>
+<p class="define_text_2">在绘图区域的上边显示文件选项卡。</p>
+<p class="define_head_3">颜色</p>
+<p class="define_text_2">打开“图形窗口颜色”对话框，为主程序窗口中的界面元素指定颜色。</p>
+<p class="define_head_3">字体</p>
+<p class="define_text_2">打开“字体”对话框，设置命令行的文字样式。</p>
+<p class="define_head_2">布局元素</p>
+<p class="define_text_1">设置布局空间的相关选项。</p>
+<p class="define_head_3">显示可打印区域</p>
+<p class="define_text_2">布局页面中显示虚线框，虚线框即为纸张的可打印区域。</p>
+<p class="define_head_3">显示图纸背景</p>
+<p class="define_text_2">在布局页面中显示一个与纸张大小一致的区域。</p>
+<p class="define_head_4">显示图纸阴影</p>
+<p class="define_text_3">选择此选项后，纸张的底部会有阴影的效果。</p>
+<p class="define_head_3">新建布局时显示页面设置管理器</p>
+<p class="define_text_2">选择此选项后，每次新建布局时，会自动弹出“<a href="PAGESETUP_dia.htm">页面设置管理器</a>”对话框。</p>
+<p class="define_head_3">在新布局中创建视口</p>
+<p class="define_text_2">选择此选项后，每次新建布局时，会在布局中自动创建一个视口。</p>
+<p class="define_head_2">褪色度控制</p>
+<p class="define_text_1">控制外部参照对象在显示时和编辑时的褪色度值。</p>
+<p class="define_head_3">外部参照显示</p>
+<p class="define_text_2">指定外部参照在图形中显示的褪色度值。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_XDWGFADECTL.htm">XDWGFADECTL</a>。</p>
+<p class="define_head_3">在位编辑显示</p>
+<p class="define_text_2">指定外部参照对象在编辑过程中显示的褪色度值。有效值的范围从 0% 到 90%。默认设置是 70%。</p>
+<p class="define_text_2">设置值存储在系统变量 <a href="../../SystemVariables/html/VAR_XFADECTL.htm">XFADECTL</a>。</p>
+<p class="define_head_2">显示精度</p>
+<p class="define_text_1">设置绘制的对象的显示质量。</p>
+<p class="define_head_3">圆弧和圆的平滑度</p>
+<p class="define_text_2">控制圆弧、圆以及椭圆等对象的平滑度。也可以通过 <a href="VIEWRES.htm">VIEWRES</a> 命令进行设置。</p>
+<p class="define_head_3">每条多段线曲线的线段数</p>
+<p class="define_text_2">设置多段线曲线的线段数。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_SPLINESEGS.htm">SPLINESEGS</a>。</p>
+<p class="define_head_3">渲染对象的平滑度</p>
+<p class="define_text_2">设置着色和渲染曲面实体的平滑度。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_FACETRES.htm">FACETRES</a>。</p>
+<p class="define_head_3">曲面轮廓素线</p>
+<p class="define_text_2">为对象上每个曲面指定轮廓素线数目，有效取值范围为 0 到 2047。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_ISOLINES.htm">ISOLINES</a>。</p>
+<p class="define_head_2">显示性能</p>
+<p class="define_text_1">设置系统的显示性能选项。</p>
+<!--<p class="define_head_3">平移和缩放过程中显示光栅图像/PDF底图</p>
+<p class="define_text_2">在使用 <a href="PAN.htm">PAN</a> 和 <a href="ZOOM.htm">ZOOM</a> 平移和缩放光栅图像及PDF底图时，设置光栅图像及PDF底图的显示是内容还是轮廓。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_RTDISPLAY.htm">RTDISPLAY</a>。</p>-->
+<p class="define_head_3">仅亮显光栅图像边框</p>
+<p class="define_text_2">勾选此项，选中光栅图像时仅亮显图像边框。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_IMAGEHLT.htm">IMAGEHLT</a>。在二维线框视觉样式下，该设置仅在系统变量 <a href="../../SystemVariables/html/VAR_SELECTIONEFFECT.htm">SELECTIONEFFECT</a> 设置为 1 有效。</p>
+<p class="define_head_3">应用实体填充</p>
+<p class="define_text_2">勾选此项，以实体填充的形式来显示对象。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_FILLMODE.htm">FILLMODE</a>。</p>
+<p class="define_head_3">仅显示文字边框</p>
+<p class="define_text_2">显示文字的边框而不显示文字。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_QTEXTMODE.htm">QTEXTMODE</a>。</p>
+<p class="define_head_3">以线框形式显示轮廓</p>
+<p class="define_text_2">勾选此项，以线框形式显示实体对象轮廓曲线。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_DISPSILH.htm">DISPSILH</a>。</p>
+<p class="define_head_3">图形硬件设置</p>
+<p class="define_text_2">打开“<a href="GRAPHICSCONFIG_dia.htm">图形硬件设置</a>”对话框，设置硬件加速及其他显示性能选项。</p>
+<!--<p class="define_head_3">缩放时不显示填充</p>
+<p class="define_text_2">勾选此项，在使用 <a href="PAN.htm">PAN</a> 和 <a href="ZOOM.htm">ZOOM</a> 平移和缩放时，不显示填充。</p>
+<p class="define_head_3">平滑线显示</p>
+<p class="define_text_2">勾选此项，开启反走样，以平滑线显示对象。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_LINESMOOTHING.htm">LINESMOOTHING</a>。</p>-->
+<p class="define_head_2">十字光标大小</p>
+<p class="define_text_1">拖拽滑块，调节十字光标的显示尺寸。</p>
+<p class="define_text_1">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_CURSORSIZE.htm">CURSORSIZE</a>。</p>
+<!---option...--->
+<a name="Drafting"></a>
+<hr algin="left" />
+<p class="define_head_1">草图</p>
+<p class="define_text_1">设置自动捕捉、对象捕捉、自动追踪等选项。</p>
+<p class="define_head_2">自动捕捉设置</p>
+<p class="define_text_1">设置自动捕捉的相关选项。</p>
+<!--<p class="define_head_3">开启捕捉标记（功能暂未实现）</p>
+<p class="define_text_2">开启捕捉标记。</p>-->
+<p class="define_head_3">磁吸</p>
+<p class="define_text_2">吸引且将光标锁定到检测到的最接近的捕捉特征点。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_AUTOSNAP.htm">AUTOSNAP</a>。</p>
+<p class="define_head_3">显示自动捕捉工具提示</p>
+<p class="define_text_2">勾选此项，显示自动捕捉工具提示。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_AUTOSNAP.htm">AUTOSNAP</a>。</p>
+<p class="define_head_3">显示自动捕捉标记</p>
+<p class="define_text_2">控制捕捉标记的显示。</p>
+<p class="define_head_3">显示自动捕捉靶框</p>
+<p class="define_text_2">控制自动捕捉靶框的显示。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_APBOX.htm">APBOX</a>。</p>
+<!--<p class="define_head_3">显示捕捉光标图饰（功能暂未实现）</p>
+<p class="define_text_2">设置捕捉光标图饰的显示。</p>-->
+<p class="define_head_3">自动捕捉标记颜色</p>
+<p class="define_text_2">设置自动捕捉光标的颜色。</p>
+<p class="define_head_3">厚度</p>
+<p class="define_text_2">设置自动捕捉标记的边框厚度。</p>
+<p class="define_head_2">自动捕捉标记大小</p>
+<p class="define_text_1">通过拖曳指定自动捕捉标记的显示尺寸。</p>
+<p class="define_head_2">对象捕捉选项</p>
+<p class="define_text_1">设置对象捕捉时遇到图案填充对象的处理方式。</p>
+<p class="define_head_3">忽略图案填充对象</p>
+<p class="define_text_2">勾选此项，将不能捕捉到图案填充对象。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_OSNAPHATCH.htm">OSNAPHATCH</a>。</p>
+<p class="define_head_3">忽略尺寸界线</p>
+<p class="define_text_2">勾选此项，将不能捕捉到尺寸界线。</p>
+<p class="define_head_3">使用当前标高替换 Z 值</p>
+<p class="define_text_2">勾选此项，忽略对象捕捉位置的 Z 值，并使用为当前 UCS 设置的标高的 Z 值。</p>
+<p class="define_head_2">自动追踪设置</p>
+<p class="define_text_1">设置自动追踪的相关选项。</p>
+<p class="define_head_3">显示极轴追踪矢量</p>
+<p class="define_text_2">控制极轴追踪矢量的显示。勾选此项，将会在指定角度显示一个矢量。使用极轴追踪可以沿角度绘制直线。</p>
+<p class="define_head_3">显示全屏追踪矢量</p>
+<p class="define_text_2">控制全屏追踪路径的显示。勾选此项，将显示对齐矢量以辅助用户按照特定角度或按照与其他对象的特定关系绘制对象。</p>
+<p class="define_head_3">显示自动追踪工具提示</p>
+<p class="define_text_2">控制自动追踪工具提示的显示。</p>
+<p class="define_head_2">对齐点获取</p>
+<p class="define_text_1">设置在图形中获取矢量对齐点的方法。</p>
+<p class="define_head_3">自动</p>
+<p class="define_text_2">当靶框移到对象捕捉上时，自动显示追踪矢量。</p>
+<p class="define_head_3">用 Shift 键获取</p>
+<p class="define_text_2">当按 SHIFT 键并将靶框移到对象捕捉上时，显示追踪矢量。</p>
+<p class="define_head_2">靶框大小</p>
+<p class="define_text_1">拖拽滚动条，调节靶框的显示尺寸。该设置存储在系统变量 <a href="../../SystemVariables/html/VAR_APERTURE.htm">APERTURE</a>。</p>
+<p class="define_text_1">对象捕捉靶框的显示由系统变量 <a href="../../SystemVariables/html/VAR_APBOX.htm">APBOX</a> 来控制，靶框只有在对象捕捉模式开启下并捕捉到相应的点时才会显示。靶框的大小则显示对象捕捉的范围。</p>
+<div class="define_text_1">
+<table class="note-table">
+<tr>
+<td class="note-table-img"><img class="note-img" src="../../images/note.gif"></td>
+<td class="note-table-title"><span class="note-title">注意</span></td>
+<td class="note-table-text"><span class="note-text">用户很容易将对象捕捉的靶框和选取状态下的拾取框混淆，要辨别清楚。对象选取状态下提示的拾取框由系统变量 <a href="../../SystemVariables/html/VAR_PICKBOX.htm">PICKBOX</a> 来控制大小。</span></td>
+</tr>
+</table>
+</div>
+<!---option...--->
+<a name="Selection"></a>
+<hr algin="left" />
+<p class="define_head_1">选择集</p>
+<p class="define_text_1">设置在绘图区域中进行对象选择时的相关选项。</p>
+<p class="define_head_2">拾取框大小</p>
+<p class="define_text_1">拖拽滑块，调节拾取框的显示尺寸。</p>
+<p class="define_head_2">区域选择效果</p>
+<p class="define_text_1">设置选择操作时所选区域的相关选项。</p>
+<p class="define_head_3">命令处于活动状态时</p>
+<p class="define_text_2">命令处于活动状态并且命令行提示“选择对象”时，会显示选择预览。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_SELECTIONPREVIEW.htm">SELECTIONPREVIEW</a>。</p>
+<p class="define_head_3">未激活任何命令时</p>
+<p class="define_text_2">命令未激活时，也会显示选择预览。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_SELECTIONPREVIEW.htm">SELECTIONPREVIEW</a>。</p>
+<p class="define_head_3">区域效果设置</p>
+<p class="define_text_2">点击“区域效果设置”按钮，开启“<a href="OPTIONS_dia02.htm">视觉效果设置</a>”对话框，设置选择预览的外观。</p>
+<p class="define_head_2">选择模式</p>
+<p class="define_text_1">设置在进行对象选择时的选择方式。</p>
+<p class="define_head_3">先选择后执行</p>
+<p class="define_text_2">勾选此项，允许先选择对象，再执行命令对所选对象进行操作。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_PICKFIRST.htm">PICKFIRST</a>。</p>
+<p class="define_head_3">用 Shift 键添加到选择集</p>
+<p class="define_text_2">勾选此项，按 SHIFT 键选择对象时，向选择集中添加或从选择集中删除对象。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_PICKADD.htm">PICKADD</a>。</p>
+<p class="define_head_3">对象编组</p>
+<p class="define_text_2">勾选此项，可以通过选择编组中的一个对象选择编组中的所有对象。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_PICKSTYLE.htm">PICKSTYLE</a>。</p>
+<p class="define_head_3">关联填充</p>
+<p class="define_text_2">如果选择该选项，选择关联填充时也选定边界对象。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_PICKSTYLE.htm">PICKSTYLE</a>。</p>
+<p class="define_head_3">支持自动窗口选择</p>
+<p class="define_text_2">勾选此项，选择对象时通过窗口或窗交进行选择。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_PICKAUTO.htm">PICKAUTO</a>。</p>
+<p class="define_head_4">允许在对象上按下进行框选或窗选</p>
+<p class="define_text_3">勾选此项，可以在对象上单击进行窗口或窗交选择。</p>
+<p class="define_text_3">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_PICKAUTO.htm">PICKAUTO</a>。</p>
+<p class="define_head_4">允许按住并拖动以进行套索选择</p>
+<p class="define_text_3">勾选此项，可以按住并拖动进行套索选择。</p>
+<p class="define_text_3">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_PICKAUTO.htm">PICKAUTO</a>。</p>
+<p class="define_head_3">窗口选择方法</p>
+<p class="define_text_2">在下拉列表中选择绘制选择窗口的方法。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_PICKDRAG.htm">PICKDRAG</a>。</p>
+<p class="define_head_3">属性选项板的对象限制</p>
+<p class="define_text_2">限制属性选项板中选定对象的数目。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_PROPOBJLIMIT.htm">PROPOBJLIMIT</a>。</p>
+<p class="define_head_3">选择效果颜色</p>
+<p class="define_text_2">设置选择对象时高亮光晕效果的颜色。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_SELECTIONEFFECTCOLOR.htm">SELECTIONEFFECTCOLOR</a>。</p>
+<p class="define_head_2">夹点大小</p>
+<p class="define_text_1">拖拽滑块，调节夹点的显示尺寸。</p>
+<p class="define_text_1">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_GRIPSIZE.htm">GRIPSIZE</a>。</p>
+<p class="define_head_2">夹点</p>
+<p class="define_text_1">设置夹点的相关选项。</p>
+<p class="define_head_3">未选中夹点颜色</p>
+<p class="define_text_2">设置未被选中的夹点显示颜色。</p>
+<p class="define_head_3">选中夹点颜色</p>
+<p class="define_text_2">设置被选中的夹点显示颜色。</p>
+<p class="define_head_3">悬停夹点颜色</p>
+<p class="define_text_2">设置光标悬停在夹点上时夹点的显示颜色。</p>
+<p class="define_head_3">启用夹点</p>
+<p class="define_text_2">控制选取对象后，是否在对象上显示夹点。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_GRIPS.htm">GRIPS</a>。</p>
+<p class="define_head_3">激活图块内夹点</p>
+<p class="define_text_2">控制选取图块对象后，是否显示图块中对象的夹点。勾选此项，则同时显示图块和图块内对象的夹点，否则，则仅显示图块的夹点。</p>
+<p class="figure"><img class="pics" src="../pics/option_gripinblock.jpg"><br/>
+<span class="pics-caption" style="margin-left:50px;"><b>A：</b>关闭“激活图块内夹点”</span><span class="pics-caption" style="margin-left:100px;"><b>B：</b>打开“激活图块内夹点”</span></p>
+<p class="define_head_3">启用夹点提示</p>
+<p class="define_text_2">夹点开启的情况下，当移动光标到对象的夹点上时，是否显示夹点提示信息。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_GRIPTIPS.htm">GRIPTIPS</a>。</p>
+<p class="define_head_3">显示动态夹点菜单</p>
+<p class="define_text_2">夹点开启的情况下，当移动光标到对象的夹点上时，是否显示动态夹点菜单。</p>
+<p class="define_head_3">允许按 Ctrl 键循环改变对象编辑方式行为</p>
+<p class="define_text_2">夹点开启的情况下，选中夹点时，按 Ctrl 键可以循环切换夹点编辑选项。</p>
+<p class="define_head_3">启用夹点吸附范围</p>
+<p class="define_text_2">控制夹点吸附范围的显示，并设置吸附范围。其取值范围为 0-10，预设值为 1。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_GRIPADSORB.htm">GRIPADSORB</a>。</p>
+<p class="define_head_3">显示夹点时限制对象选择</p>
+<p class="define_text_2">当选择集中对象数目大于指定数目时，不显示夹点。预设值为 100。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_GRIPOBJLIMIT.htm">GRIPOBJLIMIT</a>。</p>
+<!---option...--->
+<a name="User Preferences"></a>
+<hr algin="left" />
+<p class="define_head_1">用户系统配置</p>
+<p class="define_text_1">控制系统相关选项的设置。</p>
+<p class="define_head_2">Windows 标准</p>
+<p class="define_text_1">控制在绘图区域中鼠标右键的作用。</p>
+<p class="define_head_3">双击进行编辑</p>
+<p class="define_text_2">控制绘图区域中的双击编辑操作。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_DBLCLKEDIT.htm">DBLCLKEDIT</a>。</p>
+<p class="define_head_3">绘图区域中使用快捷菜单</p>
+<p class="define_text_2">单击鼠标右键时，在绘图区域显示快捷菜单。</p>
+<p class="define_head_3">自定义右键单击</p>
+<p class="define_text_2">开启“自定义右键单击”对话框。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/var_SHORTCUTMENU.htm">SHORTCUTMENU</a>。</p>
+<p class="define_head_4">打开计时右键单击</p>
+<p class="define_text_3">勾选此项后，若快速单击鼠标右键，功能与按回车（Enter）键相同；若慢速单击鼠标右键，则显示右键快捷菜单。慢速单击的时间期限以毫秒（ms）为单位来设置。</p>
+<p class="define_head_4">默认模式</p>
+<p class="define_text_3">设置在没有选中对象时，单击鼠标右键的是重复上一个命令还是显示右键快捷菜单。若勾选了“打开计时右键单击”选项，“默认模式”将不可用。</p>
+<p class="define_head_4">编辑模式</p>
+<p class="define_text_3">设置在选中对象时，单击鼠标右键是重复上一个命令还是显示右键快捷菜单。</p>
+<p class="define_head_4">命令模式</p>
+<p class="define_text_3">设置在执行命令时，单击鼠标右键的含义。若勾选了“打开计时右键单击”选项，“命令模式”将不可用。</p>
+<p class="define_head_4">确认</p>
+<p class="define_text_3">当命令正在执行时，单击右键与按回车（Enter）键功能相同。“命令”右键快捷菜单将被禁用。</p>
+<p class="define_head_4">快捷菜单：总是启用</p>
+<p class="define_text_3">启用“命令”右键快捷菜单。</p>
+<p class="define_head_4">快捷菜单：命令选项存在时可用</p>
+<p class="define_text_3">当命令选项存在时，才启用“命令”右键快捷菜单。若无可用的命令选项，则单击鼠标右键与按回车（Enter）键功能相同。</p>
+<p class="define_head_2">拖放比例</p>
+<p class="define_text_1">当单位设置为无单位，即系统变量 INSUNITS 设置为 0 时，设置源、目标的单位内容。</p>
+<p class="define_head_3">源内容单位</p>
+<p class="define_text_2">设置插入到当前图形中的对象的单位。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_INSUNITSDEFSOURCE.htm">INSUNITSDEFSOURCE</a>。</p>
+<p class="define_head_3">目标图形单位</p>
+<p class="define_text_2">设置在当前图形中的对象的单位。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_INSUNITSDEFTARGET.htm">INSUNITSDEFTARGET</a>。</p>
+<p class="define_head_2">字段</p>
+<p class="define_text_1">设置与字段相关的系统配置。</p>
+<p class="define_head_3">显示字段的背景</p>
+<p class="define_text_2">显示字段是否带有浅灰色背景，打印时不会打印背景色。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_FIELDDISPLAY.htm">FIELDDISPLAY</a>。</p>
+<p class="define_head_3">字段更新设置</p>
+<p class="define_text_2">打开“字段更新设置”对话框。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_FIELDEVAL.htm">FIELDVAL</a>。</p>
+<p class="define_head_2">VBA 宏设置</p>
+<p class="define_text_1">控制是否启用宏病毒防护。</p>
+<p class="define_head_3">启用宏病毒防护</p>
+<p class="define_text_2">在打开包含病毒的宏时，显示警告信息。</p>
+<p class="define_head_2">坐标数据输入的优先级</p>
+<p class="define_text_1">确定是否以从命令行以键盘输入坐标值来替代对象捕捉设置。</p>
+<p class="define_text_1">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_OSNAPCOORD.htm">OSNAPCOORD</a>。</p>
+<p class="define_head_3">执行对象捕捉</p>
+<p class="define_text_2">执行对象捕捉总是替代键盘坐标输入。</p>
+<p class="define_head_3">键盘输入</p>
+<p class="define_text_2">坐标键盘输入总是替代执行对象捕捉。</p>
+<p class="define_head_3">键盘输入，脚本例外</p>
+<p class="define_text_2">键盘输入替代对象捕捉设置，脚本中的设置除外。</p>
+<p class="define_head_2">对象排序方式</p>
+<p class="define_text_1">设置对象的排序方式。</p>
+<p class="define_text_1">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_SORTENTS.htm">SORTENTS</a>。</p>
+<p class="define_head_3">对象选择</p>
+<p class="define_text_2">在对象选择期间，按创建的先后次序排列可选择的对象。如果在对象选择期间选中了两个重叠的对象，最新创建的对象将视为被选中对象。如果不选择此选项，将随机确定被选中对象的排列次序。</p>
+<p class="define_head_3">对象捕捉</p>
+<p class="define_text_2">在使用“对象捕捉”时，按照创建的先后次序排列可选择的对象。如果使用“对象捕捉”时选中了两个重叠的对象，最新创建的对象视为捕捉到的对象。如果不选择此选项，将随机确定“对象捕捉”的次序。该设置保存在图形中。</p>
+<p class="define_head_3">重生成</p>
+<p class="define_text_2">在使用 <a href="REGEN.htm">REGEN</a> 或 <a href="REGENALL.htm">REGENALL</a> 命令时，按创建的先后次序排列并重生成图形中的对象。如果不选择此选项，将随机确定对象的重生成次序。该设置保存在图形中。</p>
+<p class="define_head_3">打印</p>
+<p class="define_text_2">在打印时，按照创建的先后次序排列并打印图形中的对象。如果不选择此选项，将随机确定对象的打印次序。该设置保存在图形中。</p>
+<p class="define_head_2">关联标注</p>
+<p class="define_text_1">设置标注的关联性。</p>
+<p class="define_head_3">使新标注可关联</p>
+<p class="define_text_2">勾选此项，新创建的标注为关联标注。当修改与关联标注相关联的对象时，关联标注也随之自动进行调整。</p>
+<p class="define_text_2">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_DIMASSOC.htm">DIMASSOC</a>。</p>
+<p class="define_head_2">线宽设置</p>
+<p class="define_text_1">开启“<a href="LWEIGHT_dia.htm">线宽设置</a>”对话框。</p>
+<p class="define_head_2">隐藏消息设置</p>
+<p class="define_text_1">开启“隐藏消息设置”对话框，用户可控制以下弹窗是否显示。</p>
+<ul class="define_text_2">
+	<li class="procedure"><strong>多行文字 - 未保存的更改：</strong>创建或编辑多行文字后，未保存即按 Esc 键退出命令，显示弹窗提示用户是否保存文字更改。</li>
+	<li class="procedure"><strong>缺少 SHX 文件：</strong>打开的文件中 SHX 字体缺失时，显示弹窗提示用户是否进行替换。</li>
+	<li class="procedure"><strong>参照 - 未融入的参照文件：</strong>打开文件时未找到参照文件，显示弹窗提示用户是否忽略缺失的参照文件。</li>
+	<li class="procedure"><strong>参照 - 相对路径：</strong>如果当前图形中具有相对路径的外部参照，将当前图形另存至其他位置时，显示弹窗提示用户是否更新路径。</li>
+	<li class="procedure"><strong>DWG 文件重新关联到 ZWCAD：</strong>中望CAD 未设置为 DWG 文件默认程序，启动中望CAD 时，显示弹窗提示用户是否将 DWG 文件与中望CAD 关联。</li>
+	<li class="procedure"><strong>注释比例 - 大量注释比例：</strong>大量的注释比例会影响图形性能，打开的图形中存在大量注释比例时，显示弹窗提示用户是否重置比例列表。</li>
+	<li class="procedure"><strong>图案填充 - 冻结的图层：</strong>冻结图层上无法创建填充，如果 HPLAYER 系统变量设置为冻结的图层，执行填充时，显示弹窗提示用户是否将该图层解冻。</li>
+	<li class="procedure"><strong>OLE 文字大小：</strong>通过剪切板向图形中粘贴 Excel 或 Word 的内容时，显示“OLE 文字大小”对话框。</li>
+	<li class="procedure"><strong>调整屏幕分辨率<!--（ZWCAD）-->：</strong>中望CAD 在不合适的屏幕分辨率或显示比例下无法运行，如显示比例设置为 150%，启动中望CAD 时，显示弹窗提示用户需调整分辨率或显示比例。</li>
+	<li class="procedure"><strong>打印 - 正在处理后台作业：</strong>发布图纸时，勾选“后台打印”，显示弹窗提示用户正在处理后台作业。</li>
+	<li class="procedure"><strong>阵列 - 阵列编辑状态：</strong>编辑关联阵列时，选择源对象进行编辑，显示弹窗提示用户当前的阵列编辑状态。</li>
+	<li class="procedure"><strong>阵列 - 关联的路径阵列<!--（关联的路径阵列）-->：</strong>通过鼠标在绘图区域拖动路径阵列时，显示弹窗提示用户当前操作将丢失路径阵列与路径曲线的关联性。</li>
+	<li class="procedure"><strong>文件比较忽略实体：</strong>文件比较不支持比较OLE、三维实体等对象，如果图纸中包含不支持的对象类型，显示弹窗提示用户不支持的对象类型将被隐藏。</li>
+	<li class="procedure"><strong>漫游和飞行 - 更改为透视视图：</strong>漫游和飞行时仅支持透视视图，如果当前为平行视图，显示弹窗提示用户是否更改当前视图。</li>
+	<li class="procedure"><strong>比较 - 输出比较快照：</strong>输出文件比较快照时，显示弹窗提示用户快照输出后将被通知。</li>
+	<li class="procedure"><strong>外部参照比较 - 修改的外部参照：</strong>外部参照比较过程中，如果外部参照被修改，按提示重载外部参照，显示弹窗提示用户是否要结束比较。</li>
+	<li class="procedure"><strong>外部参照重新加载 - 比较更改：</strong>未处于外部参照比较过程中，如果外部参照被修改，按提示重载外部参照，显示弹窗提示用户是否要比较附着的外部参照与参照图形文件之间的差异。</li>
+	<li class="procedure"><strong>快捷特性 - 恢复默认：</strong>在“自定义用户界面”对话框中“快捷特性”节点右键选择“恢复默认”，显示弹窗提示用户将恢复默认的快捷特性设置。</li>
+	<li class="procedure"><strong>快捷特性 - 移除未定义的对象类型：</strong>在“自定义用户界面”对话框中单击“快捷特性”节点，如果对象类型列表中存在未定义任何特性的对象类型，关闭对话框时，显示弹窗提示用户是否移除未定义的对象类型。</li>
+	<li class="procedure"><strong>STEP 输入设置：</strong>输入 STEP 文件时，显示“STEP 输入设置”对话框。</li>
+	<li class="procedure"><strong>打印 - 无法使用此绘图仪配置：</strong>当前打印配置中的打印设备不可用时，执行打印弹出缺少绘图仪配置的提示框。</li>
+	<li class="procedure"><strong>参数过滤器 - 新参数：</strong>表达式管理器中选中“表达式中使用的所有项”过滤器时，创建新的参数时，显示弹窗提示创建的新参数与当前的过滤器不匹配。</li>
+	<li class="procedure"><strong>受约束的可变块：</strong>将约束应用于可变块时，显示弹窗提示应用约束后会不显示可变块夹点。</li>
+	<li class="procedure"><strong>图纸重复打开：</strong>当重复打开同一张图纸时，显示弹窗提示用户选择跳转到已打开的图纸标签页或者以只读的形式打开图纸。</li>
+	<li class="procedure"><strong>动态观察：</strong>在二维线框模式下使用动态观察操作时，提示切换至三维视觉样式，以获得更佳的浏览体验。</li>
+	<li class="procedure"><strong>命令行 - 关闭：</strong>关闭命令行时，显示弹窗提示用户如何快速再次打开命令行使其显示。</li>
+</ul>
+<!---option...--->
+<a name="Profiles"></a>
+<hr algin="left" />
+<p class="define_head_1">配置</p>
+<p class="define_text_1">设置自定义的配置。</p>
+<p class="define_head_2">可用配置</p>
+<p class="define_text_1">列表显示可用配置。</p>
+<p class="define_head_2">置为当前</p>
+<p class="define_text_1">在列表中选择配置，将其设置为当前配置。</p>
+<p class="define_head_2">添加到列表</p>
+<p class="define_text_1">开启“添加配置文件”对话框，指定新的配置的名称以及说明文字，并增加到列表中。</p>
+<p class="define_head_2">重命名</p>
+<p class="define_text_1">开启“重命名配置文件”对话框，为指定的配置重新指定新名称和说明文字。</p>
+<p class="define_head_2">删除</p>
+<p class="define_text_1">删除列表中指定的配置。</p>
+<p class="define_head_2">输出</p>
+<p class="define_text_1">开启“导出配置文件”对话框，将当前选定配置写入指定的 <em>.arg</em> 文件。</p>
+<p class="define_head_2">输入</p>
+<p class="define_text_1">开启“导入配置文件”对话框，指定 <em>.arg</em> 文件以导入配置。</p>
+<p class="define_head_2">重置</p>
+<p class="define_text_1">将选定配置中的值重置为系统默认设置。</p>
+<!---option...--->
+<a name="Plot"></a>
+<hr algin="left" />
+<p class="define_head_1">打印</p>
+<p class="define_text_1">设置打印相关的选项。</p>
+<p class="define_head_2">新布局的默认打印设置</p>
+<p class="define_text_1">为新建的布局指定默认的打印机。</p>
+<p class="define_head_3">用作默认的输出设备</p>
+<p class="define_text_2">指定列表中的某款打印机作为新图形的默认输出设备。</p>
+<p class="define_head_3">使用上次的可用打印设置</p>
+<p class="define_text_2">指定新建的布局使用上一次可用的打印设置。</p>
+<p class="define_head_3">添加或编辑绘图仪</p>
+<p class="define_text_2">显示“<a href="PLOT_dia04.htm">添加绘图仪</a>”对话框。</p>
+<p class="define_head_2">打印到文件</p>
+<p class="define_head_3">打印到文件操作的默认位置</p>
+<p class="define_text_2">设定“打印到文件”的默认输出位置。</p>
+<p class="define_head_2">指定打印偏移相对于</p>
+<p class="define_text_1">指定图形的偏移是从纸张的左下角开始计算还是从可打印区域的左下角开始计算。</p>
+<p class="define_text_1">该设置储存在系统变量 <a href="../../SystemVariables/html/VAR_PLOTOFFSET.htm">PLOTOFFSET</a>。</p>
+<p class="define_head_3">图纸边缘</p>
+<p class="define_text_2">设定图形打印偏移的相对位置为图纸边缘。</p>
+<p class="define_head_3">可打印区域</p>
+<p class="define_text_2">设定图形打印偏移的相对位置为可打印区域。</p>
+<p class="define_head_2">新图形的默认打印样式</p>
+<p class="define_text_1">新建图形时，图形文件的默认打印样式。</p>
+<p class="define_head_3">新建或编辑打印样式表</p>
+<p class="define_text_2">打开文件浏览对话框，选择打印样式表进行编辑，或新建打印样式表。</p>
+<p class="define_head_2">常规打印选项</p>
+<p class="define_head_3">OLE 打印质量</p>
+<p class="define_text_2">设置 OLE 对象的默认打印质量。</p>
+<p class="define_head_3">隐藏系统打印机</p>
+<p class="define_text_2">控制在“打印”对话框中是否隐藏系统打印机。该设置并不隐藏通过“添加绘图仪向导”配置的系统打印机。</p>
+<p class="define_head_2">打印戳记设置</p>
+<p class="define_text_1">显示“<a href="PLOTSTAMP_dia.htm">打印戳记</a>”对话框。</p>
+<!---option...--->
+<a name="Online"></a>
+<hr algin="left" />
+<p class="define_head_1">在线</p>
+<p class="define_text_1">在“在线”选项卡中，控制是否启用云存储，选择云存储服务提供商以及设置自动同步文件的方式。</p>
+<p class="define_head_2">启用云存储</p>
+<p class="define_text_1">勾选启用云存储，云存储服务供应商、自动文件同步设置以及同步目录设置模块将启用。</p>
+<p class="define_head_3">云存储服务供应商</p>
+<p class="define_text_3">选择云存储服务提供商并获取授权。</p>
+<p class="define_head_4">选择下拉框</p>
+<p class="define_text_3">可从中选择云存储服务提供商。云存储当前支持哪些供应商由中望CAD 云互联的配置模块动态检测获取。目前支持百度云盘、华为云空间。</p>
+<p class="define_head_4">获取授权</p>
+<p class="define_text_3">获取（或重新获取）当前云存储供应商的授权。如果未获取授权则显示为“未授权”，反之则显示用户名。</p>
+<p class="define_head_3">自动文件同步设置</p>
+<p class="define_text_3">设置将本地图纸的副本保存至云端的方式。</p>
+<p class="define_head_4">在我保存时自动同步</p>
+<p class="define_text_3">在保存本地文件时，自动同步到云端。</p>
+<p class="define_head_4">仅同步我选择的文档</p>
+<p class="define_text_3">仅同步用户指定的文档。</p>
+<p class="define_head_3">同步目录设置</p>
+<p class="define_text_3">设置云存储功能本地文件夹位置。</p>
+<p class="define_head_4">本地同步目录</p>
+<p class="define_text_3">指定当前云存储设备所对应的本地同步路径。</p>
+<!--
+<p class="define_head_3">自定义配置同步设置</p>
+<p class="define_text_3">此区域仅在“于云端同步我的自定义设置”选项启用时可用。此区域的所有配置数据保存在注册表中。</p>
+<p class="define_head_4">于云端同步我的自定义设置</p>
+<p class="define_text_3">启用该选项在云端同步自定义配置。可选择保持所有的配置同步或仅同步选定的配置。</p>
+<p class="define_head_4">保持所有的配置同步</p>
+<p class="define_text_3">同步所有配置。</p>
+<p class="define_head_4">仅同步选定的配置</p>
+<p class="define_text_3">仅同步用户选择的配置。</p>
+<p class="define_head_4">选择要同步的配置项</p>
+<p class="define_text_3">开启“<a href="SYNCSETTINGS_dia.htm">中望CAD 自定义配置项</a>”对话框，用户可从中选择需要同步至云的配置文件。</p>
+-->
+<!----...option--->
+<!--main-->
+</div>
+</div>
+</div>
+<div class="clr"></div>
+<div class="blank"></div>
+</div>
+</body>
+</html>

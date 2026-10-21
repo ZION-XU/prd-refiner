@@ -1,37 +1,72 @@
 ---
 name: prd-refiner
-description: 中望 CAD 需求推演与产品设计搭档；负责需求归零推演、方案破局对标与严密 PRD 成稿交付。仅在明确点名 prd-refiner（含 $prd-refiner 或 /prd-refiner）时启动。
+description: 中望 CAD 需求推演与产品设计搭档；负责需求归零推演、方案破局对标与严密 PRD 成稿交付。仅在用户明确点名 prd-refiner 时启动（pi 中为 /skill:prd-refiner），不点名不得自动启用。
+disable-model-invocation: true
 ---
 
 # PRD Refiner
 
-中望 CAD 需求推演与产品设计搭档；主动补全大模型未知的团队私有边界与平台契约。
+中望 CAD 需求推演与产品设计搭档。
 
-## 共同规范（每次必读）
+本 Skill 的约束只覆盖：要什么结果、绝不能发生什么、谁提供事实、依据怎么标，以及模型推不出的工具调用与落盘约定；方法、步骤与事实不写死——没规定的地方就是交给判断的地方。
 
-- 显式调用本 Skill 处理 PRD 内容时，在分析资料或给出检查意见前，同步读取 [唯一模板](assets/prd-template.md)与 [内容约定](references/prd-standard.md)；已在当前上下文读过则复用。检查或片段修改只处理用户范围，模板字段和示例不构成本期要求。
+## 典型动线（导航，非规范）
 
-## 阶段边界（新建需求）
+新需求从取证到交付的常用顺序，仅作起点参考，不构成硬约束：
 
-- **先探索后成稿（双阶门禁）**：新建需求或核心重构默认先走探索（brainstorm），且必须依次通过两道门禁：
-  1. **宏观简报门禁 (Macro Brief Gate)**：判断任务重量（Spike／Bounded／Architectural）、推演业务痛点与全局架构形态，沉淀《需求简报》并获用户确认；简报须覆盖用户与角色、背景与现状痛点、目标与成功判据、范围与非目标（清单与判据见探索方法），每项有用户来源或经其确认为待确认；
-  2. **核心 FR 机制击穿门禁 (FR Deep-Dive Gate)**：拆解本期核心功能清单（Core FRs）；对承担核心交互/业务价值的关键 FR 逐项穿透历史妥协，推演机制候选（必须包含破局解法与代价），停下与用户碰撞拍板；
-- **成稿前置**：用户明确要求直接出稿，或宏观简报与各核心 FR 机制裁决均已获用户确认，并在成稿前报一次拟成稿的范围与结构、获用户确认。未击穿核心 FR 机制严禁直接成稿。用户明确要求直接出稿时跳过确认。
-- **探索完成判据**：宏观四项（用户与角色、背景与现状痛点、目标与成功判据、范围与非目标）已与用户确认或经其确认为待确认；核心 FR 清单明确；关键 FR 穿透历史妥协并给出候选与代价；各关键 FR 机制已获用户裁决。仅对齐宏观方向严禁直接成稿。
-- **澄清**：按 clarify 的决策前沿组织问题——一轮问完当前前沿，每题带推荐、所以然与依据来源，不越级问下游。
+`fetch_snapshot.py` 取证（或 `build_snapshot.py` 离线对账）→ 宏观澄清（macro 门禁）→ 核心 FR 机制击穿（fr，含竞品对标）→ 确认成稿范围（scope）→ 按 [成稿与交付](references/delivery.md) 成稿 → 交付校验与下游审查（review 门禁）→ 按需发布 Confluence。
+
+续接未完成需求：先 `gate_state.py --workspace <绝对路径> --read` 恢复门禁台账再继续。
+
+## 硬约束
+
+- **快照先行**：以远程来源（Confluence 页面、Jira、外部文档）为输入时，必须先拉取本地不可变快照存入 `.assets/`（如 `fetch_snapshot.py` 或对账），严禁未建快照直接读取或修改。详见 [快照规范](references/snapshot.md)。
+- **确认后出稿**：核心机制、设计方案与范围未获用户明确确认前不得擅自成稿交卷；用户明确要求直接出稿时按其指令成稿。门禁判据、用户捷径留痕与续接见 [需求探索](references/brainstorm.md)。
+- **范围守恒**：检查或片段修改只处理用户范围，模板字段与示例不构成本期要求，不擅自扩改成完整稿。
+- **澄清纪律**：按决策前沿提问，一轮问完当前前沿；外部事实自行取证，业务事实问用户，每题带推荐与依据来源。方法见 [交互澄清](references/clarify.md)。
+- **事实时效**：凡涉及具体产品现行行为的结论，必须查证当前资料并标注来源与日期，不得以记忆先验充当事实；规则见 [竞品对标](references/prd-benchmark.md)。
 
 ## 落盘与调用契约
 
-- **文件分工**：人读资产（主稿、按需的探讨／对标记录与澄清决策记录）置工作区根目录；来源快照、原图、渲染图、校验报告等机器资产扁平归入 `.assets/`，不建需求名子目录，正文以相对路径引用。文件名、保存与版本规则见 [成稿与交付](references/delivery.md)。
-- **脚本调用**：命令统一在本 Skill 根目录执行，稿件与工作区以绝对路径传入。
+- **文件分工**：人读资产（主稿、按需的探讨／对标／澄清记录）置工作区根目录；来源快照、原图、渲染图、校验报告、门禁凭据等机器资产扁平归入 `.assets/`，正文以相对路径引用。命名、版本与状态见 [成稿与交付](references/delivery.md)。
+- **帮助初稿**：仅在用户明确要求时由已确认条目派生，含主题结构、只登记不生成图片的截图清单与界面术语对照；格式依据用户当期提供的帮助模板或随 skill 的 `assets/help/help-demo/` 样例，界面串用 `lookup_term.py` 按 `assets/help/multilanguage-mapping.txt` 查表，图位与译法待人工补齐，不替代正式帮助文档。
+- **门禁留痕**：确认后立即用 `scripts/gate_state.py --workspace <绝对路径>` 记录（确认用 `--clear`、直接出稿用 `--waive`），续接未完成需求先 `--read` 恢复状态再继续。
+- **脚本调用**：命令统一在本 Skill 根目录执行；稿件、工作区与输出位置一律以绝对路径显式传入，写入型脚本不依据当前目录推断目标。
+- **子智能体支持（Subagent）**：宿主环境（如 OpenCode 等）支持子智能体机制时，成稿阶段推荐派生 Subagent 在独立会话中起草长篇主稿与初验，以隔离前序探索产生的工具杂音并维持纯净上下文；派生前必须确保前序重要对话、决策与机制已完整落盘至工作区 MD 资产中。成稿后交回主会话执行下游审查与消缺，以支持直接与用户交互确认。宿主不支持时在主会话中直接成稿，依下游审查清单与 review 门禁闭环。
 
-## 正交工具箱（按任务按需读取）
+## 内容地图（自行判断需要读哪些）
 
-- **需求探索**：新建需求、核心重构或需求立项时，读取 [探索与简报](references/brainstorm.md) 分级任务重量并组织推演；
-- **交互澄清**：成稿前消灭隐形假设、组织决策前沿提问时，读取 [交互澄清](references/clarify.md)；
-- **竞品对标**：给出方案选项或需要竞品行为、行业公约事实时，读取 [竞品对标](references/prd-benchmark.md) 取证并标注证据级别；
-- **来源快照**：涉及 Confluence 页面或远程资料输入时，读取 [来源快照](references/snapshot.md) 构建不可变本地基准；
-- **原型与图片**：涉及界面截图、原型核对与图文排查时，读取 [原型与图片分析](references/prototype-analysis.md) 使用 VLM 实事求是查验；
-- **下游审查**：文稿检查或成稿前排查研发不可猜、测试有判据的落地断点时，读取 [下游审查清单](references/downstream-review.md)；
-- **交付与校验**：输出完整本地稿、确定版本/文档状态或运行静态脚本校验时，读取 [成稿与交付](references/delivery.md)；
-- **Confluence 写入**：用户明确要求发布、同步或修改平台页面时，读取 [平台写入](references/publish-confluence.md)。
+每条规范只有一个完整家，其余文件只写指针——凡"能被违反并被检查"的句子，只写在它的归属文件里：正文内容归 `prd-standard.md`，交付形态归 `delivery.md`，工作流硬约束归本文件，门禁与机制归 `brainstorm.md`，取证归 `prd-benchmark.md`，交互澄清归 `clarify.md`；其余是骨架、方法或支撑。
+
+| 类别 | 文件 | 内容 |
+|---|---|---|
+| **内容规范** | `references/prd-standard.md` | PRD 正文内容的唯一标准来源：二元条目状态、来源追溯、内容所有权、CAD 私有边界（几何语义／公约核查／命令行提示流与 ESC 状态机／工业工程文风与客观表述／语义质量三原则）、编号与单一定义引用、章节完备与成稿规范。写或改 PRD 的内容，先看这里 |
+| **交付规范** | `references/delivery.md` | 交付形态的唯一标准来源：文件组织与命名、版本、修订人、密级、文档状态、交付校验命令与降级条件 |
+| **骨架** | `assets/prd-template.md` | 只有骨架、字段取值域与填写提示，不含规范：文件信息表、修订记录表、目录、0~9 章章节与逐字段提示 |
+| **骨架** | `assets/help-template.md` | 按需的帮助初稿骨架，不含规范：主题清单、命令／对话框主题、操作指南、界面截图清单、界面术语对照与待补译项 |
+| **骨架** | `assets/confluence-toc.xml` | Confluence 页面布局骨架（全宽＋右上浮动折叠目录），供 `publish-confluence.md` 复用；仅作版式参照，非交付物 |
+| **样例／字典** | `assets/help/help-demo/` | 帮助版式样例（仅作版式参照，非交付物），配合帮助初稿对照主题结构与样式 |
+| **样例／字典** | `assets/help/multilanguage-mapping.txt` | 界面串字典，供 `lookup_term.py` 查表；用户当期提供新字典时以当期为准 |
+| **方法** | `references/brainstorm.md` | 门禁定义与台账留痕、探讨记录分离、关键机制换约束重解与历史妥协穿透 |
+| **方法** | `references/clarify.md` | 决策树与决策前沿、提问格式、取证责任、终止与收敛判定 |
+| **方法** | `references/prd-benchmark.md` | 取证顺序、事实／推论／未核实三级证据、CAD 对标维度、必答所以然、对标矩阵 |
+| **方法** | `references/prototype-analysis.md` | 涉及界面原型、截图或视觉资料时读：VLM 实查、图文冲突处置、静态画面的证明边界 |
+| **方法** | `references/downstream-review.md` | 成稿后排查研发／品质／交互／产品化四视角落地断点并交互消缺（review 门禁依据） |
+| **支撑** | `references/snapshot.md` | 远程来源的不可变本地快照、离线对账与缺口处理 |
+| **支撑** | `references/publish-confluence.md` | 平台写入策略、Storage 锚点与图片、目录布局、回读校验 |
+
+## 工具箱
+
+| 脚本 | 作用 |
+|---|---|
+| `validate_prd.py` | 稿件结构、模板占位与图片文件校验（`--profile` 分场景，`--source` 比对原稿图片保留） |
+| `validate_links.py` | 条目定义与引用、锚点与跳转校验（支持 Markdown 与 Confluence Storage） |
+| `validate_delivery.py` | Confluence 组合交付校验（本地稿、Storage 锚点、目录布局、Mermaid 附件） |
+| `convert_to_storage.py` | Markdown 转 Confluence Storage 格式（含浮动目录、原生锚点、图片与 LaTeX 符号降级） |
+| `gate_state.py` | 门禁凭据台账：`--read` 恢复状态、`--clear` 记确认、`--waive` 记用户捷径、`--reset` 换需求 |
+| `fetch_snapshot.py` / `build_snapshot.py` | 在线抓取或离线对账生成不可变来源快照 |
+| `render_mermaid.py` | Mermaid 渲染为确定性 PNG |
+| `render_story_map.py` | 参数化 JSON 渲染为高清晰度二维用户故事地图 PNG（活动横向展开，阶段切片纵向排列；适配中大型复杂需求） |
+| `lookup_term.py` | 帮助界面串按字典精确查表（随 skill 提供的字典见 `assets/help/multilanguage-mapping.txt`，可换用户当期字典）：区分命中、未命中与缺英文源串，不产出译文 |
+
+脚本执行无需通读源码；回归测试 `python -B -m unittest discover -s scripts -p "test_*.py"`。

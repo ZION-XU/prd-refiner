@@ -3,6 +3,9 @@
 
 Automatically discovers Confluence PAT and URL from existing MCP configurations
 or environment variables, ensuring zero-token and zero-friction snapshot creation.
+
+The target workspace must be passed explicitly: the snapshot is a machine asset
+of the requirement workspace, never of whatever directory happens to be current.
 """
 from __future__ import annotations
 
@@ -17,6 +20,7 @@ import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 from build_snapshot import create_snapshot_from_data, extract_referenced_filenames
 
@@ -154,21 +158,22 @@ def fetch_current_user(base_url: str, pat: str, ctx: ssl.SSLContext) -> dict:
 
 
 def download_attachment_direct(base_url: str, page_id: str, filename: str, pat: str,
-                               dest: Path, ctx: ssl.SSLContext) -> bool:
+                               dest: Path, ctx: ssl.SSLContext, retries: int = 2) -> bool:
     """Download image directly by filename using Confluence attachment endpoint."""
     encoded_name = urllib.parse.quote(filename)
     urls = [
         f'{base_url.rstrip("/")}/download/attachments/{page_id}/{encoded_name}?api=v2',
         f'{base_url.rstrip("/")}/download/attachments/{page_id}/{encoded_name}',
     ]
-    for url in urls:
-        req = urllib.request.Request(url, headers={'Authorization': f'Bearer {pat}'})
-        try:
-            with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:
-                dest.write_bytes(resp.read())
-                return True
-        except Exception:
-            continue
+    for _ in range(retries + 1):
+        for url in urls:
+            req = urllib.request.Request(url, headers={'Authorization': f'Bearer {pat}'})
+            try:
+                with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:
+                    dest.write_bytes(resp.read())
+                    return True
+            except Exception:
+                continue
     return False
 
 
@@ -223,13 +228,21 @@ def fetch_and_build_snapshot(page_id: str, workspace: Path,
     with tempfile.TemporaryDirectory(prefix='prd-snapshot-assets-') as temp_dir:
         temp_path = Path(temp_dir)
         cached_files = {}
-        for img in images:
-            dest = temp_path / img
-            ok = download_attachment_direct(url, page_id, img, token, dest, ctx)
-            if ok:
-                cached_files[img] = dest
+
+        def _download_one(img_name: str) -> tuple[str, bool]:
+            dest_file = temp_path / img_name
+            success = download_attachment_direct(url, page_id, img_name, token, dest_file, ctx)
+            return img_name, success
+
+        max_workers = min(10, max(1, len(images)))
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            download_results = list(executor.map(_download_one, images))
+
+        for img_name, success in download_results:
+            if success:
+                cached_files[img_name] = temp_path / img_name
             else:
-                missing_downloads.append(img)
+                missing_downloads.append(img_name)
 
         if missing_downloads:
             return {
@@ -260,7 +273,7 @@ def fetch_and_build_snapshot(page_id: str, workspace: Path,
         return result
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, 'reconfigure'):
         try:
             sys.stdout.reconfigure(encoding='utf-8')
@@ -268,12 +281,13 @@ def main() -> int:
             pass
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--page-id', required=True, help='Confluence page ID or full page URL')
-    parser.add_argument('--workspace', type=Path, default=Path.cwd(), help='Target workspace directory')
+    parser.add_argument('--workspace', required=True, type=Path,
+                        help='Requirement workspace root (absolute path); snapshot lands in <workspace>/.assets')
     parser.add_argument('--url', help='Confluence base URL (overrides MCP config)')
     parser.add_argument('--pat', help='Confluence PAT (overrides MCP config)')
     parser.add_argument('--pat-file', type=Path, help='File containing Confluence PAT')
     parser.add_argument('--force', action='store_true', help='Overwrite existing snapshot if present')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     page_id = parse_page_id(args.page_id)
     pat = args.pat

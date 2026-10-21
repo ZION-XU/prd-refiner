@@ -5,25 +5,34 @@
 ## 1. 目标与更新策略
 
 - **新建**：核对站点、空间、父页面路径及标题。存在同名页时核实后再操作。
-- **单章修改**：优先使用 `confluence_update_page_section`，`heading_text` 精确匹配标题，`new_content` 仅包含标题下的替换正文（不重复含标题），使用 Storage 格式。
+- **单章修改**：优先使用 `confluence_update_page_section`，`heading_text` 精确匹配标题，`new_content` 从标题下一行开始，仅包含替换正文，使用 Storage 格式。
 - **全文修改**：基于最新 Storage 合并授权片段后提交，保留范围外正文、宏、附件与历史；提交前核对远端版本防止并发覆盖。
 
-## 2. Storage 格式与原生锚点
+## 2. Storage 格式转换与原生锚点
 
-提交内容使用 Storage 格式（`content_format=storage`）：
-- **定义锚点**：每个 FR、BR、AC、DEC 等条目在唯一完整定义处插入小写编号锚点（表格定义放在对应单元格内）：
+将本地 Markdown 转换为符合规范的 Storage XML 格式（提交时 `content_format=storage`）：
+
+```bash
+python scripts/convert_to_storage.py <Markdown绝对路径> --output <输出XML绝对路径>
+```
+
+转换脚本自动处理以下工程契约：
+- **布局封装**：自动加载 [布局骨架](../assets/confluence-toc.xml)，将前置信息与正文分别嵌入双栏浮动目录与单栏全宽主体；
+- **定义锚点**：每个 FR、BR、AC、NFR、DEC、RK、SRC 条目在定义处插入小写编号锚点：
   ```xml
   <ac:structured-macro ac:name="anchor"><ac:parameter ac:name="">fr-001</ac:parameter></ac:structured-macro>
   ```
-- **同页引用**：使用原生同页链接跳转对应锚点：
+- **同页引用**：自动转换为原生同页链接跳转：
   ```xml
   <ac:link ac:anchor="fr-001"><ac:plain-text-link-body><![CDATA[直线计数（FR-001）]]></ac:plain-text-link-body></ac:link>
   ```
+- **LaTeX 符号降级**：自动将 `$\ge$`、`$\le$`、`$\to$`、`$\pm$` 等伪数学 LaTeX 语法清洗为原生 Unicode 符号（`≥`、`≤`、`→`、`±`），杜绝页面公式渲染乱码；
+- **XML 语法清洗**：自动转义表格及正文中的非 HTML 尖括号（如 `<全部其他值>`），并调用 ElementTree 验证 XML 合法性。
 
-## 3. 图片与 Mermaid 规范
+## 3. 图片与图表规范
 
-- **普通图片**：引用的本地图片上传至目标页面附件，正文中以附件名引用：`<ac:image><ri:attachment ri:filename="图片名.png"/></ac:image>`；严禁保留本地路径或临时 URL。
-- **Mermaid 流程图**：执行渲染脚本生成 PNG 并上传附件：
+- **普通图片与流程图资产（推荐）**：引用的本地图片须为可显示的图片（源文件先导出，见 [成稿与交付](delivery.md) §1）。业务流程图、架构图等图表推荐由宿主环境（Host Harness / 插件工具 / 外部生成器）预先绘制并直接落盘为图片（PNG/SVG）至 `<工作区>/.assets/images/`，正文以标准 Markdown 图片语法引用；上传至目标页面附件后在正文中以附件名引用：`<ac:image><ri:attachment ri:filename="图片名.png"/></ac:image>`；严禁保留本地路径或临时 URL。
+- **Mermaid 源码围栏（兼容备用）**：若正文包含 ```mermaid 代码块，执行渲染脚本生成 PNG 并上传附件：
   ```bash
   python scripts/render_mermaid.py <Markdown路径>
   ```
@@ -32,8 +41,8 @@
 ## 4. 目录与排版布局
 
 - **默认全宽 + 右上浮动折叠目录**：新完整稿复用 [布局骨架](../assets/confluence-toc.xml)：
-  - 文首 `two_right_sidebar`：左格放文档信息与修订表，右格放包含 `zwFloatingTocRight` 类的浮动折叠目录。
-  - 后续 `single`：放全宽正文。
+  - 文首 `two_right_sidebar`：左格仅放文档信息与修订表（不含目录）；右格放包含 `zwFloatingTocRight` 类的浮动折叠目录。
+  - 后续 `single`：放全宽正文。正文不保留任何手写目录或 `[TOC]` 标记。
   - **禁令**：使用浮动目录时，正文严禁包含 `code` 或 `noformat` 宏（会导致目录遮挡失效）；长代码改用文本排版或附件展示。
 - 用户明确要求正文目录（`--layout inline`）或双栏时遵循其要求。
 
