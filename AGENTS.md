@@ -16,13 +16,14 @@
 | 脚本 | 职责 | 关键参数 |
 |---|---|---|
 | `validate_prd.py` | 稿件结构/占位/图片校验 | `--profile {template,draft,existing}`、`--source`、`--image-policy` |
-| `validate_links.py` | 条目定义引用、锚点校验（Markdown 或 Confluence Storage） | `--format {markdown,storage}`、`--reference-policy location` |
+| `validate_links.py` | 条目定义引用、锚点校验（Markdown 或 Confluence Storage） | `--format {markdown,storage}`、`--profile {template,draft,existing}`、`--reference-policy location` |
 | `validate_delivery.py` | Confluence 组合交付校验 | `--workspace` 必填，Storage 正文跑两遍（提交稿 + 服务端回读） |
 | `convert_to_storage.py` | Markdown 转 Confluence Storage 格式 | `--output` 必填，`--layout {floating,inline}`，含 LaTeX 降级与 XML 校验 |
 | `gate_state.py` | 门禁台账（`macro→fr→scope→review` 顺序） | `--workspace` 必填，`--read`/`--clear <gate>`/`--waive`/`--reset`，写入必带 `--evidence` |
 | `fetch_snapshot.py` | 在线抓 Confluence 快照 | `--page-id`、`--workspace`；自动复用 MCP/环境凭据 |
 | `build_snapshot.py` | 离线对账建快照 | `--json-file`/`--source-file`、`--workspace`、`--page-id`、`--page-version`；缺图/重名/不安全引用一律失败不降级 |
 | `render_mermaid.py` | Mermaid 渲染为哈希命名 PNG | `--output-dir`、`--force` |
+| `render_story_map.py` | 二维用户故事地图 JSON 渲染为 PNG | `--data` 必填，`--output` 默认 `.assets/images/story-map.png`；字段契约见 `assets/story-map-schema.md`；依赖本机无头浏览器 |
 | `lookup_term.py` | 界面串按字典精确查表，不产出译文 | `--mapping`（绝对路径）、`--terms`/`--terms-file` |
 
 ## 易错点
@@ -31,5 +32,5 @@
 - **落盘分工**：人读资产（主稿、探讨/对标/澄清记录）在**工作区根目录**；机器资产（快照、渲染图、校验报告、`gates.json`）在**工作区 `.assets/`**，正文用相对路径引用。不把机器资产散落在工作区根目录，也不把主稿写进 `.assets/`。
 - **范围守恒**：校验发现的缺陷只修用户范围内部分；范围外来稿问题只报告不扩改。
 - **主稿命名**：单文件，名称确定用 `<需求名>.md`，未定用 `prd.md`；版本从 `0.1` 起，每次修订递增末级并在修订记录追加一行，不覆盖历史。
-- **成稿与交付门禁**：macro/fr/scope 三处确认（或用户直接出稿 waive）后才成稿；成稿经静态校验后，完成四视角审查与消缺并取得 review 确认方可交付；确认后立即记台账，换需求先 `--reset`，续接先 `--read`。
+- **成稿与交付门禁**：macro/fr/scope 三处确认（或用户直接出稿 waive）后才成稿；成稿经静态校验后，完成四视角审查与消缺并取得 review 确认方可交付；确认后立即记台账。一个需求一个工作空间，换会话续接先 `--read`（不要 `--reset`），换需求另开工作空间，`--reset` 仅用于撤回 waive 或纠正误记。
 - **事实时效**：涉及竞品/产品现行行为的结论必须查证当前资料并标注来源与日期，不得以记忆先验充当事实。

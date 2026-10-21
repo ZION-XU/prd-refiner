@@ -12,7 +12,20 @@
 
 ## 安装与使用
 
-将本目录复制或链接到宿主支持的 Skill 目录，仅在用户明确点名时启动（pi 中为 `/skill:prd-refiner`），不点名不得自动启用。开发副本建议链接主线，避免漂移。Python 3.10+ 用于标准库校验器；本地资料任务无需企业账号，远程能力依赖宿主已有凭据。
+将本目录拷贝（或通过软链接/目录联接）到对应宿主的 Skill 目录下，仅在用户明确点名时启动，不点名不得自动启用。Python 3.10+ 用于标准库校验器；本地资料任务无需企业账号，远程能力依赖宿主已有凭据。
+
+### 常用宿主 Skill 路径
+
+将本仓库目录直接拷贝为对应宿主路径下的 `prd-refiner` 文件夹即可：
+
+- **Codex**：`~/.codex/skills/prd-refiner`（调用：对话中明确指明使用 `prd-refiner`，或在 Plan 模式下使用 `$prd-refiner`）
+- **ZCode**：`~/.zcode/skills/prd-refiner`（调用：对话中明确点名 `prd-refiner`）
+- **Pi**：`~/.agents/skills/prd-refiner`（调用：输入 `/skill:prd-refiner`）
+- **Antigravity**：`~/.gemini/config/skills/prd-refiner`（调用：对话中指明或输入 `/prd-refiner`）
+
+> 如需单项目隔离生效，亦可直接放置在项目根目录的 `.agents/skills/prd-refiner`（或 `.codex/skills/`、`.zcode/skills/`）下。
+
+### 使用范例
 
 ```text
 /prd-refiner 一起优化这份 PRD，先讨论关键问题。
@@ -20,7 +33,7 @@
 /prd-refiner 修改 FR-002，保持其他功能并检查相关验收。
 ```
 
-新需求从取证到交付的典型动线：快照取证 → 宏观澄清（macro 门禁）→ 核心 FR 机制击穿（fr，含竞品对标）→ 确认成稿范围（scope）→ 成稿 → 交付校验与下游审查（review 门禁）→ 按需发布 Confluence。门禁确认由 `scripts/gate_state.py` 记入工作区台账，换会话后 `--read` 即恢复，不必重复盘问。
+新需求从取证到交付的典型动线：快照取证 → 宏观澄清（macro 门禁）→ 核心 FR 机制击穿（fr，含竞品对标）→ 确认成稿范围（scope）→ 成稿 → 交付校验与下游审查（review 门禁）→ 按需发布 Confluence。一个需求对应一个工作空间，门禁确认由 `scripts/gate_state.py` 记入该工作空间的台账；同一需求换会话续接（如背景确认后另开会话推进具体功能）时工作空间不变，`--read` 即恢复，不必重复盘问，也不需要重置台账；换需求则另开工作空间。
 
 完整稿按统一模板交付工作区 Markdown：主稿为单文件（名称确定用 `<需求名>.md`，未定用 `prd.md`），版本从 `0.1` 起递增并追加修订记录；探讨结论、竞品分析与澄清决策独立落盘根目录供用户查阅及跨会话流转。来源快照、原图、Mermaid 渲染图、门禁凭据、校验报告等机器文件统一扁平放入 `.assets/`。Confluence 来源必须先建不可变本地快照再分析；写回时使用 Storage、浮动折叠目录、原生锚点和附件图片。凡涉及具体产品现行行为的结论必须查证当前资料并标注来源与日期，不得以记忆先验充当事实。用户指定目的地或配套要求时遵循其选择。
 
@@ -46,6 +59,7 @@ prd-refiner/
 ├─ assets/                  骨架、版式参照与字典（不含规范）
 │  ├─ prd-template.md       主稿骨架、字段取值域与填写提示
 │  ├─ help-template.md      帮助初稿骨架（主题结构、截图清单、界面术语对照）
+│  ├─ story-map-schema.md   二维用户故事地图 JSON 字段契约与示例
 │  ├─ confluence-toc.xml    Confluence 页面布局骨架，供 publish-confluence.md 复用
 │  └─ help/
 │     ├─ help-demo/         帮助版式样例（Commands/、images/、styles/，仅作版式参照）

@@ -30,7 +30,7 @@ disable-model-invocation: true
 
 - **文件分工**：人读资产（主稿、按需的探讨／对标／澄清记录）置工作区根目录；来源快照、原图、渲染图、校验报告、门禁凭据等机器资产扁平归入 `.assets/`，正文以相对路径引用。命名、版本与状态见 [成稿与交付](references/delivery.md)。
 - **帮助初稿**：仅在用户明确要求时由已确认条目派生，含主题结构、只登记不生成图片的截图清单与界面术语对照；格式依据用户当期提供的帮助模板或随 skill 的 `assets/help/help-demo/` 样例，界面串用 `lookup_term.py` 按 `assets/help/multilanguage-mapping.txt` 查表，图位与译法待人工补齐，不替代正式帮助文档。
-- **门禁留痕**：确认后立即用 `scripts/gate_state.py --workspace <绝对路径>` 记录（确认用 `--clear`、直接出稿用 `--waive`），续接未完成需求先 `--read` 恢复状态再继续。
+- **门禁留痕**：一个需求对应一个工作空间；同一需求换会话继续时工作空间不变，先 `scripts/gate_state.py --workspace <绝对路径> --read` 恢复状态再继续，确认后立即记账（确认用 `--clear`、用户要求直接出稿用 `--waive`）。换需求另开工作空间；`--reset` 仅用于撤回直出稿捷径或纠正误记。详见 [需求探索](references/brainstorm.md)。
 - **脚本调用**：命令统一在本 Skill 根目录执行；稿件、工作区与输出位置一律以绝对路径显式传入，写入型脚本不依据当前目录推断目标。
 - **子智能体支持（Subagent）**：宿主环境（如 OpenCode 等）支持子智能体机制时，成稿阶段推荐派生 Subagent 在独立会话中起草长篇主稿与初验，以隔离前序探索产生的工具杂音并维持纯净上下文；派生前必须确保前序重要对话、决策与机制已完整落盘至工作区 MD 资产中。成稿后交回主会话执行下游审查与消缺，以支持直接与用户交互确认。宿主不支持时在主会话中直接成稿，依下游审查清单与 review 门禁闭环。
 
@@ -47,6 +47,7 @@ disable-model-invocation: true
 | **骨架** | `assets/confluence-toc.xml` | Confluence 页面布局骨架（全宽＋右上浮动折叠目录），供 `publish-confluence.md` 复用；仅作版式参照，非交付物 |
 | **样例／字典** | `assets/help/help-demo/` | 帮助版式样例（仅作版式参照，非交付物），配合帮助初稿对照主题结构与样式 |
 | **样例／字典** | `assets/help/multilanguage-mapping.txt` | 界面串字典，供 `lookup_term.py` 查表；用户当期提供新字典时以当期为准 |
+| **样例／字典** | `assets/story-map-schema.md` | 二维用户故事地图的 JSON 字段契约与示例，供 `render_story_map.py` 取数 |
 | **方法** | `references/brainstorm.md` | 门禁定义与台账留痕、探讨记录分离、关键机制换约束重解与历史妥协穿透 |
 | **方法** | `references/clarify.md` | 决策树与决策前沿、提问格式、取证责任、终止与收敛判定 |
 | **方法** | `references/prd-benchmark.md` | 取证顺序、事实／推论／未核实三级证据、CAD 对标维度、必答所以然、对标矩阵 |
@@ -63,10 +64,10 @@ disable-model-invocation: true
 | `validate_links.py` | 条目定义与引用、锚点与跳转校验（支持 Markdown 与 Confluence Storage） |
 | `validate_delivery.py` | Confluence 组合交付校验（本地稿、Storage 锚点、目录布局、Mermaid 附件） |
 | `convert_to_storage.py` | Markdown 转 Confluence Storage 格式（含浮动目录、原生锚点、图片与 LaTeX 符号降级） |
-| `gate_state.py` | 门禁凭据台账：`--read` 恢复状态、`--clear` 记确认、`--waive` 记用户捷径、`--reset` 换需求 |
+| `gate_state.py` | 门禁凭据台账：`--read` 恢复状态、`--clear` 记确认、`--waive` 记用户捷径、`--reset` 撤回捷径或纠正误记（换需求另开工作空间） |
 | `fetch_snapshot.py` / `build_snapshot.py` | 在线抓取或离线对账生成不可变来源快照 |
 | `render_mermaid.py` | Mermaid 渲染为确定性 PNG |
-| `render_story_map.py` | 参数化 JSON 渲染为高清晰度二维用户故事地图 PNG（活动横向展开，阶段切片纵向排列；适配中大型复杂需求） |
+| `render_story_map.py` | 参数化 JSON 渲染为高清晰度二维用户故事地图 PNG（活动横向展开，阶段切片纵向排列；适配中大型复杂需求）；JSON 字段契约见 `assets/story-map-schema.md`，默认落 `.assets/images/` |
 | `lookup_term.py` | 帮助界面串按字典精确查表（随 skill 提供的字典见 `assets/help/multilanguage-mapping.txt`，可换用户当期字典）：区分命中、未命中与缺英文源串，不产出译文 |
 
 脚本执行无需通读源码；回归测试 `python -B -m unittest discover -s scripts -p "test_*.py"`。

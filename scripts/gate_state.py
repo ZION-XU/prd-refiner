@@ -116,7 +116,7 @@ def waive(workspace: Path, evidence: str) -> dict:
 
 
 def reset(workspace: Path, evidence: str) -> dict:
-    """Start a new requirement in the same workspace; the old ledger is discarded."""
+    """Clear the ledger inside one workspace; a new requirement uses a new workspace."""
     state = {'gates': {}, 'waived': None, 'reset': {
         'at': datetime.now().astimezone().isoformat(timespec='seconds'),
         'evidence': evidence,
@@ -137,7 +137,7 @@ def main(argv: list[str] | None = None) -> int:
     action.add_argument('--waive', action='store_true',
                         help='Record the user shortcut: the user asked for a direct draft')
     action.add_argument('--reset', action='store_true',
-                        help='Discard the ledger when starting a new requirement in this workspace')
+                        help='Discard the whole ledger in this workspace; only for revoking a waiver or correcting a misrecorded gate, not for continuing in a new session')
     parser.add_argument('--evidence', help='What the user actually confirmed; required for every write')
     args = parser.parse_args(argv)
     if hasattr(sys.stdout, 'reconfigure'):

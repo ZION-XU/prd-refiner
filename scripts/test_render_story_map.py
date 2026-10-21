@@ -10,6 +10,7 @@ from render_story_map import (
     find_system_browser,
     generate_story_map_html,
     render_story_map,
+    resolve_output,
     main,
 )
 
@@ -131,6 +132,32 @@ class RenderStoryMapTests(unittest.TestCase):
         res = render_story_map(self.root / "nonexistent.json", self.root / "out.png")
         self.assertFalse(res["passed"])
         self.assertIn("data file not found", res["errors"][0])
+
+    def test_resolve_output_defaults_to_assets_images(self):
+        data_file = self.root / "data.json"
+        expected = data_file.resolve().parent / ".assets" / "images" / "story-map.png"
+        self.assertEqual(resolve_output(data_file, None), expected)
+        explicit = self.root / "custom" / "map.png"
+        self.assertEqual(resolve_output(data_file, explicit), explicit)
+
+    def test_default_output_is_used_when_omitted(self):
+        data_file = self.root / "data.json"
+        data_file.write_text(json.dumps(self.sample_data, ensure_ascii=False), encoding="utf-8")
+        fake_browser = self.root / "fake_browser.exe"
+        fake_browser.write_text("dummy", encoding="utf-8")
+        expected_png = self.root / ".assets" / "images" / "story-map.png"
+
+        def fake_run(command, **_kwargs):
+            out_arg = [c for c in command if c.startswith("--screenshot=")][0]
+            Path(out_arg.split("=", 1)[1]).write_bytes(PNG_HEADER)
+            return subprocess.CompletedProcess(command, 0, "", "")
+
+        with patch("render_story_map.subprocess.run", side_effect=fake_run):
+            res = render_story_map(data_file, None, browser_path=fake_browser)
+
+        self.assertTrue(res["passed"])
+        self.assertTrue(expected_png.is_file())
+        self.assertEqual(Path(res["output"]), expected_png.resolve())
 
     def test_render_story_map_invalid_json(self):
         bad_json = self.root / "bad.json"
