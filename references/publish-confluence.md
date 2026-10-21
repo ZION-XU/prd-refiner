@@ -26,7 +26,7 @@ python scripts/convert_to_storage.py <Markdown绝对路径> --output <输出XML�
   ```xml
   <ac:link ac:anchor="fr-001"><ac:plain-text-link-body><![CDATA[直线计数（FR-001）]]></ac:plain-text-link-body></ac:link>
   ```
-- **LaTeX 符号降级**：自动将 `$\ge$`、`$\le$`、`$\to$`、`$\pm$` 等伪数学 LaTeX 语法清洗为原生 Unicode 符号（`≥`、`≤`、`→`、`±`），杜绝页面公式渲染乱码；
+- **LaTeX 符号降级**：自动将 `$\ge$`、`$\le$`、`$\to$`、`$\pm$` 等伪数学 LaTeX 语法清洗为原生 Unicode 符号（`≥`、`≤`、`→`、`±`），避免伪数学语法导致的渲染乱码；
 - **XML 语法清洗**：自动转义表格及正文中的非 HTML 尖括号（如 `<全部其他值>`），并调用 ElementTree 验证 XML 合法性。
 
 ## 3. 图片与图表规范

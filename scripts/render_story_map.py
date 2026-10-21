@@ -3,6 +3,8 @@
 
 Part of PRD Refiner skill. Provides a zero-friction, parameterized generator
 for 2D User Story Maps (Activities on X-axis, Release slices on Y-axis).
+
+The input JSON contract is documented in assets/story-map-schema.md.
 """
 from __future__ import annotations
 
@@ -109,26 +111,26 @@ def generate_story_map_html(data: dict) -> tuple[str, int, int]:
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
   body {{
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background-color: #0f172a;
+    background-color: #ffffff;
     color: #1e293b;
     padding: 32px;
     width: {total_width}px;
   }}
   .header {{
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border: 1px solid #334155;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 1px solid #cbd5e1;
     border-radius: 12px;
     padding: 24px 32px;
     margin-bottom: 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(15,23,42,0.08);
   }}
   .header h1 {{
     font-size: 26px;
     font-weight: 700;
-    color: #f8fafc;
+    color: #0f172a;
     letter-spacing: -0.5px;
     display: flex;
     align-items: center;
@@ -143,7 +145,7 @@ def generate_story_map_html(data: dict) -> tuple[str, int, int]:
     font-weight: 600;
   }}
   .header .meta {{
-    color: #94a3b8;
+    color: #475569;
     font-size: 14px;
     display: flex;
     gap: 20px;
@@ -159,15 +161,15 @@ def generate_story_map_html(data: dict) -> tuple[str, int, int]:
 
   /* Activity Header Column */
   .activity-corner {{
-    background: #1e293b;
-    border: 1px dashed #475569;
+    background: #f1f5f9;
+    border: 1px dashed #94a3b8;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 16px;
-    color: #94a3b8;
+    color: #475569;
     font-size: 14px;
     font-weight: 600;
     text-align: center;
@@ -210,12 +212,12 @@ def generate_story_map_html(data: dict) -> tuple[str, int, int]:
     flex-direction: column;
     justify-content: center;
     border-left: 6px solid;
-    background: #1e293b;
-    color: #f8fafc;
+    background: #f8fafc;
+    color: #0f172a;
   }}
   .theme-mvp {{ border-color: #f59e0b; }}
   .theme-next {{ border-color: #0284c7; }}
-  .theme-future {{ border-color: #64748b; color: #94a3b8; }}
+  .theme-future {{ border-color: #64748b; color: #475569; }}
 
   .swimlane-badge {{
     font-size: 11px;
@@ -224,9 +226,9 @@ def generate_story_map_html(data: dict) -> tuple[str, int, int]:
     letter-spacing: 0.8px;
     margin-bottom: 6px;
   }}
-  .badge-mvp {{ color: #fbbf24; }}
-  .badge-next {{ color: #38bdf8; }}
-  .badge-future {{ color: #94a3b8; }}
+  .badge-mvp {{ color: #b45309; }}
+  .badge-next {{ color: #0369a1; }}
+  .badge-future {{ color: #64748b; }}
 
   .swimlane-title {{
     font-size: 15px;
@@ -235,7 +237,7 @@ def generate_story_map_html(data: dict) -> tuple[str, int, int]:
   }}
   .swimlane-desc {{
     font-size: 12px;
-    color: #94a3b8;
+    color: #64748b;
     margin-top: 6px;
   }}
 
@@ -244,8 +246,8 @@ def generate_story_map_html(data: dict) -> tuple[str, int, int]:
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background: rgba(30, 41, 59, 0.4);
-    border: 1px solid #334155;
+    background: rgba(241, 245, 249, 0.8);
+    border: 1px solid #e2e8f0;
     border-radius: 10px;
     padding: 12px;
   }}
@@ -394,7 +396,14 @@ def generate_story_map_html(data: dict) -> tuple[str, int, int]:
     return '\n'.join(html), total_width, total_height
 
 
-def render_story_map(data_file: Path, output_file: Path,
+def resolve_output(data_file: Path, output: Path | None) -> Path:
+    """Default to the same machine-asset directory render_mermaid uses."""
+    if output is not None:
+        return output
+    return data_file.resolve().parent / '.assets' / 'images' / 'story-map.png'
+
+
+def render_story_map(data_file: Path, output_file: Path | None = None,
                      html_out: Path | None = None,
                      browser_path: Path | None = None,
                      scale: float = 1.5) -> dict:
@@ -403,10 +412,12 @@ def render_story_map(data_file: Path, output_file: Path,
         return {'passed': False, 'errors': [f'data file not found: {data_file}']}
 
     try:
-        data = json.loads(data_file.read_text(encoding='utf-8'))
+        # utf-8-sig tolerates the BOM Windows editors add, matching the other scripts.
+        data = json.loads(data_file.read_text(encoding='utf-8-sig'))
     except Exception as exc:
         return {'passed': False, 'errors': [f'invalid JSON format in {data_file}: {exc}']}
 
+    output_file = resolve_output(data_file, output_file)
     html_content, width, height = generate_story_map_html(data)
 
     browser = browser_path or find_system_browser()
@@ -438,7 +449,10 @@ def render_story_map(data_file: Path, output_file: Path,
             f'file:///{temp_html.resolve().as_posix()}',
         ]
         try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            # errors='replace' keeps a non-UTF-8 browser message from raising here,
+            # matching render_mermaid.py; the screenshot result is checked separately.
+            res = subprocess.run(cmd, capture_output=True, text=True, errors='replace',
+                                 timeout=30)
         except Exception as exc:
             return {'passed': False, 'errors': [f'browser invocation failed: {exc}']}
 
@@ -465,12 +479,15 @@ def render_story_map(data_file: Path, output_file: Path,
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--data', required=True, type=Path, help='Path to story map JSON input file')
-    parser.add_argument('--output', required=True, type=Path, help='Target PNG output image file path')
+    parser.add_argument('--output', type=Path,
+                        help='Target PNG output image file path (default: <data dir>/.assets/images/story-map.png)')
     parser.add_argument('--html', type=Path, help='Optional output HTML debug file path')
     parser.add_argument('--browser', type=Path, help='Path to Chrome or Edge executable')
     parser.add_argument('--scale', type=float, default=1.5, help='Device scale factor (default: 1.5)')
     args = parser.parse_args(argv)
-
+    # A GBK console cannot encode the report verbatim; match the other scripts.
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
     res = render_story_map(
         data_file=args.data,
         output_file=args.output,

@@ -91,6 +91,7 @@ REGISTERED_ASSETS = (
     'assets/confluence-toc.xml',
     'assets/prd-template.md',
     'assets/help-template.md',
+    'assets/story-map-schema.md',
 )
 REGISTERED_HELP_ASSETS = (
     'assets/help/help-demo',
