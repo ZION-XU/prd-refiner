@@ -1,18 +1,18 @@
-# 人机协同绘图（可选）
+# 可编辑图表（Excalidraw 场景）
 
-## 主路径：生成可编辑场景文件，不跑本地服务
+## 生成可编辑场景文件
 
 ```bash
 python scripts/story_map_to_excalidraw.py --data <绝对路径.json> --output <绝对路径.excalidraw>
 ```
 
-- 输入契约与 PNG 渲染共用 [JSON 结构](../assets/story-map-schema.md)。
+- 输入契约见 [JSON 结构](../assets/story-map-schema.md)。
 - 布局与卡片高度由脚本算（文字按容器宽度预先换行），所以卡片不会重叠；不要改用“先画元素再调坐标”的方式生成。
 - 产物在 [excalidraw.com](https://excalidraw.com)（File → Open）或 Excalidraw 桌面版里直接打开即可编辑。
 - emoji 默认保留：浏览器渲染正常、观感更好；只有需要跨机像素级一致时才加 `--strip-emoji`。按 [JSON 结构 · 内容边界](../assets/story-map-schema.md#内容边界)，emoji 只做状态提示，别让它承担语义。
 - 源文件按 [成稿与交付](delivery.md) 放 `.assets/`，渲染出的图片放 `.assets/images/`。
 
-## 出图：命令行 SVG/PNG（不依赖 excalidraw-mcp）
+## 出图：命令行 SVG/PNG
 
 ```bash
 python scripts/render_story_map_vector.py --data <绝对路径.json> --output <绝对路径.svg> --format svg
@@ -32,10 +32,6 @@ python scripts/render_story_map_vector.py --data <绝对路径.json> --output <�
 2. **改文案要改两处**：文字的 `text`（含换行）与 `originalText` 同时改，并按新行数更新高度，坐标跟着容器重新居中。
 3. **id 与版本**：新增元素 id 必须唯一；改动后 `version` 自增、`versionNonce` 与 `seed` 换新值，否则应用可能忽略本次改动。
 4. **改布局要成对移动**：容器和文字的 `x`/`y`/`width`/`height` 一起改，文字不会自动跟随容器。
-
-## 可选：宿主已挂载 Excalidraw MCP 时
-
-宿主暴露 `mcp__excalidraw__*` 一类工具时，还可以让用户在实时画布上自己改、再由 AI 回读导出（`import_scene` → 用户编辑 → `query_elements` → `export_to_image`）。宿主没有这套工具就整段跳过，不提示、不报错——上一条路径已覆盖全部产出需求。
 
 ## 边界
 

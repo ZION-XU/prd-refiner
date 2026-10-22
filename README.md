@@ -56,7 +56,7 @@ prd-refiner/
 │  ├─ prd-benchmark.md      方法：三级证据、CAD 对标维度、必答所以然、对标矩阵
 │  ├─ prototype-analysis.md 方法：VLM 实查、图文冲突处置、静态画面的证明边界
 │  ├─ downstream-review.md  方法：四视角落地断点排查与消缺（review 门禁依据）
-│  ├─ visual-collab.md      方法：可选的人机协同绘图（宿主挂载 Excalidraw MCP 时）
+│  ├─ visual-collab.md      方法：可编辑图表（.excalidraw 场景 + SVG/PNG 出图）
 │  ├─ snapshot.md           支撑：远程来源的不可变本地快照、离线对账与缺口处理
 │  └─ publish-confluence.md 支撑：平台写入策略、Storage 锚点与图片、回读校验
 ├─ assets/                  骨架、版式参照与字典（不含规范）
@@ -95,7 +95,7 @@ prd-refiner/
 - [竞品对标](references/prd-benchmark.md)：取证责任、事实／推论／未核实三级证据、CAD 对标维度、必答所以然、对标矩阵。
 - [原型分析](references/prototype-analysis.md)：VLM 实查、图文冲突处置、静态画面的证明边界。
 - [下游审查清单](references/downstream-review.md)：研发／品质／交互／产品化四视角的落地断点排查与消缺（review 门禁依据）。
-- [人机协同绘图](references/visual-collab.md)：把故事地图 JSON 生成为可编辑的 `.excalidraw` 场景文件（不依赖本地服务），并说明 AI 直接改该文件时的约定；宿主挂载 Excalidraw MCP 时另有实时画布协同。
+- [可编辑图表](references/visual-collab.md)：把故事地图 JSON 生成为可编辑的 `.excalidraw` 场景文件，并同源输出 SVG/PNG；含 AI 直接改该文件时的约定。
 - [来源快照](references/snapshot.md)：远程来源的不可变本地快照、离线对账与缺口处理。
 - [Confluence 写入](references/publish-confluence.md)：仅在用户明确要求写入平台时使用，复用 [布局骨架](assets/confluence-toc.xml)。
 - `scripts/`：结构、引用、交付与门禁校验，Storage 格式转换与 LaTeX 符号清洗降级，帮助术语查表，快照抓取与对账，Mermaid 渲染，故事地图渲染与可编辑场景生成；执行无需通读源码。架构不变量（规范唯一归属、模板不含规范、入口覆盖全部文件）由 `scripts/test_doc_contract.py` 守住。
