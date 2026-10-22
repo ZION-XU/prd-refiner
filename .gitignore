@@ -33,3 +33,6 @@ output/
 outputs/
 private-inputs/
 .understand-anything/
+
+# Local archives and exports
+*.zip
