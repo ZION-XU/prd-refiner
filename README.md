@@ -1,5 +1,7 @@
 # PRD Refiner
 
+[![tests](https://github.com/ZION-XU/prd-refiner/actions/workflows/tests.yml/badge.svg)](https://github.com/ZION-XU/prd-refiner/actions/workflows/tests.yml)
+
 中望 CAD 需求推演与产品设计搭档：辅助产品人员做需求归零推演、方案破局对标与严密 PRD 成稿交付。Skill 的约束只覆盖模型推不出的部分——要什么结果、绝不能发生什么、谁提供事实、依据怎么标，以及工具调用与落盘约定；方法、步骤与事实不写死，没规定的地方交给模型自行判断。
 
 ## 设计元规则
@@ -104,5 +106,7 @@ prd-refiner/
 ```text
 python -B -m unittest discover -s scripts -p "test_*.py"
 ```
+
+推送到 GitHub 后，`.github/workflows/tests.yml` 会在 Ubuntu 与 Windows 的 Python 3.10 上自动跑同一套测试。
 
 文稿校验命令、降级条件与检查边界见交付规范。静态测试不证明需求正确或宿主对话行为。改动后核对三条路由：内容地图能定位模板与内容约定；Confluence 来源检查需要图片；写入 Confluence 需要平台格式与图片映射。业务资料、生成文稿和分析材料存放仓库外。
