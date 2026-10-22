@@ -1,14 +1,18 @@
 # 二维用户故事地图 JSON 结构
 
-`scripts/render_story_map.py` 的输入契约。准备 JSON 时按本文件填，无需通读源码。
+`scripts/story_map_to_excalidraw.py` 与 `scripts/render_story_map_vector.py` 共用的输入契约。准备 JSON 时按本文件填，无需通读源码。
 
 ```bash
-python scripts/render_story_map.py --data <绝对路径.json> --output <绝对路径.png>
+# 出可编辑的 Excalidraw 场景文件，再在 excalidraw.com 或桌面版里改
+python scripts/story_map_to_excalidraw.py --data <绝对路径.json> --output <绝对路径.excalidraw>
+
+# 出 SVG 或 PNG（矢量优先，浏览器光栅化，支持 --scale）
+python scripts/render_story_map_vector.py --data <绝对路径.json> --output <绝对路径.png> --format png --scale 2
 ```
 
-- `--output` 省略时默认写入 `<json 所在目录>/.assets/images/story-map.png`；建议显式传入以遵守 [成稿与交付](../references/delivery.md) §1 的落盘公约。
-- 卡片内容全部做 HTML 转义，`&`、`<`、`>` 可直接写入正文。
-- 依赖本机 Chrome / Edge / Chromium 做无头渲染；找不到时脚本会输出一份独立 HTML 并以非零码退出，需人工打开截图或改用轻量流程图（见 [内容约定](../references/prd-standard.md) §4）。
+- 转换器省略 `--output` 时默认写入 `<json 所在目录>/.assets/story-map.excalidraw`；图片输出需显式传入，建议落在 `.assets/images/` 以遵守 [成稿与交付](../references/delivery.md) §1 的落盘公约。
+- 卡片内容在 SVG 输出中做 XML 转义，`&`、`<`、`>` 可直接写入正文。
+- SVG 输出不依赖浏览器；PNG 依赖本机 Chrome / Edge / Chromium 做光栅化，缺少浏览器时脚本明确报错，不会产出半成品图片。
 
 ## 顶层字段
 
@@ -35,7 +39,7 @@ python scripts/render_story_map.py --data <绝对路径.json> --output <绝对�
 
 | 字段 | 必填 | 说明 |
 |---|---|---|
-| `theme` | 否 | 只能是 `mvp`、`next`、`future` 三者之一，决定泳道与卡片的配色；缺省为 `mvp` |
+| `theme` | 否 | `mvp`、`next`、`future` 或 `legacy`（已交付基线），决定泳道与卡片的配色；缺省为 `mvp` |
 | `badge` | 否 | 泳道标签，如 `MVP Release`；缺省显示 `Release` |
 | `title` | 否 | 阶段名称，如「第 1 阶段」 |
 | `desc` | 否 | 阶段目标或范围 |
@@ -112,3 +116,4 @@ python scripts/render_story_map.py --data <绝对路径.json> --output <绝对�
 
 - 故事地图只呈现**已在正文确认**的活动划分、阶段归属与条目索引；未决的归属与优先级按 [内容约定](../references/prd-standard.md) §4 登记为 DEC，不得先画进地图再补正文。
 - 图中不得出现正文没有的 FR 编号；每个 `fr` 值都应能在主稿中找到对应定义。
+- 卡片与泳道文字可以用 emoji 做状态提示（如 🟢 🔴 ⚪），观感更清楚；但**别让 emoji 承担语义**——状态、编号与结论仍要用文字或 `[P0]`、`[已交付]` 这类标记写明，因为 emoji 的字形与颜色因系统而异，个别环境可能缺字。

@@ -48,12 +48,13 @@ disable-model-invocation: true
 | **骨架** | `assets/confluence-toc.xml` | Confluence 页面布局骨架（全宽＋右上浮动折叠目录），供 `publish-confluence.md` 复用；仅作版式参照，非交付物 |
 | **样例／字典** | `assets/help/help-demo/` | 帮助版式样例（仅作版式参照，非交付物），配合帮助初稿对照主题结构与样式 |
 | **样例／字典** | `assets/help/multilanguage-mapping.txt` | 界面串字典，供 `lookup_term.py` 查表；用户当期提供新字典时以当期为准 |
-| **样例／字典** | `assets/story-map-schema.md` | 二维用户故事地图的 JSON 字段契约与示例，供 `render_story_map.py` 取数 |
+| **样例／字典** | `assets/story-map-schema.md` | 二维用户故事地图的 JSON 字段契约与示例，供故事地图脚本取数 |
 | **方法** | `references/brainstorm.md` | 门禁定义与台账留痕、探讨记录分离、关键机制换约束重解与历史妥协穿透 |
 | **方法** | `references/clarify.md` | 决策树与决策前沿、提问格式、取证责任、终止与收敛判定 |
 | **方法** | `references/prd-benchmark.md` | 取证顺序、事实／推论／未核实三级证据、CAD 对标维度、必答所以然、对标矩阵 |
 | **方法** | `references/prototype-analysis.md` | 涉及界面原型、截图或视觉资料时读：VLM 实查、图文冲突处置、静态画面的证明边界 |
 | **方法** | `references/downstream-review.md` | 成稿后排查研发／品质／交互／产品化四视角落地断点并交互消缺（review 门禁依据） |
+| **方法** | `references/visual-collab.md` | 可编辑绘图路径：故事地图 JSON 生成 `.excalidraw` 场景文件供用户在官方页面或桌面版修改，AI 也可按约定直接改该文件；宿主挂载 Excalidraw MCP 时另有实时画布协同 |
 | **支撑** | `references/snapshot.md` | 远程来源的不可变本地快照、离线对账与缺口处理 |
 | **支撑** | `references/publish-confluence.md` | 平台写入策略、Storage 锚点与图片、目录布局、回读校验 |
 
@@ -68,7 +69,8 @@ disable-model-invocation: true
 | `gate_state.py` | 门禁凭据台账：`--read` 恢复状态、`--clear` 记确认、`--waive` 记用户捷径、`--reset` 撤回捷径或纠正误记（换需求另开工作空间） |
 | `fetch_snapshot.py` / `build_snapshot.py` | 在线抓取或离线对账生成不可变来源快照 |
 | `render_mermaid.py` | Mermaid 渲染为 PNG，文件名按内容哈希命名并复用已有同名 PNG |
-| `render_story_map.py` | 由 JSON 数据渲染为二维用户故事地图 PNG（活动横向展开，阶段切片纵向排列；适配中大型复杂需求）；字段契约见 `assets/story-map-schema.md`，默认落 `.assets/images/` |
+| `story_map_to_excalidraw.py` | 由同一份 JSON 生成**可编辑**的 `.excalidraw` 场景文件：布局与卡片高度由脚本计算，避免重叠；不依赖浏览器或本地服务，默认落 `.assets/story-map.excalidraw` |
+| `render_story_map_vector.py` | 由同一份 JSON 出 SVG 或 PNG：SVG 纯 Python 序列化，PNG 用无头浏览器 canvas 光栅化（支持 `--scale`，默认 2）；不依赖 excalidraw-mcp，也不做页面截图 |
 | `lookup_term.py` | 帮助界面串按字典精确查表（随 skill 提供的字典见 `assets/help/multilanguage-mapping.txt`，可换用户当期字典）：区分命中、未命中与缺英文源串，不产出译文 |
 
 脚本执行无需通读源码；回归测试 `python -B -m unittest discover -s scripts -p "test_*.py"`。
