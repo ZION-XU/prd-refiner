@@ -13,11 +13,14 @@ import json
 from pathlib import Path
 import re
 import sys
+from urllib.parse import unquote, urlsplit
 import xml.etree.ElementTree as ET
 
 from build_snapshot import valid_image
 from validate_links import active_lines, inspect, parse_storage, storage_markdown
-from validate_prd import validate as validate_prd, definitions_in, ID_PATTERN
+from validate_prd import (validate as validate_prd, definitions_in, ID_PATTERN,
+                          HTMLImages, INLINE_IMAGE, REFERENCE_IMAGE, REFERENCE_LINK,
+                          without_fenced_code)
 from validate_prd import compare_source_images, compare_image_counts, image_reference_count
 
 AC = '{urn:ac}'
@@ -88,6 +91,49 @@ def inspect_mermaid_delivery(markdown: str, storage: str, workspace: Path) -> tu
         'expected_assets': [stem + '.png' for stem in stems],
         'attachment_references': sorted(attachment_names),
     }, errors
+
+
+def extract_local_image_filenames(markdown: str) -> list[str]:
+    """Return sorted basenames of local images referenced in active Markdown."""
+    active = without_fenced_code(re.sub(r'<!--[\s\S]*?-->', '', markdown))
+    refs = {m.group(1).strip().casefold(): m.group(2) for m in REFERENCE_LINK.finditer(active)}
+    targets = [m.group(1) for m in INLINE_IMAGE.finditer(active)]
+    html_images = HTMLImages()
+    html_images.feed(active)
+    targets.extend(html_images.targets)
+    for match in REFERENCE_IMAGE.finditer(active):
+        label = (match.group(2) or match.group(1)).strip().casefold()
+        if label in refs:
+            targets.append(refs[label])
+    filenames: set[str] = set()
+    for target in targets:
+        cleaned = target.strip('<>')
+        if not cleaned or cleaned.startswith('//') or re.match(r'^(?:https?|data):', cleaned, re.IGNORECASE):
+            continue
+        file_path = unquote(urlsplit(cleaned).path)
+        if file_path and Path(file_path).name:
+            filenames.add(Path(file_path).name)
+    return sorted(filenames)
+
+
+def inspect_local_image_delivery(markdown: str | None, storage: str, *,
+                                 image_policy: str = 'local') -> tuple[list[str], list[str]]:
+    """Verify local Markdown images are mapped to Confluence attachment tags in Storage."""
+    errors: list[str] = []
+    local_filenames = extract_local_image_filenames(markdown) if markdown else []
+    attachment_names = set(re.findall(
+        r'<ri:attachment\b[^>]*\bri:filename=["\']([^"\']+)["\']', storage, re.IGNORECASE))
+    if image_policy == 'local':
+        for filename in local_filenames:
+            if filename not in attachment_names:
+                errors.append(f'Local image lacks Confluence attachment reference in Storage: {filename}')
+        storage_images = HTMLImages()
+        storage_images.feed(storage)
+        for src in storage_images.targets:
+            cleaned = src.strip()
+            if cleaned and not cleaned.startswith('//') and not re.match(r'^(?:https?|data):', cleaned, re.IGNORECASE):
+                errors.append(f'Storage must use ri:attachment instead of local img src: {cleaned}')
+    return local_filenames, errors
 
 
 def inspect_native_references(text: str) -> list[str]:
@@ -251,6 +297,12 @@ def validate(storage: Path, workspace: Path, markdown: Path | None = None, *,
             result['mermaid_delivery'], mermaid_errors = inspect_mermaid_delivery(
                 md_text, body, workspace.resolve())
             errors.extend(mermaid_errors)
+        local_images, local_img_errors = inspect_local_image_delivery(
+            md_text, body, image_policy=image_policy)
+        errors.extend(local_img_errors)
+        if md_text is not None:
+            mermaid_assets = result.get('mermaid_delivery', {}).get('expected_assets', [])
+            result['required_attachments'] = sorted(set(local_images) | set(mermaid_assets))
         errors.extend('Storage: ' + e for e in inspect(body, 'storage', reference_policy))
         errors.extend(inspect_native_references(body))
         if layout == 'floating':

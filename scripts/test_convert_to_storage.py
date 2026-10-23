@@ -120,6 +120,20 @@ class StorageConversionTests(unittest.TestCase):
         self.assertIn('文件密级：公开', storage)
         self.assertIn('<h2>1. 章节标题</h2>', storage)
 
+    def test_ordered_lists_and_escaped_pipes_in_tables(self):
+        fragment = md_to_storage_fragment(
+            "- 无序项 A\n"
+            "1. 第一步\n"
+            "2. 第二步\n\n"
+            "| 提示流 | 选项说明 |\n"
+            "|---|---|\n"
+            "| 指定下一点或 `[闭合(C)|放弃(U)]` | 支持输入 \\[闭合\\|放弃] 并显示 *斜体* |\n"
+        )
+        self.assertIn('<ul>\n<li>无序项 A</li>\n</ul>', fragment)
+        self.assertIn('<ol>\n<li>第一步</li>\n<li>第二步</li>\n</ol>', fragment)
+        self.assertIn('<td>指定下一点或 <code>[闭合(C)|放弃(U)]</code></td>', fragment)
+        self.assertIn('<td>支持输入 \\[闭合|放弃] 并显示 <em>斜体</em></td>', fragment)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,7 @@
 interface:
   display_name: "PRD Refiner"
-  short_description: "辅助中望 CAD 产品人员编写、检查和优化可供团队讨论的 PRD 初版"
-  default_prompt: "使用 $prd-refiner 处理这份 PRD。先读团队模板与内容约定；Confluence 来源连同正文引用的原型图片一起查看，写入时按平台规范处理。"
+  short_description: "中望 CAD 需求推演与产品设计搭档：需求归零推演、方案破局对标与严密 PRD 成稿交付"
+  default_prompt: "使用 $prd-refiner 推进当前需求。按 SKILL.md 硬约束与内容地图按需读取规范；远程来源先建本地不可变快照，成稿前按门禁完成澄清与机制确认。"
 
 policy:
   allow_implicit_invocation: false

@@ -218,6 +218,8 @@ def rasterize_svg(svg_text: str, output_file: Path, *, scale: float = 1.0,
         )
     except OSError as exc:
         server.shutdown()
+        server.server_close()
+        shutil.rmtree(profile, ignore_errors=True)
         return {'passed': False, 'errors': [f'failed to launch browser {browser}: {exc}']}
     started = time.time()
     try:
@@ -229,6 +231,7 @@ def rasterize_svg(svg_text: str, output_file: Path, *, scale: float = 1.0,
         except Exception:
             process.kill()
         server.shutdown()
+        server.server_close()
         shutil.rmtree(profile, ignore_errors=True)
     if not received:
         return {'passed': False, 'errors': [f'headless browser produced no image within {timeout:.0f}s']}

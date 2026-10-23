@@ -17,6 +17,7 @@ import hashlib
 from pathlib import Path
 import re
 import sys
+from urllib.parse import unquote
 import xml.etree.ElementTree as ET
 
 
@@ -82,8 +83,50 @@ def inline_formatting(text: str) -> str:
     text = re.sub(r'<br\s*>', '<br/>', text, flags=re.IGNORECASE)
     text = re.sub(r'<hr\s*>', '<hr/>', text, flags=re.IGNORECASE)
     text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+    text = re.sub(r'(?<!\*)\*([^*\n]+?)\*(?!\*)', r'<em>\1</em>', text)
     text = re.sub(r'`([^`\n]+)`', r'<code>\1</code>', text)
     return text
+
+
+def split_table_row(row_line: str) -> list[str]:
+    """Split a Markdown table row on unescaped pipes outside inline code or tags."""
+    inner = row_line.strip()[1:-1]
+    cells: list[str] = []
+    current: list[str] = []
+    in_code = False
+    in_cdata = False
+    i = 0
+    n = len(inner)
+    while i < n:
+        if not in_code and inner.startswith('<![CDATA[', i):
+            in_cdata = True
+            current.append('<![CDATA[')
+            i += 9
+            continue
+        if in_cdata and inner.startswith(']]>', i):
+            in_cdata = False
+            current.append(']]>')
+            i += 3
+            continue
+        ch = inner[i]
+        if ch == '\\' and i + 1 < n and inner[i + 1] == '|':
+            current.append('|')
+            i += 2
+            continue
+        if ch == '`' and not in_cdata:
+            in_code = not in_code
+            current.append(ch)
+            i += 1
+            continue
+        if ch == '|' and not in_code and not in_cdata:
+            cells.append(''.join(current))
+            current = []
+            i += 1
+            continue
+        current.append(ch)
+        i += 1
+    cells.append(''.join(current))
+    return cells
 
 
 def mermaid_asset_stem(source: str) -> str:
@@ -118,18 +161,22 @@ def md_to_storage_fragment(text: str) -> str:
     # 2. Convert internal links [label](#target)
     def replace_link(m: re.Match) -> str:
         label = m.group(1)
-        target = m.group(2).lstrip('#').lower()
+        target = unquote(m.group(2).lstrip('#')).lower()
         label_clean = (label.replace('<strong>', '').replace('</strong>', '')
                             .replace('<code>', '').replace('</code>', '')
                             .replace('**', '').replace('`', ''))
         return f'<ac:link ac:anchor="{target}"><ac:plain-text-link-body><![CDATA[{label_clean}]]></ac:plain-text-link-body></ac:link>'
 
-    text = re.sub(r'\[([^\]\n]+)\]\(#([a-zA-Z0-9_\-]+)\)', replace_link, text)
+    text = re.sub(r'(?<!!)\[([^\]\n]+)\]\(#([^)\s]+)\)', replace_link, text)
 
     # 3. Convert image attachments ![alt](path/file.png)
     def replace_img(m: re.Match) -> str:
-        src = m.group(2).strip()
-        filename = Path(src).name
+        raw_src = m.group(2).strip()
+        if raw_src.startswith('<') and '>' in raw_src:
+            src = raw_src[1:raw_src.index('>')]
+        else:
+            src = raw_src.split()[0]
+        filename = Path(unquote(src)).name
         return f'<p><ac:image><ri:attachment ri:filename="{filename}"/></ac:image></p>'
 
     text = re.sub(r'!\[([^\]\n]*)\]\(([^)\n]+)\)', replace_img, text)
@@ -138,7 +185,7 @@ def md_to_storage_fragment(text: str) -> str:
     out: list[str] = []
     in_table = False
     table_rows: list[list[str]] = []
-    in_list = False
+    list_tag: str | None = None
 
     def flush_table():
         nonlocal in_table, table_rows
@@ -163,10 +210,10 @@ def md_to_storage_fragment(text: str) -> str:
         table_rows = []
 
     def flush_list():
-        nonlocal in_list
-        if in_list:
-            out.append('</ul>')
-            in_list = False
+        nonlocal list_tag
+        if list_tag:
+            out.append(f'</{list_tag}>')
+            list_tag = None
 
     for line in lines:
         stripped = line.strip()
@@ -193,22 +240,33 @@ def md_to_storage_fragment(text: str) -> str:
         if stripped.startswith('|') and stripped.endswith('|'):
             flush_list()
             in_table = True
-            raw_cells = stripped[1:-1].split('|')
+            raw_cells = split_table_row(stripped)
             table_rows.append(raw_cells)
             continue
         else:
             flush_table()
 
-        l_match = re.match(r'^\s*[-*]\s+(.+)$', stripped)
-        if l_match:
-            if not in_list:
+        ul_match = re.match(r'^\s*[-*]\s+(.+)$', stripped)
+        if ul_match:
+            if list_tag != 'ul':
+                flush_list()
                 out.append('<ul>')
-                in_list = True
-            item_text = inline_formatting(l_match.group(1).strip())
+                list_tag = 'ul'
+            item_text = inline_formatting(ul_match.group(1).strip())
             out.append(f'<li>{item_text}</li>')
             continue
-        else:
-            flush_list()
+
+        ol_match = re.match(r'^\s*\d+\.\s+(.+)$', stripped)
+        if ol_match:
+            if list_tag != 'ol':
+                flush_list()
+                out.append('<ol>')
+                list_tag = 'ol'
+            item_text = inline_formatting(ol_match.group(1).strip())
+            out.append(f'<li>{item_text}</li>')
+            continue
+
+        flush_list()
 
         if stripped.startswith('>'):
             qtext = inline_formatting(stripped.lstrip('> ').strip())

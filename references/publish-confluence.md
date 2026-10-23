@@ -31,7 +31,7 @@ python scripts/convert_to_storage.py <Markdown绝对路径> --output <输出XML�
 
 ## 3. 图片与图表规范
 
-- **普通图片与流程图资产（推荐）**：引用的本地图片须为可显示的图片（源文件先导出，见 [成稿与交付](delivery.md) §1）。业务流程图、架构图等图表推荐由宿主环境（Host Harness / 插件工具 / 外部生成器）预先绘制并直接落盘为图片（PNG/SVG）至 `<工作区>/.assets/images/`，正文以标准 Markdown 图片语法引用；上传至目标页面附件后在正文中以附件名引用：`<ac:image><ri:attachment ri:filename="图片名.png"/></ac:image>`；严禁保留本地路径或临时 URL。
+- **普通图片、故事地图与流程图资产（推荐）**：引用的本地图片须为可显示的图片（源文件先导出，见 [成稿与交付](delivery.md) §1）。二维用户故事地图（`render_story_map_vector.py` 产出的 SVG/PNG）、业务流程图、架构图或快照原图统一落盘至 `<工作区>/.assets/images/`，正文以标准 Markdown 图片语法引用；`convert_to_storage.py` 会自动将其转为 `<ac:image><ri:attachment ri:filename="图片名.png"/></ac:image>`，发布时必须将 `validate_delivery.py` 报告的 `required_attachments` 全部上传至目标页面附件；严禁保留本地路径或临时 URL。
 - **Mermaid 源码围栏（兼容备用）**：若正文包含 ```mermaid 代码块，执行渲染脚本生成 PNG 并上传附件：
   ```bash
   python scripts/render_mermaid.py <Markdown路径>

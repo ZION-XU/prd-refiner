@@ -25,7 +25,7 @@ CORE_HEADINGS = (
     ('## 8. 风险与开放问题',),
     ('## 9. 来源与参考资料',),
 )
-ID_EXPR = r'(?:FR|BR|AC|DEC|NFR|RK|SRC)-\d{3}'
+ID_EXPR = r'(?:FR|BR|AC|DEC|NFR|RK|SRC)-\d{2,4}'
 ID_PATTERN = re.compile(r'\b' + ID_EXPR + r'\b')
 PLACEHOLDER_PATTERN = re.compile(
     r'\{(?:REQ-ID|YYYY-MM-DD|需求名称|需求负责人|文档版本|功能名称|填写|待填写|'

@@ -279,6 +279,27 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stderr)
         self.assertFalse(json.loads(result.stdout)['passed'])
 
+    def test_local_story_map_image_requires_confluence_attachment(self):
+        img_dir = self.root / '.assets' / 'images'
+        img_dir.mkdir(parents=True)
+        (img_dir / 'story-map.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg"/>', encoding='utf-8')
+        self.md.write_text(MD + '\n![用户故事地图](.assets/images/story-map.svg)\n', encoding='utf-8')
+        # Raw local <img src> in Storage fails
+        self.xml.write_text(BODY + '<img src=".assets/images/story-map.svg"/>', encoding='utf-8')
+        failed = self.check()
+        self.assertFalse(failed['passed'])
+        self.assertTrue(any('lacks Confluence attachment reference' in e for e in failed['errors']))
+        self.assertTrue(any('instead of local img src' in e for e in failed['errors']))
+
+        # Proper <ri:attachment> succeeds and lists required_attachments
+        self.xml.write_text(
+            BODY + '<p><ac:image><ri:attachment ri:filename="story-map.svg"/></ac:image></p>',
+            encoding='utf-8',
+        )
+        passed = self.check()
+        self.assertTrue(passed['passed'], passed)
+        self.assertEqual(passed['required_attachments'], ['story-map.svg'])
+
 
 if __name__ == '__main__':
     unittest.main()

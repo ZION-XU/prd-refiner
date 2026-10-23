@@ -409,6 +409,14 @@ only-a-filename.png
             self.assertTrue(result['passed'])
             self.assertTrue(any('empty echo heading' in w for w in result['warnings']))
 
+    def test_two_and_four_digit_ids_are_recognized(self):
+        doc = COMPLETE + '\n## 补充说明\n### 扩展功能（FR-02）\n参见 BR-1000。\n| 规则 | 说明 |\n|---|---|\n| BR-1000 | 四位编号规则 |\n'
+        self.assertTrue(self.run_doc(doc)['passed'])
+        dangling = COMPLETE + '\n## 补充说明\n参见 BR-1000 与 FR-02。\n'
+        result = self.run_doc(dangling)
+        self.assertFalse(result['passed'])
+        self.assertTrue(any('BR-1000' in e and 'FR-02' in e for e in result['errors']))
+
 
 if __name__ == '__main__':
     unittest.main()
