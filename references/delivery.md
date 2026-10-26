@@ -12,10 +12,11 @@
   - **竞品分析**：`<需求名>_竞品分析.md`，按需沉淀先验外显、历史妥协与 CAD 三要素公约。
   - **澄清记录**：`<需求名>_澄清决策记录.md`，仅当实际向用户提出产品澄清且拍板时输出。
   - **帮助初稿**：`<需求名>_帮助初稿.md`，仅在用户要求由需求文档派生帮助内容时产出，不作为每次任务的固定产物。
-- **解耦流转与子智能体起草**：成稿前必须将前序所有口头探讨、机制决断完整落盘至 `<需求名>_需求探讨.md` 与 `<需求名>_澄清决策记录.md`。宿主支持子智能体（Subagent）时，成稿阶段推荐派生独立子智能体仅读取上述落盘资产与模板进行主稿起草与静态校验（`validate_prd.py` / `validate_links.py`），以隔离长文本生成与工具调用杂音；起草完成后交回主会话，由主会话执行下游审查并直接与用户交互消缺。
+- **解耦流转与子智能体起草**：成稿前必须将前序所有口头探讨、机制决断完整落盘至 `<需求名>_需求探讨.md` 与 `<需求名>_澄清决策记录.md`。细节不靠成稿时一次生成：逐 FR 的交互卡在 `ux` 门禁确认后即增量写入主稿，成稿阶段只做装配、去重与一致性检查（交互卡结构与帧清单见 [交互与原型设计](interaction-design.md)）。宿主支持子智能体（Subagent）时，成稿阶段推荐派生独立子智能体仅读取上述落盘资产、主稿与模板做整体装配与静态校验（`validate_prd.py` / `validate_links.py` / `validate_frames.py`），以隔离长文本生成的工具杂音；装配完成后交回主会话，由主会话执行下游审查并直接与用户交互消缺。
 - **底层机器资产**（`.assets/`，不打扰用户）：
   - 来源快照（`source.md`、`source.original.txt`、`manifest.json`、`images/`，见 [来源快照](snapshot.md)）、中间稿、下载原图、图表源文件、Mermaid 渲染图、校验报告、门禁凭据 `gates.json`（由 `gate_state.py` 维护）等直接放在此处；正文使用相对路径引用，不得散落在外。
   - **渲染图落点**：Mermaid 渲染图默认写入 `.assets/images/`（`render_mermaid.py --output-dir` 可改），与来源快照图片共用同一目录；文件名带内容哈希，不互相覆盖。
+  - **交互原型资产**：帧清单 `.assets/frames/manifest.json` 与可编辑原型源文件（`.excalidraw`、设计工具导出文件等）放 `.assets/frames/`；导出的帧图放 `.assets/images/`，按 `fr-001-s1.png` 稳定命名、重出即覆盖，manifest 记版本与截取日期（契约见 [交互与原型设计](interaction-design.md)）。正文只引本地帧图。
   - **正文只引可显示的图片**：位图与 SVG 可直接引用；业务流程图、架构图或文档源文件（如 draw.io 等）优先由宿主能力生成为图片（PNG/SVG）存入 `.assets/images/` 后以标准 Markdown 图片语法引用，源文件本身留在 `.assets/`，不写进正文。
   - 机器资产共用一个扁平目录，以快照的 `manifest.json` 为快照完成标记（其余资产各自独立）；换来源时用 `--force` 只覆盖快照自身的文件，不删除其他资产。
 - 用户指定目录、文件名或仅需片段交付时，遵循用户指令。
@@ -44,7 +45,10 @@
 ```bash
 python scripts/validate_prd.py <稿件绝对路径> --profile template
 python scripts/validate_links.py <稿件绝对路径> --format markdown --profile template
+python scripts/validate_frames.py --workspace <工作区绝对路径>
 ```
+
+`validate_prd.py` 同时检查每个 FR 的交互卡结构并输出交互卡覆盖率（有帧的卡、显式未涉及、缺失）；`validate_frames.py` 检查正文帧表与 `.assets/frames/manifest.json` 的双向闭包、帧图存在性与孤儿帧。覆盖率有缺失或闭包不通过时不得交付。
 
 | 场景 | 对应参数 | 说明 |
 |---|---|---|

@@ -35,7 +35,7 @@
 /prd-refiner 修改 FR-002，保持其他功能并检查相关验收。
 ```
 
-新需求从取证到交付的典型动线：快照取证 → 宏观澄清（macro 门禁）→ 核心 FR 机制击穿（fr，含竞品对标）→ 确认成稿范围（scope）→ 成稿 → 交付校验与下游审查（review 门禁）→ 按需发布 Confluence。一个需求对应一个工作空间，门禁确认由 `scripts/gate_state.py` 记账；同一需求换会话续接时工作空间不变，`--read` 即恢复，换需求则另开工作空间。
+新需求从取证到交付的典型动线：快照取证 → 宏观澄清（macro 门禁）→ 核心 FR 机制击穿（fr，含竞品对标）→ 逐 FR 交互稿与帧确认（ux 门禁，交互卡增量写入主稿）→ 确认成稿范围（scope）→ 装配成稿 → 交付校验与下游审查（review 门禁）→ 按需发布 Confluence。一个需求对应一个工作空间，门禁确认由 `scripts/gate_state.py` 记账；同一需求换会话续接时工作空间不变，`--read` 即恢复，换需求则另开工作空间。
 
 完整稿按统一模板交付工作区 Markdown，产出物的落盘分工、命名与版本规则见 [成稿与交付](references/delivery.md)；远程来源必须先建不可变本地快照再分析，见 [来源快照](references/snapshot.md)；写回 Confluence 的格式与校验见 [平台写入](references/publish-confluence.md)；涉及产品现行行为的结论必须查证当前资料并标注来源与日期，见 [竞品对标](references/prd-benchmark.md)。用户指定目的地或配套要求时遵循其选择。
 
@@ -55,6 +55,7 @@ prd-refiner/
 │  ├─ clarify.md            方法：决策树与决策前沿、提问格式、取证责任、收敛判定
 │  ├─ prd-benchmark.md      方法：三级证据、CAD 对标维度、必答所以然、对标矩阵
 │  ├─ prototype-analysis.md 方法：VLM 实查、图文冲突处置、静态画面的证明边界
+│  ├─ interaction-design.md 方法：逐 FR 交互卡与帧、帧清单契约、原型工具探测与降级
 │  ├─ downstream-review.md  方法：四视角落地断点排查与消缺（review 门禁依据）
 │  ├─ visual-collab.md      方法：可编辑图表（.excalidraw 场景 + SVG/PNG 出图）
 │  ├─ snapshot.md           支撑：远程来源的不可变本地快照、离线对账与缺口处理
@@ -68,8 +69,9 @@ prd-refiner/
 │     ├─ help-demo/         帮助版式样例（Commands/、images/、styles/，仅作版式参照）
 │     └─ multilanguage-mapping.txt  界面串字典，供 lookup_term.py 查表
 └─ scripts/                 纯标准库 Python，命令在仓库根目录执行
-   ├─ validate_prd.py       稿件结构、模板占位与图片校验
+   ├─ validate_prd.py       稿件结构、模板占位、图片与交互卡校验（含覆盖率）
    ├─ validate_links.py     条目定义与引用、锚点与跳转校验
+   ├─ validate_frames.py    正文帧表与帧清单的双向闭包、帧图与孤儿帧校验
    ├─ validate_delivery.py  Confluence 组合交付校验
    ├─ convert_to_storage.py Markdown 转 Confluence Storage（含 LaTeX 降级）
    ├─ gate_state.py         门禁凭据台账：--read／--clear／--waive／--reset
@@ -90,15 +92,16 @@ prd-refiner/
 - [交付规范](references/delivery.md)：唯一交付规范——文件组织与命名、版本、修订人、密级、文档状态、交付校验与降级条件。
 - [模板](assets/prd-template.md)：骨架、字段取值域与填写提示（不含规范）。
 - [帮助初稿骨架](assets/help-template.md)：帮助主题结构、界面截图清单与界面术语对照的字段提示（不含规范）。
-- [需求探索](references/brainstorm.md)：门禁（macro→fr→scope→review）的唯一完整定义与台账留痕、探讨记录分离、关键机制换约束重解与历史妥协穿透。
+- [需求探索](references/brainstorm.md)：门禁（macro→fr→ux→scope→review）的唯一完整定义与台账留痕、探讨记录分离、交互与正文同步生长、关键机制换约束重解与历史妥协穿透。
 - [交互澄清](references/clarify.md)：决策树与决策前沿、提问格式、取证责任、终止与收敛判定。
 - [竞品对标](references/prd-benchmark.md)：取证责任、事实／推论／未核实三级证据、CAD 对标维度、必答所以然、对标矩阵。
 - [原型分析](references/prototype-analysis.md)：VLM 实查、图文冲突处置、静态画面的证明边界。
+- [交互与原型设计](references/interaction-design.md)：逐 FR 小循环、交互卡六要素、最小帧集、帧清单与 `manifest.json` 契约、原型工具能力探测与降级链、视口动态反馈表达。
 - [下游审查清单](references/downstream-review.md)：研发／品质／交互／产品化四视角的落地断点排查与消缺（review 门禁依据）。
 - [可编辑图表](references/visual-collab.md)：把故事地图 JSON 生成为可编辑的 `.excalidraw` 场景文件，并同源输出 SVG/PNG；含 AI 直接改该文件时的约定。
 - [来源快照](references/snapshot.md)：远程来源的不可变本地快照、离线对账与缺口处理。
 - [Confluence 写入](references/publish-confluence.md)：仅在用户明确要求写入平台时使用，复用 [布局骨架](assets/confluence-toc.xml)。
-- `scripts/`：结构、引用、交付与门禁校验，Storage 格式转换与 LaTeX 符号清洗降级，帮助术语查表，快照抓取与对账，Mermaid 渲染，故事地图渲染与可编辑场景生成；执行无需通读源码。架构不变量（规范唯一归属、模板不含规范、入口覆盖全部文件）由 `scripts/test_doc_contract.py` 守住。
+- `scripts/`：结构、交互卡、引用、帧清单、交付与门禁校验，Storage 格式转换与 LaTeX 符号清洗降级，帮助术语查表，快照抓取与对账，Mermaid 渲染，故事地图渲染与可编辑场景生成；执行无需通读源码。架构不变量（规范唯一归属、模板不含规范、入口覆盖全部文件）由 `scripts/test_doc_contract.py` 守住。
 - [AGENTS.md](AGENTS.md)：仓库维护说明与脚本速查。
 
 ## 维护验证

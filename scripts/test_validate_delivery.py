@@ -13,7 +13,25 @@ from validate_delivery import inspect_toc, mermaid_asset_stem, validate
 
 LAYOUT = (Path(__file__).resolve().parents[1] / 'assets/confluence-toc.xml').read_text(encoding='utf-8')
 TOC = re.search(r'<div class="zwFloatingTocRight"[^>]*>[\s\S]*?</div>', LAYOUT)[0]
-MD = (COMPLETE.split('## 目录')[0] + '## 1. 背景、用户与目标\n核对直线。\n' + MARKDOWN +
+CARD = '''**交互卡**
+
+- 入口与前置：选择集非空时菜单入口可用。
+- 取消、回滚与撤销：ESC 只关闭提示，不修改图纸。
+- 命令行等价：COUNT 命令提供同一结果。
+
+| 状态 | 触发／输入 | 可见反馈 | 下一状态 |
+|---|---|---|---|
+| S1 默认态 | 选择集非空 | 计数按钮可用 | S2 完成 |
+| S2 完成 | 点击计数 | 命令行回显数量 | 结束 |
+
+| 帧 ID | 对应状态 | 画面 | 说明 |
+|---|---|---|---|
+| FR-001-S1 | S1 | [原型](https://example.invalid/fr-001-s1) | 合成示例 |
+'''
+WITH_CARD = MARKDOWN.replace(
+    '用户点击计数显示数量；详见[计数对象范围（BR-001）](#br-001)。',
+    '用户点击计数显示数量；详见[计数对象范围（BR-001）](#br-001)。\n\n' + CARD)
+MD = (COMPLETE.split('## 目录')[0] + '## 1. 背景、用户与目标\n核对直线。\n' + WITH_CARD +
       '\n## 8. 风险与开放问题\n暂无。\n## 9. 来源与参考资料\n本轮合成输入。\n')
 CHAPTERS = ('<h2>目录</h2>' + STORAGE +
             '<h2>5. 验收标准</h2><ul><li>混合选择（AC-001）：计数为 2。</li></ul>')

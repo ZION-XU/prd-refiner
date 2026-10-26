@@ -38,6 +38,21 @@ COMPLETE = '''# 直线计数（合成案例）
 | FR-001 | 直线计数 |
 ### FR-001 直线计数
 用户点击计数，按 BR-001 显示数量。
+
+**交互卡**
+
+- 入口与前置：选择集非空时菜单入口可用。
+- 取消、回滚与撤销：ESC 只关闭提示，不修改图纸。
+- 命令行等价：COUNT 命令提供同一结果。
+
+| 状态 | 触发／输入 | 可见反馈 | 下一状态 |
+|---|---|---|---|
+| S1 默认态 | 选择集非空 | 计数按钮可用 | S2 计数完成 |
+| S2 计数完成 | 点击计数 | 命令行回显数量，图纸不变 | S1 默认态 |
+
+| 帧 ID | 对应状态 | 画面 | 说明 |
+|---|---|---|---|
+| FR-001-S1 | S1 | [原型](https://example.invalid/fr-001-s1) | 合成示例，不实际出图 |
 ## 4. 业务规则与异常处理
 | 规则 | 内容 |
 |---|---|
@@ -53,7 +68,21 @@ COMPLETE = '''# 直线计数（合成案例）
 '''
 
 
-class ValidatorTests(unittest.TestCase):
+class DocTestCase(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.prd = self.root / '计数初版.md'
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def run_doc(self, text=COMPLETE, profile='template'):
+        self.prd.write_text(text, encoding='utf-8')
+        return validate(self.prd, profile)
+
+
+class ValidatorTests(DocTestCase):
     def test_source_images_cannot_all_disappear_in_complete_output(self):
         source = self.root / 'source.html'
         source.write_text('<table><tr><td><img src="https://example.invalid/prototype.png"/></td></tr></table>', encoding='utf-8')
@@ -103,18 +132,6 @@ only-a-filename.png
                                 capture_output=True, encoding='utf-8')
         self.assertEqual(output.returncode, 1, output.stderr)
         self.assertTrue(any('output has none' in e for e in json.loads(output.stdout)['errors']))
-
-    def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
-        self.root = Path(self.temp.name)
-        self.prd = self.root / '计数初版.md'
-
-    def tearDown(self):
-        self.temp.cleanup()
-
-    def run_doc(self, text=COMPLETE, profile='template'):
-        self.prd.write_text(text, encoding='utf-8')
-        return validate(self.prd, profile)
 
     def test_complete_output_requires_template_headings(self):
         self.assertTrue(self.run_doc()['passed'])
@@ -410,12 +427,89 @@ only-a-filename.png
             self.assertTrue(any('empty echo heading' in w for w in result['warnings']))
 
     def test_two_and_four_digit_ids_are_recognized(self):
-        doc = COMPLETE + '\n## 补充说明\n### 扩展功能（FR-02）\n参见 BR-1000。\n| 规则 | 说明 |\n|---|---|\n| BR-1000 | 四位编号规则 |\n'
+        doc = COMPLETE + ('\n## 补充说明\n### 扩展功能（FR-02）\n参见 BR-1000。\n'
+                          '- 交互卡：未涉及（编号识别测试，无界面与命令行交互）。\n'
+                          '| 规则 | 说明 |\n|---|---|\n| BR-1000 | 四位编号规则 |\n')
         self.assertTrue(self.run_doc(doc)['passed'])
         dangling = COMPLETE + '\n## 补充说明\n参见 BR-1000 与 FR-02。\n'
         result = self.run_doc(dangling)
         self.assertFalse(result['passed'])
         self.assertTrue(any('BR-1000' in e and 'FR-02' in e for e in result['errors']))
+
+
+def without_interaction_card(text: str) -> str:
+    start = text.index('**交互卡**')
+    end = text.index('## 4. 业务规则与异常处理')
+    return text[:start] + text[end:]
+
+
+class InteractionCardTests(DocTestCase):
+    """Every FR definition must carry a usable interaction card."""
+
+    def test_missing_card_fails_complete_output_but_only_warns_in_draft(self):
+        text = without_interaction_card(COMPLETE)
+        result = self.run_doc(text)
+        self.assertFalse(result['passed'])
+        self.assertTrue(any('FR-001 缺少交互卡' in e for e in result['errors']))
+        self.assertEqual(result['interaction_coverage']['missing'], 1)
+        draft = self.run_doc(text, 'draft')
+        self.assertTrue(draft['passed'], draft)
+        self.assertTrue(any('缺少交互卡' in w for w in draft['warnings']))
+        # Input-only diagnostics never claim the new contract.
+        self.assertTrue(self.run_doc(text, 'existing')['passed'])
+
+    def test_card_without_frame_table_fails(self):
+        start = COMPLETE.index('| 帧 ID')
+        end = COMPLETE.index('## 4. 业务规则与异常处理')
+        text = COMPLETE[:start] + COMPLETE[end:]
+        result = self.run_doc(text)
+        self.assertFalse(result['passed'])
+        self.assertTrue(any('有效帧清单' in e for e in result['errors']))
+
+    def test_frame_row_needs_image_or_prototype_link(self):
+        text = COMPLETE.replace('| FR-001-S1 | S1 | [原型](https://example.invalid/fr-001-s1) | 合成示例，不实际出图 |',
+                                '| FR-001-S1 | S1 | 待定 | 合成示例 |')
+        self.assertFalse(self.run_doc(text)['passed'])
+
+    def test_state_table_needs_two_observable_states(self):
+        text = COMPLETE.replace('| S2 计数完成 | 点击计数 | 命令行回显数量，图纸不变 | S1 默认态 |', '')
+        result = self.run_doc(text)
+        self.assertFalse(result['passed'])
+        self.assertTrue(any('状态与事件表' in e for e in result['errors']))
+
+    def test_cancellation_must_be_stated(self):
+        text = COMPLETE.replace('- 取消、回滚与撤销：ESC 只关闭提示，不修改图纸。', '')
+        result = self.run_doc(text)
+        self.assertFalse(result['passed'])
+        self.assertTrue(any('取消、回滚与撤销' in e for e in result['errors']))
+
+    def test_explicit_no_interaction_needs_a_specific_reason(self):
+        start = COMPLETE.index('**交互卡**')
+        end = COMPLETE.index('## 4. 业务规则与异常处理')
+        good = (COMPLETE[:start] +
+                '- 交互卡：未涉及（纯数据校验，无界面与命令行交互）。\n\n' + COMPLETE[end:])
+        self.assertTrue(self.run_doc(good)['passed'])
+        self.assertEqual(self.run_doc(good)['interaction_coverage']['explicit_none'], 1)
+        vague = good.replace('未涉及（纯数据校验，无界面与命令行交互）', '未涉及（无）')
+        self.assertFalse(self.run_doc(vague)['passed'])
+
+    def test_line_level_none_declaration_does_not_excuse_the_card(self):
+        # "命令行等价：未涉及（…）" is one field, not the whole card.
+        text = COMPLETE.replace('- 命令行等价：COUNT 命令提供同一结果。',
+                                '- 命令行等价：未涉及（本功能只有界面入口）。')
+        result = self.run_doc(text)
+        self.assertTrue(result['passed'], result)
+        self.assertEqual(result['interaction_coverage']['with_frames'], 1)
+        broken = text.replace('| S2 计数完成 | 点击计数 | 命令行回显数量，图纸不变 | S1 默认态 |', '')
+        self.assertFalse(self.run_doc(broken)['passed'])
+
+    def test_coverage_counts_each_fr(self):
+        doc = COMPLETE + ('\n## 补充说明\n### 第二个功能（FR-002）\n只做提示。\n'
+                          '- 交互卡：未涉及（仅命令行提示，无界面状态）。\n')
+        result = self.run_doc(doc)
+        self.assertTrue(result['passed'], result)
+        self.assertEqual(result['interaction_coverage'],
+                         {'fr_total': 2, 'with_frames': 1, 'explicit_none': 1, 'missing': 0})
 
 
 if __name__ == '__main__':

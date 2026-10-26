@@ -14,7 +14,7 @@ disable-model-invocation: true
 
 新需求从取证到交付的常用顺序，仅作起点参考，不构成硬约束：
 
-`fetch_snapshot.py` 取证（或 `build_snapshot.py` 离线对账）→ 宏观澄清（macro 门禁）→ 核心 FR 机制击穿（fr，含竞品对标）→ 确认成稿范围（scope）→ 按 [成稿与交付](references/delivery.md) 成稿 → 交付校验与下游审查（review 门禁）→ 按需发布 Confluence。
+`fetch_snapshot.py` 取证（或 `build_snapshot.py` 离线对账）→ 宏观澄清（macro 门禁）→ 核心 FR 机制击穿（fr，含竞品对标）→ 逐 FR 交互稿与帧（ux 门禁：交互卡与帧经用户确认，结论增量写入主稿）→ 确认成稿范围（scope）→ 按 [成稿与交付](references/delivery.md) 装配成稿 → 交付校验与下游审查（review 门禁）→ 按需发布 Confluence。
 
 续接未完成需求：先 `gate_state.py --workspace <绝对路径> --read` 恢复门禁台账再继续。
 
@@ -22,14 +22,15 @@ disable-model-invocation: true
 
 - **归零推演与主动提案**：拒绝做题家式盲从输入材料或默写竞品旧实现；核心 FR 机制击穿必须穿透【第一性归零推演四问】（意图剥离、前提审计、极限动线、参谋反转），决策前沿必须优先提出破除冗余的最短路径提案。规范见 [需求探索](references/brainstorm.md) 与 [交互澄清](references/clarify.md)。
 - **快照先行**：以远程来源（Confluence 页面、Jira、外部文档）为输入时，必须先拉取本地不可变快照存入 `.assets/`（如 `fetch_snapshot.py` 或对账），严禁未建快照直接读取或修改。详见 [快照规范](references/snapshot.md)。
-- **确认后出稿**：核心机制、设计方案与范围未获用户明确确认前不得擅自成稿交卷；用户明确要求直接出稿时按其指令成稿。门禁判据、用户捷径留痕与续接见 [需求探索](references/brainstorm.md)。
+- **确认后出稿**：核心机制、设计方案与范围未获用户明确确认前不得擅自成稿交卷；用户明确要求直接出稿时按其指令成稿。门禁判据、用户捷径留痕与续接见 [需求探索](references/brainstorm.md)。**已确认内容可以增量写入主稿，未确认的决策不得写死**——禁止的是把推测当结论，不是禁止提前落笔。
+- **交互卡完备**：桌面 CAD 的细节由逐 FR 的交互卡承载（入口与前置、帧清单、状态事件表、取消与回滚、命令行等价），涉及界面或命令行提示的 FR 必须出卡并经用户看图确认（`ux` 门禁）；确无交互的 FR 显式写“未涉及”及理由。方法与帧清单契约见 [交互与原型设计](references/interaction-design.md)，内容判据见 [内容约定](references/prd-standard.md) §5。
 - **范围守恒**：检查或片段修改只处理用户范围，模板字段与示例不构成本期要求，不擅自扩改成完整稿。
 - **澄清纪律**：按决策前沿提问，一轮问完当前前沿；外部事实自行取证，业务事实问用户，每题带推荐与依据来源。方法见 [交互澄清](references/clarify.md)。
 - **事实时效**：凡涉及具体产品现行行为的结论，必须查证当前资料并标注来源与日期，不得以记忆先验充当事实；规则见 [竞品对标](references/prd-benchmark.md)。
 
 ## 落盘与调用契约
 
-- **落盘分工**：人读资产（主稿、按需的探讨／对标／澄清记录）置工作区根目录；来源快照、原图、渲染图、校验报告、门禁凭据等机器资产扁平归入 `.assets/`，正文以相对路径引用。命名、版本与状态见 [成稿与交付](references/delivery.md)。
+- **落盘分工**：人读资产（主稿、按需的探讨／对标／澄清记录）置工作区根目录；来源快照、原图、渲染图、帧清单与原型源文件、校验报告、门禁凭据等机器资产扁平归入 `.assets/`，正文以相对路径引用。命名、版本与状态见 [成稿与交付](references/delivery.md)。
 - **帮助初稿**：仅在用户明确要求时由已确认条目派生，含主题结构、只登记不生成图片的截图清单与界面术语对照；格式依据用户当期提供的帮助模板或随 skill 的 `assets/help/help-demo/` 样例，界面串用 `lookup_term.py` 按 `assets/help/multilanguage-mapping.txt` 查表，图位与译法待人工补齐，不替代正式帮助文档。
 - **门禁留痕**：一个需求对应一个工作空间；同一需求换会话继续时工作空间不变，先 `scripts/gate_state.py --workspace <绝对路径> --read` 恢复状态再继续，确认后立即记账（确认用 `--clear`、用户要求直接出稿用 `--waive`）。换需求另开工作空间；`--reset` 仅用于撤回直出稿捷径或纠正误记。详见 [需求探索](references/brainstorm.md)。
 - **脚本调用**：命令统一在本 Skill 根目录执行；稿件、工作区与输出位置一律以绝对路径显式传入，写入型脚本不依据当前目录推断目标。
@@ -38,7 +39,7 @@ disable-model-invocation: true
 
 ## 内容地图（自行判断需要读哪些）
 
-每条规范只有一个完整家，其余文件只写指针——凡“能被违反并被检查”的句子，只写在它的归属文件里：正文内容归 `prd-standard.md`，交付形态归 `delivery.md`，工作流硬约束归本文件，门禁与机制归 `brainstorm.md`，取证归 `prd-benchmark.md`，交互澄清归 `clarify.md`；其余是骨架、方法或支撑。
+每条规范只有一个完整家，其余文件只写指针——凡“能被违反并被检查”的句子，只写在它的归属文件里：正文内容归 `prd-standard.md`，交付形态归 `delivery.md`，工作流硬约束归本文件，门禁与机制归 `brainstorm.md`，取证归 `prd-benchmark.md`，交互澄清归 `clarify.md`，交互与原型设计方法与产物契约归 `interaction-design.md`；其余是骨架、方法或支撑。
 
 | 类别 | 文件 | 内容 |
 |---|---|---|
@@ -50,10 +51,11 @@ disable-model-invocation: true
 | **样例／字典** | `assets/help/help-demo/` | 帮助版式样例（仅作版式参照，非交付物），配合帮助初稿对照主题结构与样式 |
 | **样例／字典** | `assets/help/multilanguage-mapping.txt` | 界面串字典，供 `lookup_term.py` 查表；用户当期提供新字典时以当期为准 |
 | **样例／字典** | `assets/story-map-schema.md` | 二维用户故事地图的 JSON 字段契约与示例，供故事地图脚本取数 |
-| **方法** | `references/brainstorm.md` | 门禁定义与台账留痕、探讨记录分离、关键机制换约束重解与历史妥协穿透 |
+| **方法** | `references/brainstorm.md` | 门禁定义与台账留痕、探讨记录分离、交互与正文同步生长、关键机制换约束重解与历史妥协穿透 |
 | **方法** | `references/clarify.md` | 决策树与决策前沿、提问格式、取证责任、终止与收敛判定 |
 | **方法** | `references/prd-benchmark.md` | 取证顺序、事实／推论／未核实三级证据、CAD 对标维度、必答所以然、对标矩阵 |
 | **方法** | `references/prototype-analysis.md` | 涉及界面原型、截图或视觉资料时读：VLM 实查、图文冲突处置、静态画面的证明边界 |
+| **方法** | `references/interaction-design.md` | 把 FR 细化到可开工：逐 FR 小循环、交互卡六要素、最小帧集、状态事件表、帧清单与 `manifest.json` 契约、原型工具能力探测与降级链、视口动态反馈的帧序列表达。设计交互、出帧或确认交互稿时读 |
 | **方法** | `references/downstream-review.md` | 成稿后排查研发／品质／交互／产品化四视角落地断点并交互消缺（review 门禁依据） |
 | **方法** | `references/visual-collab.md` | 可编辑绘图路径：故事地图 JSON 生成 `.excalidraw` 场景文件，供用户在官方页面或桌面版修改，AI 也可按约定直接改该文件；同源输出 SVG/PNG |
 | **支撑** | `references/snapshot.md` | 远程来源的不可变本地快照、离线对账与缺口处理 |
@@ -63,8 +65,9 @@ disable-model-invocation: true
 
 | 脚本 | 作用 |
 |---|---|
-| `validate_prd.py` | 稿件结构、模板占位与图片文件校验（`--profile` 分场景，`--source` 比对原稿图片保留） |
+| `validate_prd.py` | 稿件结构、模板占位与图片文件校验（`--profile` 分场景，`--source` 比对原稿图片保留），并检查每个 FR 的交互卡结构、输出交互卡覆盖率 |
 | `validate_links.py` | 条目定义与引用、锚点与跳转校验（支持 Markdown 与 Confluence Storage） |
+| `validate_frames.py` | 正文帧表与 `.assets/frames/manifest.json` 的双向闭包、帧图存在性与孤儿帧校验（`--workspace` 必填） |
 | `validate_delivery.py` | Confluence 组合交付校验（本地稿、Storage 锚点、目录布局、Mermaid 附件） |
 | `convert_to_storage.py` | Markdown 转 Confluence Storage 格式（含浮动目录、原生锚点、图片与 LaTeX 符号降级） |
 | `gate_state.py` | 门禁凭据台账：`--read` 恢复状态、`--clear` 记确认、`--waive` 记用户捷径、`--reset` 撤回捷径或纠正误记（换需求另开工作空间） |

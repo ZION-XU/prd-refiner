@@ -32,19 +32,32 @@ class GateLedgerTests(unittest.TestCase):
         self.assertTrue(clear(self.root, 'macro', 'user confirmed macro')['passed'])
         self.assertFalse(clear(self.root, 'scope', 'reported scope')['passed'])  # fr still pending
         self.assertTrue(clear(self.root, 'fr', 'user decided FR mechanism')['passed'])
+        self.assertFalse(clear(self.root, 'scope', 'reported scope')['passed'])  # ux still pending
+        self.assertTrue(clear(self.root, 'ux', 'user confirmed frames and states')['passed'])
         draft_ready = clear(self.root, 'scope', 'user confirmed scope and structure')
         self.assertTrue(draft_ready['passed'])
-        self.assertEqual(draft_ready['state']['cleared'], ['macro', 'fr', 'scope'])
+        self.assertEqual(draft_ready['state']['cleared'], ['macro', 'fr', 'ux', 'scope'])
         self.assertTrue(draft_ready['state']['ready_to_draft'])
         self.assertFalse(draft_ready['state']['ready_to_deliver'])
         self.assertEqual(draft_ready['state']['pending'], ['review'])
 
         final = clear(self.root, 'review', 'user confirmed downstream review and resolution')
         self.assertTrue(final['passed'])
-        self.assertEqual(final['state']['cleared'], ['macro', 'fr', 'scope', 'review'])
+        self.assertEqual(final['state']['cleared'], ['macro', 'fr', 'ux', 'scope', 'review'])
         self.assertTrue(final['state']['ready_to_draft'])
         self.assertTrue(final['state']['ready_to_deliver'])
         self.assertFalse(final['state']['pending'])
+
+    def test_legacy_ledger_without_ux_gate_reports_it_pending(self):
+        path = state_path(self.root)
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({'gates': {gate: {'at': '2026-01-01T00:00:00+08:00',
+                                                     'evidence': 'older session'}
+                                             for gate in ('macro', 'fr', 'scope')}}),
+                        encoding='utf-8')
+        state = status(load_state(self.root))
+        self.assertFalse(state['ready_to_draft'])
+        self.assertEqual(state['pending'], ['ux', 'review'])
 
     def test_waiver_records_the_user_shortcut(self):
         result = waive(self.root, 'user asked for a direct draft')

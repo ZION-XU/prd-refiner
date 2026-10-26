@@ -15,7 +15,7 @@ import re
 import xml.etree.ElementTree as ET
 from urllib.parse import unquote
 
-from validate_prd import (ID_EXPR, ID_PATTERN, HEADING_DEF, NAMED_HEADING_DEF,
+from validate_prd import (ID_EXPR, ID_PATTERN, FRAME_ID, HEADING_DEF, NAMED_HEADING_DEF,
                           LIST_DEF, NAMED_LIST_DEF, TABLE_DEF, NAMED_TABLE_DEF,
                           without_fenced_code, body_without_metadata)
 
@@ -258,6 +258,8 @@ def inspect(text: str, format: str = 'markdown', reference_policy: str = 'linked
 
         if reference_policy == 'location':
             remainder = LOCATION_REF.sub(take_location, remainder)
+        # Frame IDs address one FR's interaction card, not a separate entity.
+        remainder = FRAME_ID.sub('', remainder)
         bare = ID_PATTERN.findall(remainder)
         if i in line_definitions and line_definitions[i] in bare:
             bare.remove(line_definitions[i])

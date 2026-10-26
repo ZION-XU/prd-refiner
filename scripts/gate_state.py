@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Read or record the PRD gate ledger at `<workspace>/.assets/gates.json`.
 
-The four-stage gate is a user decision, never an inference: every write command
+The staged gate is a user decision, never an inference: every write command
 requires --evidence describing what the user actually confirmed. The ledger only
-records order (macro -> fr -> scope -> review) and provenance; it cannot judge whether the
-confirmed content is correct.
+records order (macro -> fr -> ux -> scope -> review) and provenance; it cannot judge
+whether the confirmed content is correct.
 """
 from __future__ import annotations
 
@@ -16,14 +16,15 @@ import sys
 import tempfile
 
 
-GATE_ORDER = ('macro', 'fr', 'scope', 'review')
+GATE_ORDER = ('macro', 'fr', 'ux', 'scope', 'review')
 GATE_TITLES = {
     'macro': '宏观范围与目标确认门禁',
     'fr': '核心 FR 机制击穿门禁',
+    'ux': '逐 FR 交互稿与帧确认门禁',
     'scope': '成稿范围与结构确认门禁',
     'review': '下游审查与消缺确认门禁',
 }
-PRE_DRAFT_GATES = ('macro', 'fr', 'scope')
+PRE_DRAFT_GATES = ('macro', 'fr', 'ux', 'scope')
 STATE_NAME = 'gates.json'
 
 
@@ -133,7 +134,7 @@ def main(argv: list[str] | None = None) -> int:
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument('--read', action='store_true', help='Print the ledger status without writing')
     action.add_argument('--clear', choices=GATE_ORDER, metavar='GATE',
-                        help='Record one confirmed gate (macro, fr, scope or review) in order')
+                        help='Record one confirmed gate (macro, fr, ux, scope or review) in order')
     action.add_argument('--waive', action='store_true',
                         help='Record the user shortcut: the user asked for a direct draft')
     action.add_argument('--reset', action='store_true',

@@ -15,11 +15,12 @@
 
 | 脚本 | 职责 | 关键参数 |
 |---|---|---|
-| `validate_prd.py` | 稿件结构/占位/图片校验 | `--profile {template,draft,existing}`、`--source`、`--image-policy` |
+| `validate_prd.py` | 稿件结构/占位/图片/交互卡校验（含交互卡覆盖率） | `--profile {template,draft,existing}`、`--source`、`--image-policy` |
 | `validate_links.py` | 条目定义引用、锚点校验（Markdown 或 Confluence Storage） | `--format {markdown,storage}`、`--profile {template,draft,existing}`、`--reference-policy location` |
+| `validate_frames.py` | 正文帧表与 `.assets/frames/manifest.json` 双向闭包、帧图存在性、孤儿帧 | `--workspace` 必填，`--prd`/`--manifest` 可覆盖默认位置 |
 | `validate_delivery.py` | Confluence 组合交付校验 | `--workspace` 必填，Storage 正文跑两遍（提交稿 + 服务端回读） |
 | `convert_to_storage.py` | Markdown 转 Confluence Storage 格式 | `--output` 必填，`--layout {floating,inline}`，含 LaTeX 降级与 XML 校验 |
-| `gate_state.py` | 门禁台账（`macro→fr→scope→review` 顺序） | `--workspace` 必填，`--read`/`--clear <gate>`/`--waive`/`--reset`，写入必带 `--evidence` |
+| `gate_state.py` | 门禁台账（`macro→fr→ux→scope→review` 顺序） | `--workspace` 必填，`--read`/`--clear <gate>`/`--waive`/`--reset`，写入必带 `--evidence` |
 | `fetch_snapshot.py` | 在线抓 Confluence 快照 | `--page-id`、`--workspace`；自动复用 MCP/环境凭据 |
 | `build_snapshot.py` | 离线对账建快照 | `--json-file`/`--source-file`、`--workspace`、`--page-id`、`--page-version`；缺图/重名/不安全引用一律失败不降级 |
 | `render_mermaid.py` | Mermaid 渲染为哈希命名 PNG | `--output-dir`、`--force`；依赖 npx 拉取的 mermaid-cli 与本机无头浏览器 |
@@ -30,8 +31,8 @@
 ## 易错点
 
 - **快照先行**：以 Confluence/Jira/外部文档为输入必须先建 `.assets/` 不可变快照，未建快照不得直接读取或修改远程来源。`manifest.json` 为快照完成标记。
-- **落盘分工**：人读资产（主稿、探讨/对标/澄清记录）在**工作区根目录**；机器资产（快照、渲染图、校验报告、`gates.json`）在**工作区 `.assets/`**，正文用相对路径引用。不把机器资产散落在工作区根目录，也不把主稿写进 `.assets/`。
+- **落盘分工**：人读资产（主稿、探讨/对标/澄清记录）在**工作区根目录**；机器资产（快照、渲染图、帧清单与原型源文件、校验报告、`gates.json`）在**工作区 `.assets/`**，正文用相对路径引用。不把机器资产散落在工作区根目录，也不把主稿写进 `.assets/`。
 - **范围守恒**：校验发现的缺陷只修用户范围内部分；范围外来稿问题只报告不扩改。
 - **主稿命名**：单文件，名称确定用 `<需求名>.md`，未定用 `prd.md`；版本从 `0.1` 起，每次修订递增末级并在修订记录追加一行，不覆盖历史。
-- **成稿与交付门禁**：macro/fr/scope 三处确认（或用户直接出稿 waive）后才成稿；成稿经静态校验后，完成四视角审查与消缺并取得 review 确认方可交付；确认后立即记台账。一个需求一个工作空间，换会话续接先 `--read`（不要 `--reset`），换需求另开工作空间，`--reset` 仅用于撤回 waive 或纠正误记。
+- **成稿与交付门禁**：macro/fr/ux/scope 四处确认（或用户直接出稿 waive）后才成稿；已确认内容可增量写入主稿，未确认的决策不得写死。成稿经静态校验（含交互卡覆盖率与帧清单闭包）后，完成四视角审查与消缺并取得 review 确认方可交付；确认后立即记台账。一个需求一个工作空间，换会话续接先 `--read`（不要 `--reset`），换需求另开工作空间，`--reset` 仅用于撤回 waive 或纠正误记。
 - **事实时效**：涉及竞品/产品现行行为的结论必须查证当前资料并标注来源与日期，不得以记忆先验充当事实。

@@ -16,10 +16,10 @@ import validate_prd
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / 'SKILL.md'
 
-# Facts rot and rosters date; the benchmark method must stay vendor-free and
-# require live verification instead of shipping remembered behaviour.
+# Facts rot and rosters date; the method must require live verification of other
+# products instead of shipping remembered behaviour. Our own product name is fine.
 VENDOR_DENYLIST = ('AutoCAD', 'BricsCAD', 'SolidWorks', 'MicroStation', 'CATIA',
-                   'PTC Creo', 'Siemens NX', '中望CAD', 'ZWCAD')
+                   'PTC Creo', 'Siemens NX')
 
 
 def markdown_files():
@@ -37,6 +37,11 @@ class TemplatePurityTests(unittest.TestCase):
             self.assertIn(heading, self.text)
         self.assertIn('prd-standard.md', self.text)
         self.assertIn('delivery.md', self.text)
+
+    def test_template_carries_the_interaction_card_skeleton(self):
+        self.assertIn('**交互卡**', self.text)
+        self.assertIn('帧 ID', self.text)
+        self.assertIn('interaction-design.md', self.text)
 
 
 class NoRottingFactsTests(unittest.TestCase):

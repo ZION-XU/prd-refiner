@@ -27,6 +27,10 @@ CORE_HEADINGS = (
 )
 ID_EXPR = r'(?:FR|BR|AC|DEC|NFR|RK|SRC)-\d{2,4}'
 ID_PATTERN = re.compile(r'\b' + ID_EXPR + r'\b')
+# Frame identifiers belong to one FR's interaction card; they are not entity IDs.
+FRAME_ID = re.compile(r'FR-\d{2,4}-S\d{1,2}')
+TABLE_SEPARATOR = re.compile(r'^\s*\|(?:\s*:?-{2,}:?\s*\|)+\s*$')
+NONE_DECLARED = re.compile(r'交互卡\s*[：:]\s*未涉及\s*[（(][^）)\n]{4,}[）)]')
 PLACEHOLDER_PATTERN = re.compile(
     r'\{(?:REQ-ID|YYYY-MM-DD|需求名称|需求负责人|文档版本|功能名称|填写|待填写|'
     r'草稿/|待补充工作稿/)[^{}\n]*\}|<(?:填写|待填写)[^>\n]*>'
@@ -101,6 +105,96 @@ def definitions_in(text: str) -> list[str]:
             if not (item.startswith('FR-') and item in heading_ids):
                 definitions.append(item)
     return definitions
+
+
+def split_table_row(line: str) -> list[str]:
+    text = line.strip()
+    if text.startswith('|'):
+        text = text[1:]
+    if text.endswith('|'):
+        text = text[:-1]
+    return [cell.strip() for cell in text.split('|')]
+
+
+def markdown_tables(lines: list[str]) -> list[tuple[list[str], list[list[str]]]]:
+    """Return pipe tables that carry a header separator; prose is left alone."""
+    tables = []
+    index = 0
+    while index < len(lines) - 1:
+        if lines[index].strip().startswith('|') and TABLE_SEPARATOR.match(lines[index + 1]):
+            header = split_table_row(lines[index])
+            rows = []
+            cursor = index + 2
+            while cursor < len(lines) and lines[cursor].strip().startswith('|'):
+                rows.append(split_table_row(lines[cursor]))
+                cursor += 1
+            tables.append((header, rows))
+            index = cursor
+        else:
+            index += 1
+    return tables
+
+
+def fr_blocks(body: str) -> list[tuple[str, str]]:
+    """Return each FR definition heading with the lines that belong to it."""
+    lines = body.splitlines()
+    found = []
+    for index, line in enumerate(lines):
+        match = HEADING_DEF.match(line) or NAMED_HEADING_DEF.match(line)
+        if match and match.group(1).startswith('FR-'):
+            found.append((index, len(line) - len(line.lstrip('#')), match.group(1)))
+    blocks = []
+    for index, level, item in found:
+        end = len(lines)
+        for later in range(index + 1, len(lines)):
+            heading = re.match(r'^(#{1,6})\s', lines[later])
+            if heading and len(heading.group(1)) <= level:
+                end = later
+                break
+        blocks.append((item, '\n'.join(lines[index + 1:end])))
+    return blocks
+
+
+def check_interaction_cards(body: str, findings: list[str]) -> dict:
+    """Check that every FR definition carries a usable interaction card."""
+    coverage = {'fr_total': 0, 'with_frames': 0, 'explicit_none': 0, 'missing': 0}
+    for item, block in fr_blocks(body):
+        coverage['fr_total'] += 1
+        if '交互卡' not in block:
+            coverage['missing'] += 1
+            findings.append(
+                f'{item} 缺少交互卡：涉及界面或命令行时须给出帧清单与状态事件表，'
+                '确无交互时写“交互卡：未涉及（具体理由）”')
+            continue
+        if NONE_DECLARED.search(block):
+            coverage['explicit_none'] += 1
+            continue
+        state_ok = False
+        frames_ok = False
+        for header, rows in markdown_tables(block.splitlines()):
+            joined = ' '.join(header)
+            data = [row for row in rows if any(cell.strip() for cell in row)]
+            if '状态' in joined and ('反馈' in joined or '可见' in joined):
+                state_ok = state_ok or len(data) >= 2
+            if '帧 ID' in joined and '画面' in joined:
+                picture = next((i for i, cell in enumerate(header) if '画面' in cell), None)
+                for row in data:
+                    if not FRAME_ID.search(' '.join(row)):
+                        continue
+                    cell = row[picture] if picture is not None and picture < len(row) else ' '.join(row)
+                    if '![' in cell or '](' in cell:
+                        frames_ok = True
+        if not state_ok:
+            findings.append(f'{item} 交互卡缺少状态与事件表（表头含“状态”“可见反馈”，至少两个状态行）')
+        if not frames_ok:
+            findings.append(
+                f'{item} 交互卡缺少有效帧清单（表头含“帧 ID”“画面”，'
+                '至少一行含 FR-xxx-Sx 帧号并给出本地图片或原型链接）')
+        if '取消' not in block:
+            findings.append(f'{item} 交互卡未写明取消、回滚与撤销')
+        if frames_ok:
+            coverage['with_frames'] += 1
+    return coverage
 
 
 def known_placeholders(text: str) -> list[str]:
@@ -339,6 +433,12 @@ def validate(target: Path, profile: str = 'template', image_policy: str | None =
     # Complete outputs reject empty echo headings; drafts and source documents
     # report them without turning an input diagnostic into a failed deliverable.
     check_empty_echo_headings(body, errors if profile == 'template' else warnings)
+
+    # Interaction cards are where per-function detail lives; drafts and source
+    # documents report the same findings as warnings.
+    if profile != 'existing':
+        result['interaction_coverage'] = check_interaction_cards(
+            body, errors if profile == 'template' else warnings)
 
     definitions = definitions_in(body)
     for item, count in Counter(definitions).items():
