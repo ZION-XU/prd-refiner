@@ -50,6 +50,33 @@ INLINE_IMAGE = re.compile(r'!\[[^\]\n]*\]\(\s*(<[^>\n]+>|[^\s)]+)(?:\s+["\'][^\n
 REFERENCE_IMAGE = re.compile(r'!\[([^\]\n]*)\]\[([^\]\n]*)\]')
 REFERENCE_LINK = re.compile(r'^\s*\[([^\]]+)\]:\s*(<[^>\n]+>|\S+)', re.MULTILINE)
 
+VENDOR_DENYLIST = (
+    'AutoCAD', 'BricsCAD', 'SolidWorks', 'MicroStation', 'CATIA',
+    'PTC Creo', 'Siemens NX'
+)
+
+
+def _vendor_pattern(vendor: str) -> re.Pattern:
+    parts = [re.escape(p) for p in re.split(r'\s+', vendor.strip())]
+    sub = r'\s+'.join(parts)
+    return re.compile(rf'(?<![A-Za-z]){sub}(?![A-Za-z])', re.IGNORECASE)
+
+
+VENDOR_PATTERNS = tuple((vendor, _vendor_pattern(vendor)) for vendor in VENDOR_DENYLIST)
+
+
+def check_vendor_mentions(prose: str, findings: list[str]) -> None:
+    """Flag competitor vendor names in PRD prose to uphold cleanroom and objective style contracts."""
+    for line_no, line in enumerate(prose.splitlines(), start=1):
+        for vendor, pattern in VENDOR_PATTERNS:
+            match = pattern.search(line)
+            if match:
+                findings.append(
+                    f'forbidden vendor mention: "{match.group(0)}" on line {line_no} (matches {vendor}); '
+                    'use neutral engineering terminology (e.g. 传统 CAD / 主流第三方 CAD 宿主) '
+                    'and keep competitor benchmarks in _需求探讨.md / _竞品分析.md'
+                )
+
 
 def without_fenced_code(text: str) -> str:
     """Keep line positions while excluding code examples from prose checks."""
@@ -433,6 +460,9 @@ def validate(target: Path, profile: str = 'template', image_policy: str | None =
     # Complete outputs reject empty echo headings; drafts and source documents
     # report them without turning an input diagnostic into a failed deliverable.
     check_empty_echo_headings(body, errors if profile == 'template' else warnings)
+
+    # Vendor purity check: cleanroom PRDs must not mention competitor vendors.
+    check_vendor_mentions(prose, errors if profile == 'template' else warnings)
 
     # Interaction cards are where per-function detail lives; drafts and source
     # documents report the same findings as warnings.

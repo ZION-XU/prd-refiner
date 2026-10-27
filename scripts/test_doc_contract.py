@@ -18,8 +18,7 @@ SKILL = ROOT / 'SKILL.md'
 
 # Facts rot and rosters date; the method must require live verification of other
 # products instead of shipping remembered behaviour. Our own product name is fine.
-VENDOR_DENYLIST = ('AutoCAD', 'BricsCAD', 'SolidWorks', 'MicroStation', 'CATIA',
-                   'PTC Creo', 'Siemens NX')
+VENDOR_DENYLIST = validate_prd.VENDOR_DENYLIST
 
 
 def markdown_files():

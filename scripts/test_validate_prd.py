@@ -511,6 +511,28 @@ class InteractionCardTests(DocTestCase):
         self.assertEqual(result['interaction_coverage'],
                          {'fr_total': 2, 'with_frames': 1, 'explicit_none': 1, 'missing': 0})
 
+    def test_vendor_mention_rejected_in_template_profile(self):
+        text = COMPLETE.replace('用户需要核对当前选择集中的直线数量。',
+                                '用户在 AutoCAD 中打开图纸并核对直线数量。')
+        result = self.run_doc(text, profile='template')
+        self.assertFalse(result['passed'])
+        self.assertTrue(any('forbidden vendor mention' in e for e in result['errors']))
+        self.assertTrue(any('AutoCAD' in e for e in result['errors']))
+
+    def test_vendor_mention_warned_in_draft_profile(self):
+        text = COMPLETE.replace('用户需要核对当前选择集中的直线数量。',
+                                '用户在 AutoCAD 中打开图纸。')
+        result = self.run_doc(text, profile='draft')
+        self.assertTrue(result['passed'])
+        self.assertTrue(any('forbidden vendor mention' in w for w in result['warnings']))
+
+    def test_vendor_mention_case_insensitive_and_adjacent_chinese(self):
+        text = COMPLETE.replace('用户需要核对当前选择集中的直线数量。',
+                                '现有系统与竞品autocad在某些方面存在差异。')
+        result = self.run_doc(text, profile='template')
+        self.assertFalse(result['passed'])
+        self.assertTrue(any('autocad' in e.lower() for e in result['errors']))
+
 
 if __name__ == '__main__':
     unittest.main()
