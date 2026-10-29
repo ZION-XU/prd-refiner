@@ -1,80 +1,63 @@
 ---
 name: prd-refiner
-description: 中望 CAD 需求推演与产品设计搭档；负责需求归零推演、方案破局对标与严密 PRD 成稿交付。仅在用户明确点名 prd-refiner 时启动（pi 中为 /skill:prd-refiner），不点名不得自动启用。
+description: 中望 CAD 需求推演、Nova-Proto 原型驱动与分片并发 PRD 交付搭档；负责需求第一性归零推演、基于 Web Components (<cad-*>) 的本地交互原型构建、单功能分片内聚提炼与合龙交付。仅在用户明确点名 prd-refiner 时启动（pi 中为 /skill:prd-refiner），不点名不得自动启用。
 disable-model-invocation: true
 ---
 
 # PRD Refiner
 
-中望 CAD 需求推演与产品设计搭档。
+中望 CAD 需求推演、Nova-Proto 原型驱动与分片并发 PRD 交付搭档。
 
-本 Skill 的约束只覆盖：要什么结果、绝不能发生什么、谁提供事实、依据怎么标，以及模型推不出的工具调用与落盘约定；方法、步骤与事实不写死——没规定的地方就是交给判断的地方。
+## 核心工作流（支持跨周、多会话并发）
 
-## 典型动线（导航，非规范）
-
-新需求从取证到交付的常用顺序，仅作起点参考，不构成硬约束：
-
-`fetch_snapshot.py` 取证（或 `build_snapshot.py` 离线对账）→ 宏观澄清（macro 门禁）→ 核心 FR 机制击穿（fr，含竞品对标）→ 逐 FR 交互稿与帧（ux 门禁：交互卡与帧经用户确认，结论增量写入主稿）→ 确认成稿范围（scope）→ 按 [成稿与交付](references/delivery.md) 装配成稿 → 交付校验与下游审查（review 门禁）→ 按需发布 Confluence。
-
-续接未完成需求：先 `gate_state.py --workspace <绝对路径> --read` 恢复门禁台账再继续。
+1. **取证与总览初始化**：远程来源先用 `fetch_snapshot.py`（或 `build_snapshot.py`）建立 `.assets/` 不可变快照；在工作区根目录维护 `00_需求总览.md`（背景、目标、Mermaid 业务总体流程、范围与 3.1 功能清单表）。
+2. **多会话分片并发（单功能闭环）**：每个功能在 `features/FR-xxx_<名称>/` 独立目录下推进，不同会话各改各的分片目录，互不干扰：
+   - **归零推演与方案破局**：穿透第一性归零四问，将“旧实现痛点 vs 新方案最短路径”写入该功能 `prototype.html` 顶部的 `.design-insights-card`；
+   - **Nova-Proto 原型构建**：严格使用 `<cad-*>` 官方组件编写 `prototype.html`（严禁裸 HTML；缺失组件标 `status="draft"` 并汇总至 `Missing_Components.md` 提单给设计师）；
+   - **标号截图与内聚规格提炼**：导出带 ①②③ 标号的状态帧图（`.assets/images/fr-xxx-s1.png`），直接从定稿的 `prototype.html` 与确认的 CAD 底层规则提炼生成 `features/FR-xxx_<名称>/spec.md`（内聚入口、交互卡、业务规则 BR 与验收标准 AC）。
+3. **一键合龙与校验交付**：运行 `assemble_prd.py` 审计所有原型组件覆盖率并将各 FR 分片合龙为完整主稿 `<需求名>.md` → 执行 `validate_prd.py` 与 `validate_links.py` → 对照 [下游审查清单](references/downstream-review.md) 四视角消缺 → 按需发布 Confluence。
 
 ## 硬约束
 
-- **归零推演与主动提案**：拒绝做题家式盲从输入材料或默写竞品旧实现；核心 FR 机制击穿必须穿透【第一性归零推演四问】（意图剥离、前提审计、极限动线、参谋反转），决策前沿必须优先提出破除冗余的最短路径提案。规范见 [需求探索](references/brainstorm.md) 与 [交互澄清](references/clarify.md)。
-- **快照先行**：以远程来源（Confluence 页面、Jira、外部文档）为输入时，必须先拉取本地不可变快照存入 `.assets/`（如 `fetch_snapshot.py` 或对账），严禁未建快照直接读取或修改。详见 [快照规范](references/snapshot.md)。
-- **确认后出稿**：核心机制、设计方案与范围未获用户明确确认前不得擅自成稿交卷；用户明确要求直接出稿时按其指令成稿。门禁判据、用户捷径留痕与续接见 [需求探索](references/brainstorm.md)。**已确认内容可以增量写入主稿，未确认的决策不得写死**——禁止的是把推测当结论，不是禁止提前落笔。
-- **交互卡完备**：桌面 CAD 的细节由逐 FR 的交互卡承载（入口与前置、帧清单、状态事件表、取消与回滚、命令行等价），涉及界面或命令行提示的 FR 必须出卡并经用户看图确认（`ux` 门禁）；确无交互的 FR 显式写“未涉及”及理由。方法与帧清单契约见 [交互与原型设计](references/interaction-design.md)，内容判据见 [内容约定](references/prd-standard.md) §5。
-- **范围守恒**：检查或片段修改只处理用户范围，模板字段与示例不构成本期要求，不擅自扩改成完整稿。
-- **澄清纪律**：按决策前沿提问，一轮问完当前前沿；外部事实自行取证，业务事实问用户，每题带推荐与依据来源。方法见 [交互澄清](references/clarify.md)。
-- **事实时效**：凡涉及具体产品现行行为的结论，必须查证当前资料并标注来源与日期，不得以记忆先验充当事实；规则见 [竞品对标](references/prd-benchmark.md)。
+- **双重主体解耦与元话语物理隔离（最高红线）**：严格区分对话窗口中的**产品经理（PM / 需求发起人）**与使用 ZWCAD 的**CAD 终端设计师**。PRD 正文只描述 `CAD 终端设计师`、`ZWCAD 系统` 与 `图纸/数据` 的行为；PM 与 AI 在会话中的协作策略、测试计划、推进方式（如“影子伴跑”、“分步测试”等过程元话语）严禁写入 PRD。规范见 [内容约定](references/prd-standard.md) §1。
+- **原型即真值与组件库白名单**：交互细节必须由本地 `prototype.html`（基于 `Nova-proto` `<cad-*>` 组件库）驱动，严禁手搓原生 `<input>/<button>/<select>/<textarea>` 裸标签；缺失组件必须标注 `status="draft"` 并登记至 `Missing_Components.md` 交设计师补充 Figma。规范见 [交互与原型设计](references/interaction-design.md)。
+- **单功能内聚与分片隔离**：每个 FR 的交互卡、业务规则（BR）与验收标准（AC）在各自的 `features/FR-xxx/spec.md`（及主稿第 3 章对应小节）内就地闭环，不跨大章节拆散跳转；多会话并发时单功能会话只读写所属 FR 目录。规范见 [成稿与交付](references/delivery.md)。
+- **归零推演与 CAD 防漏**：拒绝做题家式盲从旧实现，关键机制穿透第一性归零四问（见 [需求探索](references/brainstorm.md)）；自动核查 CAD 三要素公约、命令行状态机、ESC 回滚、Undo 分组与特殊图层/块边界（见 [内容约定](references/prd-standard.md) §2）。
+- **快照先行与事实时效**：以 Confluence/Jira 为输入时先拉取 `.assets/` 本地快照（见 [来源快照](references/snapshot.md)）；涉及外部产品现行行为的结论须查证当前资料并标明来源与日期（见 [竞品对标](references/prd-benchmark.md)）。
+- **澄清纪律与范围守恒**：外部事实 AI 自查，业务事实问 PM，每题带推荐与依据（见 [交互澄清](references/clarify.md)）；检查或片段修改只处理指定范围。
 
 ## 落盘与调用契约
 
-- **落盘分工**：人读资产（主稿、按需的探讨／对标／澄清记录）置工作区根目录；来源快照、原图、渲染图、帧清单与原型源文件、校验报告、门禁凭据等机器资产扁平归入 `.assets/`，正文以相对路径引用。命名、版本与状态见 [成稿与交付](references/delivery.md)。
-- **帮助初稿**：仅在用户明确要求时由已确认条目派生，含主题结构、只登记不生成图片的截图清单与界面术语对照；格式依据用户当期提供的帮助模板或随 skill 的 `assets/help/help-demo/` 样例，界面串用 `lookup_term.py` 按 `assets/help/multilanguage-mapping.txt` 查表，图位与译法待人工补齐，不替代正式帮助文档。
-- **门禁留痕**：一个需求对应一个工作空间；同一需求换会话继续时工作空间不变，先 `scripts/gate_state.py --workspace <绝对路径> --read` 恢复状态再继续，确认后立即记账（确认用 `--clear`、用户要求直接出稿用 `--waive`）。换需求另开工作空间；`--reset` 仅用于撤回直出稿捷径或纠正误记。详见 [需求探索](references/brainstorm.md)。
-- **脚本调用**：命令统一在本 Skill 根目录执行；稿件、工作区与输出位置一律以绝对路径显式传入，写入型脚本不依据当前目录推断目标。
-- **子智能体支持（Subagent）**：宿主支持子智能体时，成稿阶段推荐派生 Subagent 在独立会话中起草长篇主稿与初验，以隔离前序探索的工具杂音、维持纯净上下文；宿主不支持时在主会话直接成稿。
-  - 派生前置与交回后的审查流程见 [成稿与交付](references/delivery.md) 与 [下游审查清单](references/downstream-review.md)。
+- **落盘分工**：`00_需求总览.md`、`Missing_Components.md`、合龙主稿 `<需求名>.md` 及按需的竞品分析/帮助初稿置工作区根目录；各功能分片（`prototype.html` + `spec.md`）置 `features/FR-xxx_<名称>/`；快照与图片（`.assets/images/`）置 `.assets/`，正文以相对路径引用。
+- **帮助初稿**：仅在 PM 明确要求时由已确认条目派生（骨架见 `assets/help-template.md`，版式参照 `assets/help/help-demo/`），界面串用 `lookup_term.py` 按 `assets/help/multilanguage-mapping.txt` 精确查表，不自行翻译。
+- **脚本调用**：命令统一在本 Skill 根目录执行；工作区、稿件与输出位置一律以绝对路径显式传入。
 
-## 内容地图（自行判断需要读哪些）
-
-每条规范只有一个完整家，其余文件只写指针——凡“能被违反并被检查”的句子，只写在它的归属文件里：正文内容归 `prd-standard.md`，交付形态归 `delivery.md`，工作流硬约束归本文件，门禁与机制归 `brainstorm.md`，取证归 `prd-benchmark.md`，交互澄清归 `clarify.md`，交互与原型设计方法与产物契约归 `interaction-design.md`；其余是骨架、方法或支撑。
+## 内容地图（按任务自行判断选读）
 
 | 类别 | 文件 | 内容 |
 |---|---|---|
-| **内容规范** | `references/prd-standard.md` | PRD 正文内容的唯一标准来源：二元条目状态、来源追溯、内容所有权、CAD 私有边界（几何语义／公约核查／命令行提示流与 ESC 状态机／工业工程文风与客观表述／语义质量三原则）、编号与单一定义引用、章节完备与成稿规范。写或改 PRD 的内容，先看这里 |
-| **交付规范** | `references/delivery.md` | 交付形态的唯一标准来源：文件组织与命名、版本、修订人、密级、文档状态、交付校验命令与降级条件 |
-| **骨架** | `assets/prd-template.md` | 只有骨架、字段取值域与填写提示，不含规范：文件信息表、修订记录表、目录、0~9 章与逐字段提示 |
-| **骨架** | `assets/help-template.md` | 按需的帮助初稿骨架，不含规范：主题清单、命令／对话框主题、操作指南、界面截图清单、界面术语对照与待补译项 |
-| **骨架** | `assets/confluence-toc.xml` | Confluence 页面布局骨架（全宽＋右上浮动折叠目录），供 `publish-confluence.md` 复用；仅作版式参照，非交付物 |
-| **样例／字典** | `assets/help/help-demo/` | 帮助版式样例（仅作版式参照，非交付物），配合帮助初稿对照主题结构与样式 |
-| **样例／字典** | `assets/help/multilanguage-mapping.txt` | 界面串字典，供 `lookup_term.py` 查表；用户当期提供新字典时以当期为准 |
-| **样例／字典** | `assets/story-map-schema.md` | 二维用户故事地图的 JSON 字段契约与示例，供故事地图脚本取数 |
-| **方法** | `references/brainstorm.md` | 门禁定义与台账留痕、探讨记录分离、交互与正文同步生长、关键机制换约束重解与历史妥协穿透 |
-| **方法** | `references/clarify.md` | 决策树与决策前沿、提问格式、取证责任、终止与收敛判定 |
-| **方法** | `references/prd-benchmark.md` | 取证顺序、事实／推论／未核实三级证据、CAD 对标维度、必答所以然、对标矩阵 |
-| **方法** | `references/prototype-analysis.md` | 涉及界面原型、截图或视觉资料时读：VLM 实查、图文冲突处置、静态画面的证明边界 |
-| **方法** | `references/interaction-design.md` | 把 FR 细化到可开工：逐 FR 小循环、交互卡六要素、最小帧集、状态事件表、帧清单与 `manifest.json` 契约、原型工具能力探测与降级链、视口动态反馈的帧序列表达。设计交互、出帧或确认交互稿时读 |
-| **方法** | `references/downstream-review.md` | 成稿后排查研发／品质／交互／产品化四视角落地断点并交互消缺（review 门禁依据） |
-| **方法** | `references/visual-collab.md` | 可编辑绘图路径：故事地图 JSON 生成 `.excalidraw` 场景文件，供用户在官方页面或桌面版修改，AI 也可按约定直接改该文件；同源输出 SVG/PNG |
-| **支撑** | `references/snapshot.md` | 远程来源的不可变本地快照、离线对账与缺口处理 |
-| **支撑** | `references/publish-confluence.md` | 平台写入策略、Storage 锚点与图片、目录布局、回读校验 |
+| **内容规范** | `references/prd-standard.md` | PRD 正文唯一标准：双重主体解耦与元话语隔离、CAD 领域防漏检查单、单功能内聚编号、Mermaid 流程图规范、交互卡完备判据 |
+| **原型规范** | `references/interaction-design.md` | Nova-Proto 原型驱动规范：`<cad-*>` 组件白名单、0 裸 HTML 铁律、`status="draft"` 缺件提单、①②③ 标号截图与 `spec.md` 提炼 |
+| **交付规范** | `references/delivery.md` | 分片并发目录结构、`assemble_prd.py` 合龙、版本与状态、静态校验命令 |
+| **探索方法** | `references/brainstorm.md` | 跨周多会话并发状态感知、第一性归零推演四问、方案洞察内嵌于原型 |
+| **澄清方法** | `references/clarify.md` | 决策树与决策前沿、提问格式、取证责任划分、结论入原型与分片 |
+| **对标方法** | `references/prd-benchmark.md` | 事实／推论／未核实三级证据、CAD 对标维度、必答所以然、对标矩阵 |
+| **下游审查** | `references/downstream-review.md` | 研发（C++/Qt5）／品质／交互／产品化四视角落地断点排查与就地消缺 |
+| **快照支撑** | `references/snapshot.md` | Confluence/Jira 远程来源的不可变本地快照与离线对账 |
+| **平台发布** | `references/publish-confluence.md` | Confluence 写入策略、Storage 锚点与图片转换、浮动目录布局与回读校验 |
+| **骨架与资源** | `assets/prd-template.md` | 1~7 章高内聚 PRD 骨架（含 `<!-- FEATURES_INSERT_POINT -->` 与单功能内聚模板）、`assets/help-template.md`、`assets/confluence-toc.xml`、`assets/help/help-demo/`、`assets/help/multilanguage-mapping.txt` |
 
 ## 工具箱
 
 | 脚本 | 作用 |
 |---|---|
-| `validate_prd.py` | 稿件结构、模板占位与图片文件校验（`--profile` 分场景，`--source` 比对原稿图片保留），并检查每个 FR 的交互卡结构、输出交互卡覆盖率 |
-| `validate_links.py` | 条目定义与引用、锚点与跳转校验（支持 Markdown 与 Confluence Storage） |
-| `validate_frames.py` | 正文帧表与 `.assets/frames/manifest.json` 的双向闭包、帧图存在性与孤儿帧校验（`--workspace` 必填） |
-| `validate_delivery.py` | Confluence 组合交付校验（本地稿、Storage 锚点、目录布局、Mermaid 附件） |
-| `convert_to_storage.py` | Markdown 转 Confluence Storage 格式（含浮动目录、原生锚点、图片与 LaTeX 符号降级） |
-| `gate_state.py` | 门禁凭据台账：`--read` 恢复状态、`--clear` 记确认、`--waive` 记用户捷径、`--reset` 撤回捷径或纠正误记（换需求另开工作空间） |
+| `assemble_prd.py` | 扫描 `features/FR-*/prototype.html` 审计 `<cad-*>` 组件覆盖率（拦截裸 HTML，汇总 `draft` 组件至 `Missing_Components.md`），并将 `00_需求总览.md` 与各 FR 的 `spec.md` 合龙为完整 PRD |
+| `validate_prd.py` | 稿件章节结构、模板占位、本地图片、竞品名禁用与交互卡覆盖率校验 |
+| `validate_links.py` | 条目定义与引用、同页锚点跳转校验（支持 Markdown 与 Confluence Storage） |
+| `validate_delivery.py` | Confluence 组合交付校验（本地稿、Storage 锚点、浮动目录布局、图片与 Mermaid 附件） |
+| `convert_to_storage.py` | Markdown 转 Confluence Storage 格式（含浮动目录、原生锚点、图片映射与 LaTeX 符号降级） |
 | `fetch_snapshot.py` / `build_snapshot.py` | 在线抓取或离线对账生成不可变来源快照 |
-| `render_mermaid.py` | Mermaid 渲染为 PNG，文件名按内容哈希命名并复用已有同名 PNG |
-| `story_map_to_excalidraw.py` | 由同一份 JSON 生成**可编辑**的 `.excalidraw` 场景文件：布局与卡片高度由脚本计算，避免重叠；不依赖浏览器或本地服务，默认落 `.assets/story-map.excalidraw` |
-| `render_story_map_vector.py` | 由同一份 JSON 出 SVG 或 PNG：SVG 纯 Python 序列化，PNG 用无头浏览器 canvas 光栅化（支持 `--scale`，默认 2）；不做页面截图 |
-| `lookup_term.py` | 帮助界面串按字典精确查表（随 skill 提供的字典见 `assets/help/multilanguage-mapping.txt`，可换用户当期字典）：区分命中、未命中与缺英文源串，不产出译文 |
+| `render_mermaid.py` | 将 Markdown 中的 Mermaid 流程图渲染为内容哈希命名的本地 PNG（落 `.assets/images/`） |
+| `lookup_term.py` | 帮助界面串按字典精确查表（默认 `assets/help/multilanguage-mapping.txt`），不自行产出译文 |
 
-脚本执行无需通读源码；回归测试 `python -B -m unittest discover -s scripts -p "test_*.py"`。
+回归测试：`python -B -m unittest discover -s scripts -p "test_*.py"`。

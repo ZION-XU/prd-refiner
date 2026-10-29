@@ -10,7 +10,7 @@
 
 ## 2. Storage 格式转换与原生锚点
 
-将本地 Markdown 转换为符合规范的 Storage XML 格式（提交时 `content_format=storage`）：
+将本地合龙后的 Markdown 转换为符合规范的 Storage XML 格式（提交时 `content_format=storage`）：
 
 ```bash
 python scripts/convert_to_storage.py <Markdown绝对路径> --output <输出XML绝对路径>
@@ -24,15 +24,15 @@ python scripts/convert_to_storage.py <Markdown绝对路径> --output <输出XML�
   ```
 - **同页引用**：自动转换为原生同页链接跳转：
   ```xml
-  <ac:link ac:anchor="fr-001"><ac:plain-text-link-body><![CDATA[直线计数（FR-001）]]></ac:plain-text-link-body></ac:link>
+  <ac:link ac:anchor="fr-001"><ac:plain-text-link-body><![CDATA[创建表格（FR-001）]]></ac:plain-text-link-body></ac:link>
   ```
 - **LaTeX 符号降级**：自动将 `$\ge$`、`$\le$`、`$\to$`、`$\pm$` 等伪数学 LaTeX 语法清洗为原生 Unicode 符号（`≥`、`≤`、`→`、`±`），避免伪数学语法导致的渲染乱码；
 - **XML 语法清洗**：自动转义表格及正文中的非 HTML 尖括号（如 `<全部其他值>`），并调用 ElementTree 验证 XML 合法性。
 
 ## 3. 图片与图表规范
 
-- **普通图片、故事地图与流程图资产（推荐）**：引用的本地图片须为可显示的图片（源文件先导出，见 [成稿与交付](delivery.md) §1）。二维用户故事地图（`render_story_map_vector.py` 产出的 SVG/PNG）、业务流程图、架构图或快照原图统一落盘至 `<工作区>/.assets/images/`，正文以标准 Markdown 图片语法引用；`convert_to_storage.py` 会自动将其转为 `<ac:image><ri:attachment ri:filename="图片名.png"/></ac:image>`，发布时必须将 `validate_delivery.py` 报告的 `required_attachments` 全部上传至目标页面附件；严禁保留本地路径或临时 URL。
-- **Mermaid 源码围栏（兼容备用）**：若正文包含 ```mermaid 代码块，执行渲染脚本生成 PNG 并上传附件：
+- **原型帧图与流程图资产**：HTML 原型导出的带标号状态帧图（`fr-001-s1.png`）、业务流程图或快照原图统一落盘至 `<工作区>/.assets/images/`，正文以标准 Markdown 图片语法引用；`convert_to_storage.py` 会自动将其转为 `<ac:image><ri:attachment ri:filename="图片名.png"/></ac:image>`，发布时必须将 `validate_delivery.py` 报告的 `required_attachments` 全部上传至目标页面附件；严禁保留本地路径或临时 URL。
+- **Mermaid 流程图渲染**：若正文包含 ```mermaid 代码块，执行渲染脚本生成 PNG 并上传附件：
   ```bash
   python scripts/render_mermaid.py <Markdown路径>
   ```

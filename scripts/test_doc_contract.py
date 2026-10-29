@@ -31,8 +31,9 @@ class TemplatePurityTests(unittest.TestCase):
         self.text = (ROOT / 'assets/prd-template.md').read_text(encoding='utf-8-sig')
 
     def test_template_keeps_the_skeleton_and_points_to_the_rules(self):
-        for heading in ('## 0. 决策摘要', '## 1. 背景、用户与目标',
-                        '## 3. 功能与交互规格', '## 9. 来源与参考资料'):
+        for heading in ('## 1. 背景、用户与目标', '## 2. 范围与边界',
+                        '## 3. 功能与交互规格', '## 6. 风险与开放问题',
+                        '## 7. 来源与参考资料'):
             self.assertIn(heading, self.text)
         self.assertIn('prd-standard.md', self.text)
         self.assertIn('delivery.md', self.text)
@@ -95,7 +96,6 @@ REGISTERED_ASSETS = (
     'assets/confluence-toc.xml',
     'assets/prd-template.md',
     'assets/help-template.md',
-    'assets/story-map-schema.md',
 )
 REGISTERED_HELP_ASSETS = (
     'assets/help/help-demo',
