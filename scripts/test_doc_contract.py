@@ -96,6 +96,7 @@ REGISTERED_ASSETS = (
     'assets/confluence-toc.xml',
     'assets/prd-template.md',
     'assets/help-template.md',
+    'assets/nova-proto/',
 )
 REGISTERED_HELP_ASSETS = (
     'assets/help/help-demo',

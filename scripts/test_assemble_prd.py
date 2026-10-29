@@ -89,6 +89,16 @@ class AssemblePrdTests(unittest.TestCase):
             missing_file = ws / 'Missing_Components.md'
             self.assertTrue(missing_file.is_file())
             self.assertIn('cad-custom-grid', missing_file.read_text(encoding='utf-8'))
+            self.assertTrue((ws / '.assets' / 'nova-proto' / 'cad-components.js').is_file())
+            self.assertTrue((ws / '.assets' / 'nova-proto' / 'cad-design-tokens.css').is_file())
+
+    def test_init_only_bootstraps_nova_runtime(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ws = Path(tmp)
+            res = assemble_prd.assemble(ws, init_only=True)
+            self.assertTrue(res['passed'])
+            self.assertTrue((ws / '.assets' / 'nova-proto' / 'cad-components.js').is_file())
+            self.assertTrue((ws / '.assets' / 'nova-proto' / 'cad-design-tokens.css').is_file())
 
 
 if __name__ == '__main__':

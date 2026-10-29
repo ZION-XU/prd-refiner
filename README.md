@@ -36,8 +36,9 @@ prd-refiner/
 │  ├─ downstream-review.md  下游审查：研发 (C++/Qt5)／品质／交互／产品化四视角消缺
 │  ├─ snapshot.md           快照支撑：Confluence/Jira 不可变本地快照与对账
 │  └─ publish-confluence.md 平台发布：Storage 转换、浮动目录布局与回读校验
-├─ assets/                  骨架、版式参照与多语言字典
+├─ assets/                  骨架、组件运行时、版式参照与多语言字典
 │  ├─ prd-template.md       1~7 章高内聚 PRD 骨架（含分片合龙插槽）
+│  ├─ nova-proto/           内置 Nova-Proto Web Components 运行时 (cad-design-tokens.css, cad-components.js)
 │  ├─ help-template.md      帮助初稿骨架
 │  ├─ confluence-toc.xml    Confluence 全宽 + 右上浮动目录布局骨架
 │  └─ help/                 帮助版式样例 (help-demo) 与多语言字典 (multilanguage-mapping.txt)

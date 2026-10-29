@@ -45,7 +45,7 @@ disable-model-invocation: true
 | **下游审查** | `references/downstream-review.md` | 研发（C++/Qt5）／品质／交互／产品化四视角落地断点排查与就地消缺 |
 | **快照支撑** | `references/snapshot.md` | Confluence/Jira 远程来源的不可变本地快照与离线对账 |
 | **平台发布** | `references/publish-confluence.md` | Confluence 写入策略、Storage 锚点与图片转换、浮动目录布局与回读校验 |
-| **骨架与资源** | `assets/prd-template.md` | 1~7 章高内聚 PRD 骨架（含 `<!-- FEATURES_INSERT_POINT -->` 与单功能内聚模板）、`assets/help-template.md`、`assets/confluence-toc.xml`、`assets/help/help-demo/`、`assets/help/multilanguage-mapping.txt` |
+| **骨架与资源** | `assets/prd-template.md` | 1~7 章高内聚 PRD 骨架（含 `<!-- FEATURES_INSERT_POINT -->` 与单功能内聚模板）、内置组件库运行时 `assets/nova-proto/`（`cad-design-tokens.css` 与 `cad-components.js`）、`assets/help-template.md`、`assets/confluence-toc.xml`、`assets/help/help-demo/`、`assets/help/multilanguage-mapping.txt` |
 
 ## 工具箱
 

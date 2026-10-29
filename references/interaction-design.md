@@ -14,7 +14,14 @@
 
 ## 二、 Nova-Proto 组件库白名单与缺件提单铁律
 
-所有本地 HTML 原型基于公司 Figma 组件库 1:1 转换的 **Nova-Proto Web Components 设计系统**（默认路径 `D:\2-ongoing\20261026-Nova-proto`，引入 `tokens/cad-design-tokens.css` 与 `components/cad-components.js`）构建：
+所有本地 HTML 原型基于公司 Figma 组件库 1:1 转换的 **Nova-Proto Web Components 设计系统**构建。为实现跨机器开箱即用与便携分发，核心运行时已随本 Skill 内置于 `assets/nova-proto/`（包含 `cad-design-tokens.css` 与 `cad-components.js`）：
+
+- **工作区运行时自包含注入**：在初始化工作区或运行 `scripts/assemble_prd.py --workspace <工作区绝对路径> --init-only` 时，脚本自动将 `assets/nova-proto/` 下的 CSS 与 JS 同步至 `<工作区>/.assets/nova-proto/`；
+- **标准相对路径引用**：各分片 `features/FR-xxx/prototype.html` 统一使用相对路径引用工作区内的运行时，严禁写死个人电脑的本地绝对路径（确保整个需求目录打包发给任何同事或研发双击即可运行）：
+  ```html
+  <link rel="stylesheet" href="../../.assets/nova-proto/cad-design-tokens.css">
+  <script src="../../.assets/nova-proto/cad-components.js"></script>
+  ```
 
 ### 1. 官方标准组件白名单（Level 1）
 构建交互界面时，必须优先使用已封装的官方 Web Components 标签：

@@ -9,9 +9,14 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import sys
 from pathlib import Path
 
+
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+BUNDLED_NOVA_DIR = SKILL_ROOT / 'assets' / 'nova-proto'
+NOVA_RUNTIME_FILES = ('cad-design-tokens.css', 'cad-components.js')
 
 OFFICIAL_TAGS = frozenset({
     'cad-button', 'cad-input', 'cad-checkbox', 'cad-radio',
@@ -23,6 +28,20 @@ OFFICIAL_TAGS = frozenset({
 
 INSERT_MARKER = '<!-- FEATURES_INSERT_POINT -->'
 FR_DIR_PATTERN = re.compile(r'^(FR-(\d{2,4}))(?:[_-](.*))?$', re.IGNORECASE)
+
+
+def sync_nova_runtime(workspace: Path) -> list[str]:
+    """Copy bundled Nova-Proto runtime (CSS & JS) into `<workspace>/.assets/nova-proto/`."""
+    target_dir = Path(workspace).resolve() / '.assets' / 'nova-proto'
+    target_dir.mkdir(parents=True, exist_ok=True)
+    copied: list[str] = []
+    for filename in NOVA_RUNTIME_FILES:
+        src = BUNDLED_NOVA_DIR / filename
+        if src.is_file():
+            dst = target_dir / filename
+            shutil.copy2(src, dst)
+            copied.append(str(dst))
+    return copied
 
 
 def strip_non_dom(raw_html: str) -> str:
@@ -173,8 +192,18 @@ def inject_specs_into_overview(overview_text: str, combined_specs: str) -> str:
 
 
 def assemble(workspace: Path, output: Path | None = None,
-             overview: Path | None = None) -> dict:
+             overview: Path | None = None, *, init_only: bool = False) -> dict:
     workspace = Path(workspace).resolve()
+    runtime_files = sync_nova_runtime(workspace)
+    if init_only:
+        return {
+            'workspace': str(workspace),
+            'runtime_files': runtime_files,
+            'passed': len(runtime_files) == len(NOVA_RUNTIME_FILES),
+            'errors': [] if len(runtime_files) == len(NOVA_RUNTIME_FILES) else ['failed to copy Nova-Proto runtime assets'],
+            'warnings': [],
+        }
+
     overview_path = Path(overview).resolve() if overview else workspace / '00_需求总览.md'
     output_path = Path(output).resolve() if output else workspace / 'prd.md'
 
@@ -188,6 +217,7 @@ def assemble(workspace: Path, output: Path | None = None,
         return {
             'workspace': str(workspace),
             'output': str(output_path),
+            'runtime_files': runtime_files,
             'passed': False,
             'errors': errors,
             'warnings': warnings,
@@ -200,6 +230,7 @@ def assemble(workspace: Path, output: Path | None = None,
         return {
             'workspace': str(workspace),
             'output': str(output_path),
+            'runtime_files': runtime_files,
             'passed': False,
             'errors': errors,
             'warnings': warnings,
@@ -244,6 +275,7 @@ def assemble(workspace: Path, output: Path | None = None,
         'workspace': str(workspace),
         'overview': str(overview_path),
         'output': str(output_path),
+        'runtime_files': runtime_files,
         'shards_count': len(shards),
         'draft_components_count': len(all_drafts),
         'missing_components_file': str(missing_doc) if missing_doc else None,
@@ -262,11 +294,13 @@ def main(argv: list[str] | None = None) -> int:
                         help='Assembled PRD output path (default: <workspace>/prd.md)')
     parser.add_argument('--overview', type=Path,
                         help='Overview markdown file (default: <workspace>/00_需求总览.md)')
+    parser.add_argument('--init-only', action='store_true',
+                        help='Only sync bundled Nova-Proto CSS/JS runtime into <workspace>/.assets/nova-proto/')
     parser.add_argument('--json', action='store_true', help='Emit JSON report')
     args = parser.parse_args(argv)
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
-    result = assemble(args.workspace, output=args.output, overview=args.overview)
+    result = assemble(args.workspace, output=args.output, overview=args.overview, init_only=args.init_only)
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

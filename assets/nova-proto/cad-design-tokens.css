@@ -1,0 +1,62 @@
+/**
+ * Nova CAD/BIM Design Tokens (自动从 Figma BIM组件库 编译生成)
+ * 单源真理源: Figma 53 Pages 组件库规范
+ * 产物用途: 供给 Web Components 核心库与前端交互原型系统
+ */
+:root {
+  /* --- 颜色系统 (Colors) --- */
+  /* Brand 色系 */
+  --cad-color-primary: #266EFF; /* 品牌主色 / 交互强调色 */
+  --cad-color-primary-hover: #4785FF; /* 主色悬停 */
+  --cad-color-primary-active: #1D58DB; /* 主色按下激活 */
+  --cad-color-primary-disabled: #BFD3FE; /* 主色禁用态 */
+  --cad-color-primary-light: #ECF2FE; /* 主色极浅背景 (如选中条) */
+  /* Text 色系 */
+  --cad-color-main: #1F2329; /* 主文本 / 标题与标签 */
+  --cad-color-regular: #606266; /* 常规正文与表单内容 */
+  --cad-color-secondary: #8A8D91; /* 次级注释与次要说明 */
+  --cad-color-placeholder: #A6A9AD; /* 占位文本与置灰状态 */
+  --cad-color-disabled: #C0C4CC; /* 禁用文本 */
+  --cad-color-white: #FFFFFF; /* 反白文字 */
+  /* Border 色系 */
+  --cad-color-default: #E3E5E7; /* 默认边框 (输入框、次按钮、弹窗) */
+  --cad-color-hover: #C0C4CC; /* 边框悬停加深 */
+  --cad-color-focus: #266EFF; /* 表单聚焦高亮边框 */
+  --cad-color-disabled: #EBEEF5; /* 禁用边框 */
+  --cad-color-divider: #E4E7ED; /* 水平/垂直分割线 */
+  /* Background 色系 */
+  --cad-color-white: #FFFFFF; /* 纯白背景 (卡片、输入框、下拉框) */
+  --cad-color-light: #F8FAFC; /* 浅灰底色 (窗口标题栏、表格斑马纹) */
+  --cad-color-hover: #F2F4F6; /* 次级组件悬停底色 */
+  --cad-color-active: #E5E7EB; /* 次级组件按下底色 */
+  --cad-color-disabled: #F5F7FA; /* 控件禁用底色 */
+  /* Status 色系 */
+  --cad-color-success: #52C41A; /* 成功状态色 */
+  --cad-color-warning: #FAAD14; /* 警告状态色 */
+  --cad-color-danger: #F5222D; /* 危险与错误色 */
+  --cad-color-draft: #8B5CF6; /* PM 草稿自造紫色微型角标 */
+
+  /* --- 尺寸与圆角 (Sizing & Radii) --- */
+  --cad-height-mini: 20px; /* 紧凑微型高度 (表格内嵌套) */
+  --cad-height-small: 24px; /* CAD 默认紧凑标准高度 */
+  --cad-height-base: 28px; /* 中型高度 */
+  --cad-height-large: 32px; /* 大号高度 (主流程弹窗主按钮) */
+  --cad-radius-small: 2px; /* 小圆角 */
+  --cad-radius-base: 4px; /* 全局标准圆角 (按钮、输入框、卡片) */
+  --cad-radius-large: 6px; /* 窗口容器大圆角 */
+
+  /* --- 间距系统 (Spacing & Padding) --- */
+  --cad-padding-small: 2px 8px; /* 小型按钮与输入框内边距 */
+  --cad-padding-large: 4px 12px; /* 大号按钮内边距 */
+  --cad-gap-xs: 4px; /* 紧密微间距 */
+  --cad-gap-sm: 6px; /* 图标与文字间距 */
+  --cad-gap-md: 8px; /* 表单控件行内间距 */
+  --cad-gap-lg: 12px; /* 表单项行间距 */
+
+  /* --- 排版与字体 (Typography) --- */
+  --cad-font-size-xs: 11px; /* 辅助角标与最小说明字号 */
+  --cad-font-size-base: 12px; /* CAD 工业软件默认正文字号 */
+  --cad-font-size-md: 13px; /* 中号标题 */
+  --cad-font-size-lg: 14px; /* 弹窗大标题字号 */
+  --cad-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; /* 双端中英文排版字体栈 */
+}
