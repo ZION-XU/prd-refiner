@@ -215,9 +215,11 @@ def check_interaction_cards(body: str, findings: list[str]) -> dict:
                     if '![' in cell or '](' in cell:
                         frames_ok = True
         if not state_ok and not has_state_table:
-            # Also accept prototype-centric state walkthrough sections (e.g. 状态一 / S1 with UI feedback)
+            # Also accept prototype-centric state walkthrough sections (e.g. 状态一 / S1 with control logic)
             state_headings = re.findall(r'(?:#{3,6}\s+.*?(?:状态|S\d)|(?:^|\n)\s*[-*]\s*.*?S\d)', block)
-            has_feedback_prose = any(kw in block for kw in ('反馈', '可见', '操作说明', '界面要素', '回显'))
+            has_feedback_prose = any(
+                kw in block for kw in ('反馈', '可见', '操作说明', '界面要素', '回显', '控件逻辑', '状态迁移', '默认值', '联动')
+            )
             if len(state_headings) >= 1 and has_feedback_prose:
                 state_ok = True
         if not frames_ok and not has_frame_table:

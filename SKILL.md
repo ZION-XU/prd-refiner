@@ -19,11 +19,12 @@ disable-model-invocation: true
 
 ## 硬约束
 
-- **双重主体解耦与元话语物理隔离（最高红线）**：严格区分对话窗口中的**产品经理（PM / 需求发起人）**与使用 ZWCAD 的**CAD 终端设计师**。PRD 正文只描述 `CAD 终端设计师`、`ZWCAD 系统` 与 `图纸/数据` 的行为；PM 与 AI 在会话中的协作策略、测试计划、推进方式（如“影子伴跑”、“分步测试”等过程元话语）严禁写入 PRD。规范见 [内容约定](references/prd-standard.md) §1。
-- **原型即真值与组件库白名单**：交互细节必须由本地 `prototype.html`（基于 `Nova-proto` `<cad-*>` 组件库）驱动，严禁手搓原生 `<input>/<button>/<select>/<textarea>` 裸标签；缺失组件必须标注 `status="draft"` 并登记至 `Missing_Components.md` 交设计师补充 Figma。规范见 [交互与原型设计](references/interaction-design.md)。
-- **单功能内聚与分片隔离**：每个 FR 的交互卡、业务规则（BR）与验收标准（AC）在各自的 `features/FR-xxx/spec.md`（及主稿第 3 章对应小节）内就地闭环，不跨大章节拆散跳转；多会话并发时单功能会话只读写所属 FR 目录。规范见 [成稿与交付](references/delivery.md)。
-- **归零推演与 CAD 防漏**：拒绝做题家式盲从旧实现，关键机制穿透第一性归零四问（见 [需求探索](references/brainstorm.md)）；自动核查 CAD 三要素公约、命令行状态机、ESC 回滚、Undo 分组与特殊图层/块边界（见 [内容约定](references/prd-standard.md) §2）。
-- **快照先行与事实时效**：以 Confluence/Jira 为输入时先拉取 `.assets/` 本地快照（见 [来源快照](references/snapshot.md)）；涉及外部产品现行行为的结论须查证当前资料并标明来源与日期（见 [竞品对标](references/prd-benchmark.md)）。
+- **纯粹的 CAD 工程主体视角**：PRD 正文围绕三类核心主语展开——**`CAD 终端设计师`**、**`ZWCAD 系统`** 与 **`图纸／图元／系统变量`**，只提取定稿 `prototype.html` 与产品经理（PM）确认的 CAD 业务事实。规范见 [内容约定](references/prd-standard.md) §1。
+- **图文正交与高信息密度（一处一义）**：`prototype.html` 与状态截图承载视觉布局、控件外观与 `<cad-*>` 组件选型；PRD 正文只定义静态画面无法表达的增量工程契约。单个 FR 内部按四层正交职责归位（1. 入口与命令契约 → 2. 交互卡标号控件逻辑：数据源/取值域/联动 → 3. CAD 内核与环境边界 `BR`：DWG 持久化/特殊图层与块/ESC 与 Undo → 4. 验收判据 `AC`），每项规则只在其唯一归属处定义一次。规范见 [交互与原型设计](references/interaction-design.md) §一、§三。
+- **Nova-Proto 组件库构建与缺件提单**：本地 `prototype.html` 使用内置的 `Nova-proto` `<cad-*>` 官方组件构建；缺失组件标注 `status="draft"` 并汇总至 `Missing_Components.md` 交设计师补充 Figma。规范见 [交互与原型设计](references/interaction-design.md) §二。
+- **单功能分片并发隔离**：多会话并发时，每个会话只读写所属 `features/FR-xxx/` 目录下的 `prototype.html` 与 `spec.md`，交付时由 `assemble_prd.py` 合龙。规范见 [成稿与交付](references/delivery.md)。
+- **归零推演与 CAD 防漏**：关键机制穿透第一性归零四问，方案对比洞察写入 `prototype.html` 顶部 `.design-insights-card`（见 [需求探索](references/brainstorm.md)）；逐项落实 CAD 三要素公约、命令行状态机与特殊几何边界（见 [内容约定](references/prd-standard.md) §2）。
+- **快照先行与事实时效**：以 Confluence/Jira 为输入时先拉取 `.assets/` 本地快照（见 [来源快照](references/snapshot.md)）；外部产品现行行为须查证当前资料并标明来源与日期（见 [竞品对标](references/prd-benchmark.md)）。
 - **澄清纪律与范围守恒**：外部事实 AI 自查，业务事实问 PM，每题带推荐与依据（见 [交互澄清](references/clarify.md)）；检查或片段修改只处理指定范围。
 
 ## 落盘与调用契约
