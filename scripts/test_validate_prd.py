@@ -511,6 +511,25 @@ class InteractionCardTests(DocTestCase):
         self.assertEqual(result['interaction_coverage'],
                          {'fr_total': 2, 'with_frames': 1, 'explicit_none': 1, 'missing': 0})
 
+    def test_prototype_centric_interaction_card_passes(self):
+        img_path = self.root / 'fr-001-s1.png'
+        img_path.write_bytes(b'PNG_STUB')
+        start = COMPLETE.index('**交互卡**')
+        end = COMPLETE.index('## 4. 业务规则与异常处理')
+        walkthrough_card = '''**交互卡**
+
+#### 状态一：初始设置态（FR-001-S1）
+![FR-001-S1 初始设置态](fr-001-s1.png)
+
+界面要素与操作说明：
+- ① 计数选项：选择集非空时计数按钮由灰变亮，提供可见反馈。
+- ② 取消与回滚：按 ESC 退出操作，不修改图纸，保持原状态。
+'''
+        doc = COMPLETE[:start] + walkthrough_card + '\n' + COMPLETE[end:]
+        result = self.run_doc(doc)
+        self.assertTrue(result['passed'], result.get('errors'))
+        self.assertEqual(result['interaction_coverage']['with_frames'], 1)
+
     def test_vendor_mention_rejected_in_template_profile(self):
         text = COMPLETE.replace('用户需要核对当前选择集中的直线数量。',
                                 '用户在 AutoCAD 中打开图纸并核对直线数量。')

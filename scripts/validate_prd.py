@@ -198,12 +198,17 @@ def check_interaction_cards(body: str, findings: list[str]) -> dict:
             continue
         state_ok = False
         frames_ok = False
+        has_state_table = False
+        has_frame_table = False
         for header, rows in markdown_tables(block.splitlines()):
             joined = ' '.join(header)
             data = [row for row in rows if any(cell.strip() for cell in row)]
-            if '状态' in joined and ('反馈' in joined or '可见' in joined):
-                state_ok = state_ok or len(data) >= 2
+            if '状态' in joined:
+                has_state_table = True
+                if '反馈' in joined or '可见' in joined:
+                    state_ok = state_ok or len(data) >= 2
             if '帧 ID' in joined and '画面' in joined:
+                has_frame_table = True
                 picture = next((i for i, cell in enumerate(header) if '画面' in cell), None)
                 for row in data:
                     if not FRAME_ID.search(' '.join(row)):
@@ -211,12 +216,25 @@ def check_interaction_cards(body: str, findings: list[str]) -> dict:
                     cell = row[picture] if picture is not None and picture < len(row) else ' '.join(row)
                     if '![' in cell or '](' in cell:
                         frames_ok = True
+        if not state_ok and not has_state_table:
+            # Also accept prototype-centric state walkthrough sections (e.g. 状态一 / S1 with UI feedback)
+            state_headings = re.findall(r'(?:#{3,6}\s+.*?(?:状态|S\d)|(?:^|\n)\s*[-*]\s*.*?S\d)', block)
+            has_feedback_prose = any(kw in block for kw in ('反馈', '可见', '操作说明', '界面要素', '回显'))
+            if len(state_headings) >= 1 and has_feedback_prose:
+                state_ok = True
+        if not frames_ok and not has_frame_table:
+            # Also accept inline prototype frame images embedded in the section
+            found_frames = FRAME_ID.findall(block)
+            has_image = bool(INLINE_IMAGE.search(block) or REFERENCE_IMAGE.search(block) or '![' in block)
+            if found_frames and has_image:
+                frames_ok = True
+
         if not state_ok:
-            findings.append(f'{item} 交互卡缺少状态与事件表（表头含“状态”“可见反馈”，至少两个状态行）')
+            findings.append(f'{item} 交互卡缺少状态与事件表（表头含“状态”“可见反馈”，至少两个状态行，或采用以原型为中心的状态走查）')
         if not frames_ok:
             findings.append(
                 f'{item} 交互卡缺少有效帧清单（表头含“帧 ID”“画面”，'
-                '至少一行含 FR-xxx-Sx 帧号并给出本地图片或原型链接）')
+                '至少一行含 FR-xxx-Sx 帧号并给出本地图片或原型链接；或在走查中嵌入有效帧图）')
         if '取消' not in block:
             findings.append(f'{item} 交互卡未写明取消、回滚与撤销')
         if frames_ok:
