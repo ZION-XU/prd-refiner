@@ -1,17 +1,30 @@
 /**
  * ====================================================================
  * Nova CAD/BIM Web Components 核心库 (cad-components.js)
- * 单源真理源: Figma 53 Pages BIM 标准组件库
- * 架构机制: L1 官方核心组件 + L2 局部变体 + L3 PM草稿反哺防御机制
- * 运行方式: 原生 Web Components (Custom Elements + Shadow DOM)，零编译依赖
+ * 资产来源: Figma 53 Pages BIM 标准组件库 (49+ 核心全景对齐)
+ * 架构分级: L1 官方标准 + L2 业务场景 + L3 PM草稿补齐
+ * 运行方式: 原生 Web Components (Custom Elements + Shadow DOM) 零依赖
+ * 编译器: Nova Incremental Component Compiler v2.0 (具备舱壁熔断隔离)
  * ====================================================================
  */
 
-// 内嵌组件库全景清册 (支持 file:// 协议直接双击打开页面，零 CORS 阻塞)
-window.NOVA_MANIFEST = {
+// 1. 全局自定义元素安全注册守卫（防止重复注册抛错）
+if (typeof window !== 'undefined' && window.customElements) {
+  const _origDefine = customElements.define.bind(customElements);
+  customElements.define = function(name, constructor, options) {
+    if (customElements.get(name)) {
+      return; // 已经注册，安全跳过
+    }
+    return _origDefine(name, constructor, options);
+  };
+}
+
+// 2. 嵌入全景资产清单 (支持 file:// 协议直接双击打开页面，无 CORS 限制)
+if (typeof window !== 'undefined') {
+  window.NOVA_MANIFEST = {
   "project": "Nova CAD/BIM Design System",
   "source_file_key": "mtY1cdLoClLSdbo1noAryL",
-  "last_synced": "2026-10-28 17:51:49",
+  "last_synced": "2026-10-30 10:04:59",
   "components": {
     "button": {
       "name": "按钮 Button",
@@ -43,7 +56,7 @@ window.NOVA_MANIFEST = {
           "variants": 33
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:58"
     },
     "input": {
       "name": "输入框 Input",
@@ -132,7 +145,7 @@ window.NOVA_MANIFEST = {
           "variants": 72
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "checkbox": {
       "name": "复选框 Checkbox",
@@ -168,7 +181,7 @@ window.NOVA_MANIFEST = {
           "variants": 14
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "radio": {
       "name": "单选框 Radio",
@@ -203,7 +216,7 @@ window.NOVA_MANIFEST = {
           "variants": 14
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "select": {
       "name": "选择器 Select",
@@ -242,7 +255,7 @@ window.NOVA_MANIFEST = {
           "variants": 12
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "switch": {
       "name": "开关 Switch",
@@ -271,7 +284,7 @@ window.NOVA_MANIFEST = {
           "variants": 16
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "slider": {
       "name": "滑块 Slider",
@@ -300,7 +313,7 @@ window.NOVA_MANIFEST = {
           "variants": 24
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "tabs": {
       "name": "标签页 Tabs",
@@ -393,7 +406,7 @@ window.NOVA_MANIFEST = {
           "variants": 4
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:58"
     },
     "typography": {
       "name": "字体 Typography",
@@ -419,7 +432,7 @@ window.NOVA_MANIFEST = {
           "variants": 6
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:58"
     },
     "divider": {
       "name": "分割线 Divider",
@@ -441,7 +454,7 @@ window.NOVA_MANIFEST = {
           "variants": 8
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:58"
     },
     "scrollbar": {
       "name": "滚动条 Scrollbar",
@@ -462,7 +475,7 @@ window.NOVA_MANIFEST = {
           "variants": 4
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:58"
     },
     "link": {
       "name": "链接 Link",
@@ -484,7 +497,7 @@ window.NOVA_MANIFEST = {
           "variants": 16
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:58"
     },
     "icon": {
       "name": "图标 icon",
@@ -504,7 +517,7 @@ window.NOVA_MANIFEST = {
           "variants": 2
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:58"
     },
     "menu": {
       "name": "菜单 Menu",
@@ -536,7 +549,7 @@ window.NOVA_MANIFEST = {
           "variants": 3
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:58"
     },
     "dropdown": {
       "name": "下拉菜单 Dropdown",
@@ -587,7 +600,7 @@ window.NOVA_MANIFEST = {
           "variants": 3
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:58"
     },
     "color_picker": {
       "name": "颜色选择器 Color Picker",
@@ -608,7 +621,7 @@ window.NOVA_MANIFEST = {
           "variants": 4
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "tree_select": {
       "name": "树选择 TreeSelect",
@@ -658,7 +671,7 @@ window.NOVA_MANIFEST = {
           "variants": 32
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "material_select": {
       "name": "材质选择器 Material Select",
@@ -682,7 +695,7 @@ window.NOVA_MANIFEST = {
           "variants": 12
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "picker": {
       "name": "拾取 Picker",
@@ -704,7 +717,7 @@ window.NOVA_MANIFEST = {
           "variants": 24
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "file_loader": {
       "name": "载入文件 File Loader",
@@ -727,7 +740,7 @@ window.NOVA_MANIFEST = {
           "variants": 24
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "picture": {
       "name": "图片 Picture",
@@ -765,7 +778,7 @@ window.NOVA_MANIFEST = {
           "variants": 30
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "form": {
       "name": "表单 Form",
@@ -924,7 +937,7 @@ window.NOVA_MANIFEST = {
           "variants": 2
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "tree": {
       "name": "树形控件 Tree",
@@ -979,7 +992,7 @@ window.NOVA_MANIFEST = {
           "variants": 4
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "table": {
       "name": "表格 Table",
@@ -1141,7 +1154,7 @@ window.NOVA_MANIFEST = {
           "variants": 2
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "tooltip": {
       "name": "文字气泡 Tooltip",
@@ -1161,7 +1174,7 @@ window.NOVA_MANIFEST = {
           "variants": 8
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "message": {
       "name": "全局提示 Message",
@@ -1181,7 +1194,7 @@ window.NOVA_MANIFEST = {
           "variants": 4
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "modal": {
       "name": "对话框 Modal",
@@ -1207,7 +1220,7 @@ window.NOVA_MANIFEST = {
           "variants": 2
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "sweetalert": {
       "name": "弹窗提示 SweetAlert",
@@ -1228,7 +1241,7 @@ window.NOVA_MANIFEST = {
           "variants": 5
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "panel": {
       "name": "面板 Panel",
@@ -1271,7 +1284,7 @@ window.NOVA_MANIFEST = {
           "variants": 5
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "popover": {
       "name": "气泡卡片 Popover",
@@ -1292,7 +1305,7 @@ window.NOVA_MANIFEST = {
           "variants": 20
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "popconfirm": {
       "name": "气泡确认框 Popconfirm",
@@ -1313,7 +1326,7 @@ window.NOVA_MANIFEST = {
           "variants": 32
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "progress": {
       "name": "进度条 Bar",
@@ -1340,7 +1353,7 @@ window.NOVA_MANIFEST = {
           "variants": 66
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "composite_input": {
       "name": "单选+图片+输入",
@@ -1361,7 +1374,7 @@ window.NOVA_MANIFEST = {
           "variants": 20
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "wall_tool": {
       "name": "绘制墙体",
@@ -1381,7 +1394,7 @@ window.NOVA_MANIFEST = {
           "variants": 2
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "family_mgr": {
       "name": "族库管理",
@@ -1393,7 +1406,7 @@ window.NOVA_MANIFEST = {
       "total_variants": 0,
       "dimensions": [],
       "component_sets": [],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "axis_grid": {
       "name": "绘制轴网",
@@ -1405,7 +1418,7 @@ window.NOVA_MANIFEST = {
       "total_variants": 0,
       "dimensions": [],
       "component_sets": [],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "door_tool": {
       "name": "门",
@@ -1417,7 +1430,7 @@ window.NOVA_MANIFEST = {
       "total_variants": 0,
       "dimensions": [],
       "component_sets": [],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "stair_tool": {
       "name": "双跑楼梯",
@@ -1429,7 +1442,7 @@ window.NOVA_MANIFEST = {
       "total_variants": 0,
       "dimensions": [],
       "component_sets": [],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "options_dialog": {
       "name": "ZWCAD选项",
@@ -1441,7 +1454,7 @@ window.NOVA_MANIFEST = {
       "total_variants": 0,
       "dimensions": [],
       "component_sets": [],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "tag": {
       "name": "标签 Tag",
@@ -1464,7 +1477,7 @@ window.NOVA_MANIFEST = {
           "variants": 48
         }
       ],
-      "updated_at": "2026-10-28 17:32:21"
+      "updated_at": "2026-10-30 10:04:58"
     },
     "alert_banner": {
       "name": "警告提示 Alert",
@@ -1485,7 +1498,7 @@ window.NOVA_MANIFEST = {
           "variants": 10
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "filter": {
       "name": "筛选 Filter",
@@ -1511,7 +1524,7 @@ window.NOVA_MANIFEST = {
           "variants": 4
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "quick_nav": {
       "name": "快速导航 QuickNav",
@@ -1536,7 +1549,7 @@ window.NOVA_MANIFEST = {
           "variants": 3
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "ribbon": {
       "name": "功能区 Ribbon",
@@ -1548,7 +1561,7 @@ window.NOVA_MANIFEST = {
       "total_variants": 0,
       "dimensions": [],
       "component_sets": [],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "status_bar": {
       "name": "状态栏 StatusBar",
@@ -1578,7 +1591,7 @@ window.NOVA_MANIFEST = {
           "variants": 2
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "project_browser": {
       "name": "项目浏览器 ProjectBrowser",
@@ -1590,7 +1603,7 @@ window.NOVA_MANIFEST = {
       "total_variants": 0,
       "dimensions": [],
       "component_sets": [],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "property_panel": {
       "name": "属性面板 PropertyPanel",
@@ -1602,7 +1615,7 @@ window.NOVA_MANIFEST = {
       "total_variants": 0,
       "dimensions": [],
       "component_sets": [],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "command_tool": {
       "name": "命令工具 CommandTool",
@@ -1634,7 +1647,7 @@ window.NOVA_MANIFEST = {
           "variants": 4
         }
       ],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     },
     "main_toolbar": {
       "name": "主工具栏 MainToolbar",
@@ -1646,15 +1659,15 @@ window.NOVA_MANIFEST = {
       "total_variants": 0,
       "dimensions": [],
       "component_sets": [],
-      "updated_at": "2026-10-28 17:32:22"
+      "updated_at": "2026-10-30 10:04:59"
     }
   },
   "prototypes_audit": {
     "table_create_prototype.html": {
-      "audited_at": "2026-10-28 17:51:49",
+      "audited_at": "2026-10-30 09:26:51",
       "file_name": "table_create_prototype.html",
-      "total_interactive_elements": 31,
-      "official_components_count": 31,
+      "total_interactive_elements": 50,
+      "official_components_count": 50,
       "draft_components_count": 0,
       "raw_elements_count": 0,
       "coverage_rate": "100.0%",
@@ -1662,36 +1675,55 @@ window.NOVA_MANIFEST = {
       "draft_rate": "0.0%",
       "breakdown": {
         "official": [
+          "cad-tabs",
           "cad-dialog",
           "cad-form-group",
           "cad-select",
           "cad-button",
           "cad-icon",
+          "cad-tabs",
           "cad-form-group",
           "cad-radio",
           "cad-radio",
-          "cad-select",
-          "cad-button",
-          "cad-icon",
-          "cad-radio",
+          "cad-divider",
           "cad-form-group",
-          "cad-checkbox",
-          "cad-table",
-          "cad-form-group",
-          "cad-radio",
-          "cad-radio",
-          "cad-form-group",
-          "cad-icon",
           "cad-input",
+          "cad-input",
+          "cad-input",
+          "cad-input",
+          "cad-banner",
+          "cad-form-group",
+          "cad-file-loader",
+          "cad-button",
+          "cad-select",
+          "cad-divider",
+          "cad-form-group",
+          "cad-radio",
+          "cad-radio",
           "cad-input",
           "cad-divider",
+          "cad-form-group",
+          "cad-checkbox",
+          "cad-checkbox",
+          "cad-divider",
+          "cad-form-group",
+          "cad-button",
           "cad-icon",
-          "cad-input",
-          "cad-input",
+          "cad-button",
+          "cad-icon",
+          "cad-dialog",
+          "cad-form-group",
+          "cad-radio",
+          "cad-radio",
+          "cad-radio",
+          "cad-divider",
           "cad-form-group",
           "cad-select",
-          "cad-select",
-          "cad-select",
+          "cad-input",
+          "cad-form-group",
+          "cad-input",
+          "cad-dialog",
+          "cad-button",
           "cad-alert"
         ],
         "draft": [],
@@ -1700,9 +1732,10 @@ window.NOVA_MANIFEST = {
     }
   }
 };
+}
 
-// 通用草稿角标渲染辅助
-function renderDraftBadge(isDraft, tooltip = "PM自造草稿组件 (待反哺入库 Figma)") {
+// 3. 通用草稿徽章渲染辅助
+function renderDraftBadge(isDraft, tooltip = "PM草稿组件 (待补充 Figma)") {
   if (!isDraft) return '';
   return `
     <span class="cad-draft-badge" title="${tooltip}">
@@ -1730,11 +1763,237 @@ const COMMON_DRAFT_STYLE = `
   }
 `;
 
+
+const CAD_ICON_PATHS = {
+  edit: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9.8 3.2L12.8 6.2M2.5 13.5H5.5L13 6C13.4 5.6 13.4 5 13 4.6L11.4 3C11 2.6 10.4 2.6 10 3L2.5 10.5V13.5Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  link: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6.5 9.5L9.5 6.5M5.5 7.5L3.8 9.2C2.7 10.3 2.7 12 3.8 13.1C4.9 14.2 6.6 14.2 7.7 13.1L9.4 11.4M7.5 5.5L9.2 3.8C10.3 2.7 12 2.7 13.1 3.8C14.2 4.9 14.2 6.6 13.1 7.7L11.4 9.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  help: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.1"/><path d="M6.5 6.3C6.5 5.4 7.2 4.8 8.1 4.8C8.9 4.8 9.6 5.4 9.6 6.2C9.6 6.9 9.1 7.3 8.5 7.7C8.1 8 8 8.3 8 8.9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="11.2" r="0.75" fill="currentColor"/></svg>`,
+  close: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 3.5L12.5 12.5M3.5 12.5L12.5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  columns: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2.5" width="12" height="11" rx="1" stroke="currentColor" stroke-width="1.2"/><line x1="6" y1="2.5" x2="6" y2="13.5" stroke="currentColor" stroke-width="1.2"/><line x1="10" y1="2.5" x2="10" y2="13.5" stroke="currentColor" stroke-width="1.2"/></svg>`,
+  rows: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2.5" width="12" height="11" rx="1" stroke="currentColor" stroke-width="1.2"/><line x1="2" y1="6.2" x2="14" y2="6.2" stroke="currentColor" stroke-width="1.2"/><line x1="2" y1="9.8" x2="14" y2="9.8" stroke="currentColor" stroke-width="1.2"/></svg>`,
+  file_blank: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2H9.5L12.5 5V13.5C12.5 13.8 12.3 14 12 14H4C3.7 14 3.5 13.8 3.5 13.5V2.5C3.5 2.2 3.7 2 4 2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9.5 2V5H12.5" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><line x1="5.5" y1="8" x2="10.5" y2="8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><line x1="5.5" y1="10.5" x2="10.5" y2="10.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>`,
+  folder_import: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4C2 3.45 2.45 3 3 3H6.2L7.7 4.5H13C13.55 4.5 14 4.95 14 5.5V12.5C14 13.05 13.55 13.5 13 13.5H3C2.45 13.5 2 13.05 2 12.5V4Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M8 7V11M8 11L6.3 9.3M8 11L9.7 9.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  data_extract: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="5" y1="10.5" x2="5" y2="7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="10.5" x2="8" y2="5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="11" y1="10.5" x2="11" y2="8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  zoom_fit: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 5.5V3C2.5 2.7 2.7 2.5 3 2.5H5.5M10.5 2.5H13C13.3 2.5 13.5 2.7 13.5 3V5.5M13.5 10.5V13C13.5 13.3 13.3 13.5 13 13.5H10.5M5.5 13.5H3C2.7 13.5 2.5 13.3 2.5 13V10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="5.5" y="5.5" width="5" height="5" rx="0.5" stroke="currentColor" stroke-width="1.1"/></svg>`,
+  zoom_1to1: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7.2" cy="7.2" r="4.7" stroke="currentColor" stroke-width="1.2"/><path d="M10.8 10.8L13.5 13.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M5.7 5.5V8.9M8.7 5.5V8.9M7.2 6.5V6.6M7.2 8.0V8.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  pick: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="4.5" stroke="currentColor" stroke-width="1.2"/><line x1="8" y1="1.5" x2="8" y2="4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="8" y1="11.5" x2="8" y2="14.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="1.5" y1="8" x2="4.5" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="11.5" y1="8" x2="14.5" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  folder: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4.2C2 3.65 2.45 3.2 3 3.2H6.2L7.7 4.7H13C13.55 4.7 14 5.15 14 5.7V12.2C14 12.75 13.55 13.2 13 13.2H3C2.45 13.2 2 12.75 2 12.2V4.2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>`
+};
+
+const CAD_ALERT_DEFAULT_TITLES = {
+  info: '普通信息',
+  success: '成功通知',
+  warning: '警告通知',
+  error: '危险通知',
+  danger: '危险通知'
+};
+
+const CAD_ALERT_MULTILINE_DEFAULT = '这是一条重要的多行系统通知与反馈说明。';
+
+const CAD_ALERT_SVGS = {
+  info: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M9.93652 1.31348C14.769 1.31348 18.6865 5.23098 18.6865 10.0635C18.6865 14.896 14.769 18.8135 9.93652 18.8135C5.10403 18.8135 1.18652 14.896 1.18652 10.0635C1.18652 5.23098 5.10403 1.31348 9.93652 1.31348Z" fill="#266EFF"/><path d="M9.93652 8.36209C10.3392 8.36209 10.6657 8.68855 10.6657 9.09125V14.1954C10.6657 14.5981 10.3392 14.9246 9.93652 14.9246C9.53382 14.9246 9.20736 14.5981 9.20736 14.1954V9.09125C9.20736 8.68855 9.53382 8.36209 9.93652 8.36209ZM9.93652 5.20237C10.4735 5.20237 10.9087 5.63764 10.9087 6.17459C10.9087 6.71153 10.4735 7.14681 9.93652 7.14681C9.39958 7.14681 8.9643 6.71153 8.9643 6.17459C8.9643 5.63764 9.39958 5.20237 9.93652 5.20237Z" fill="#FFFFFF"/></svg>`,
+  success: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M9.93774 1.31226C14.7702 1.31226 18.6877 5.22976 18.6877 10.0623C18.6877 14.8947 14.7702 18.8123 9.93774 18.8123C5.10525 18.8123 1.18774 14.8947 1.18774 10.0623C1.18774 5.22976 5.10525 1.31226 9.93774 1.31226Z" fill="#00B42A"/><path d="M13.9543 7.35913C13.6696 7.07447 13.2078 7.07441 12.9231 7.35913L8.45337 11.8269L6.5647 9.93726L6.46313 9.85229C6.17902 9.65571 5.78647 9.68435 5.53345 9.93726C5.24869 10.222 5.24869 10.6837 5.53345 10.9685L7.9397 13.3748L8.04028 13.4587C8.32433 13.6555 8.71684 13.6275 8.96997 13.3748L13.9543 8.39038L14.0393 8.28979C14.2362 8.00561 14.2075 7.61225 13.9543 7.35913Z" fill="#FFFFFF"/></svg>`,
+  warning: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M9.93652 1.31348C14.769 1.31348 18.6865 5.23098 18.6865 10.0635C18.6865 14.896 14.769 18.8135 9.93652 18.8135C5.10403 18.8135 1.18652 14.896 1.18652 10.0635C1.18652 5.23098 5.10403 1.31348 9.93652 1.31348Z" fill="#F98A00"/><path d="M9.93652 12.9801C10.4735 12.9801 10.9087 13.4154 10.9087 13.9524C10.9087 14.4893 10.4735 14.9246 9.93652 14.9246C9.39958 14.9246 8.9643 14.4893 8.9643 13.9524C8.9643 13.4154 9.93652 12.9801 9.93652 12.9801ZM9.93652 5.20237C10.3392 5.20237 10.6657 5.52882 10.6657 5.93153V11.0357C10.6657 11.4384 10.3392 11.7649 9.93652 11.7649C9.53382 11.7649 9.20736 11.4384 9.20736 11.0357V5.93153C9.20736 5.52882 9.53382 5.20237 9.93652 5.20237Z" fill="#FFFFFF"/></svg>`,
+  error: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1.25C14.8325 1.25 18.75 5.16751 18.75 10C18.75 14.8325 14.8325 18.75 10 18.75C5.16751 18.75 1.25 14.8325 1.25 10C1.25 5.16751 5.16751 1.25 10 1.25Z" fill="#EF4A4A"/><path d="M6.56767 6.56775C6.28291 6.85251 6.28291 7.31419 6.56767 7.59895L8.97376 10.0049L6.53487 12.4462C6.28338 12.7326 6.29431 13.169 6.56767 13.4424C6.85244 13.7271 7.31411 13.7271 7.59888 13.4424L10.0048 11.0362L12.4461 13.4753C12.7325 13.7268 13.169 13.7157 13.4424 13.4424C13.7271 13.1576 13.7271 12.696 13.4424 12.4112L11.0361 10.0049L13.4751 7.56395C13.7266 7.27754 13.7157 6.84111 13.4424 6.56775C13.1576 6.28299 12.6959 6.28299 12.4111 6.56775L10.0048 8.97384L7.56387 6.53495L7.52731 6.50487C7.24137 6.28481 6.82965 6.30578 6.56767 6.56775Z" fill="#FFFFFF"/></svg>`,
+  danger: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1.25C14.8325 1.25 18.75 5.16751 18.75 10C18.75 14.8325 14.8325 18.75 10 18.75C5.16751 18.75 1.25 14.8325 1.25 10C1.25 5.16751 5.16751 1.25 10 1.25Z" fill="#EF4A4A"/><path d="M6.56767 6.56775C6.28291 6.85251 6.28291 7.31419 6.56767 7.59895L8.97376 10.0049L6.53487 12.4462C6.28338 12.7326 6.29431 13.169 6.56767 13.4424C6.85244 13.7271 7.31411 13.7271 7.59888 13.4424L10.0048 11.0362L12.4461 13.4753C12.7325 13.7268 13.169 13.7157 13.4424 13.4424C13.7271 13.1576 13.7271 12.696 13.4424 12.4112L11.0361 10.0049L13.4751 7.56395C13.7266 7.27754 13.7157 6.84111 13.4424 6.56775C13.1576 6.28299 12.6959 6.28299 12.4111 6.56775L10.0048 8.97384L7.56387 6.53495L7.52731 6.50487C7.24137 6.28481 6.82965 6.30578 6.56767 6.56775Z" fill="#FFFFFF"/></svg>`,
+  close: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 3.5L12.5 12.5M3.5 12.5L12.5 3.5" stroke="#606266" stroke-width="1.3" stroke-linecap="round"/></svg>`
+};
+
+if (typeof window !== 'undefined') {
+  window.renderDraftBadge = renderDraftBadge;
+  window.COMMON_DRAFT_STYLE = COMMON_DRAFT_STYLE;
+  window.CAD_ICON_PATHS = CAD_ICON_PATHS;
+  window.CAD_ALERT_SVGS = CAD_ALERT_SVGS;
+  window.CAD_ALERT_DEFAULT_TITLES = CAD_ALERT_DEFAULT_TITLES;
+  window.CAD_ALERT_MULTILINE_DEFAULT = CAD_ALERT_MULTILINE_DEFAULT;
+}
+
+
+// ====================================================================
+// Component: <cad-banner> (Key: alert_banner)
+// ====================================================================
+try {
+  (function() {
+class CadBanner extends HTMLElement {
+  static get observedAttributes() {
+    return ['type', 'title', 'closable'];
+  }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+  connectedCallback() { this.render(); }
+  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
+  render() {
+    const type = this.getAttribute('type') || 'info'; // 'default' | 'info' | 'success' | 'warning' | 'danger'
+    const title = this.getAttribute('title') || '';
+    const closable = this.hasAttribute('closable');
+
+    const bgMap = {
+      default: '#F6F7F9',
+      info: '#EBF3FF',
+      success: '#E8FFEA',
+      warning: '#FFF7E8',
+      danger: '#FFF1F0'
+    };
+    const iconSvg = type === 'warning' ? CAD_ALERT_SVGS.warning :
+                    type === 'success' ? CAD_ALERT_SVGS.success :
+                    type === 'danger' ? CAD_ALERT_SVGS.error : CAD_ALERT_SVGS.info;
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          width: 100%;
+          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
+          box-sizing: border-box;
+        }
+        .banner {
+          width: 100%;
+          min-height: 28px;
+          padding: 6px 10px;
+          background: ${bgMap[type] || bgMap.info};
+          border: 1px solid rgba(0,0,0,0.06);
+          border-radius: 4px;
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          box-sizing: border-box;
+          font-size: 12px;
+          line-height: 16px;
+          color: #303133;
+        }
+        .icon {
+          width: 16px;
+          height: 16px;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 1px;
+        }
+        .icon svg {
+          width: 15px;
+          height: 15px;
+        }
+        .body-wrap {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .title {
+          font-weight: 600;
+          color: #1F2329;
+          font-size: 12px;
+        }
+        .desc {
+          color: #606266;
+          font-size: 11.5px;
+        }
+        .close-btn {
+          cursor: pointer;
+          color: #8A8D91;
+          padding: 0 2px;
+          font-size: 14px;
+          line-height: 14px;
+          margin-left: auto;
+          transition: color 0.15s;
+        }
+        .close-btn:hover {
+          color: #1F2329;
+        }
+      </style>
+      <div class="banner">
+        <span class="icon">${iconSvg}</span>
+        <div class="body-wrap">
+          ${title ? `<span class="title">${title}</span>` : ''}
+          <span class="desc"><slot></slot></span>
+        </div>
+        ${closable ? `<span class="close-btn" title="关闭">×</span>` : ''}
+      </div>
+    `;
+
+    const closeEl = this.shadowRoot.querySelector('.close-btn');
+    if (closeEl) {
+      closeEl.onclick = () => {
+        this.style.display = 'none';
+        this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
+      };
+    }
+  }
+}
+customElements.define('cad-banner', CadBanner);
+    if (typeof window !== 'undefined') window.CadBanner = CadBanner;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-banner> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-axis-grid> (Key: axis_grid)
+// ====================================================================
+try {
+  (function() {
 /**
  * --------------------------------------------------------------------
- * 1. <cad-button> 按钮组件 (映射自 Figma ComponentSet 260:229)
+ * <cad-axis-grid> 建筑轴网生成定义器 (映射自 Figma AxisGrid Page 253:58)
  * --------------------------------------------------------------------
  */
+class CadAxisGrid extends HTMLElement {
+  static get observedAttributes() {
+    return ['status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const isDraft = this.getAttribute('status') === 'draft';
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: flex;
+          gap: 12px;
+          padding: 8px;
+          background: #F8F9FA;
+          border: 1px solid #D0D3D6;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-size: 12px;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div>开间 (X向): <cad-input size="small" value="4200" suffix-label="mm" style="width:80px;"></cad-input></div>
+      <div>进深 (Y向): <cad-input size="small" value="6000" suffix-label="mm" style="width:80px;"></cad-input></div>
+      <cad-button size="small" type="primary">正交生成轴网</cad-button>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-axis-grid', CadAxisGrid);
+
+    if (typeof window !== 'undefined') window.CadAxisGrid = CadAxisGrid;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-axis-grid> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-button> (Key: button)
+// ====================================================================
+try {
+  (function() {
 class CadButton extends HTMLElement {
   static get observedAttributes() {
     return ['type', 'size', 'disabled', 'status'];
@@ -1754,13 +2013,24 @@ class CadButton extends HTMLElement {
   }
 
   render() {
-    const type = this.getAttribute('type') || 'secondary'; // 'primary' | 'secondary' | 'text'
-    const size = this.getAttribute('size') || 'small';      // 'small' | 'large'
+    const type = this.getAttribute('type') || 'secondary'; // 'primary' | 'secondary' | 'text' | 'danger'
+    const size = this.getAttribute('size') || 'small';      // 'mini' (20px) | 'small' (24px) | 'large' (32px)
     const disabled = this.hasAttribute('disabled');
     const isDraft = this.getAttribute('status') === 'draft';
 
-    const height = size === 'large' ? 'var(--cad-height-large, 32px)' : 'var(--cad-height-small, 24px)';
-    const padding = size === 'large' ? 'var(--cad-padding-large, 4px 12px)' : 'var(--cad-padding-small, 2px 8px)';
+    let height = 'var(--cad-height-small, 24px)';
+    let padding = 'var(--cad-padding-small, 2px 8px)';
+    let fontSize = 'var(--cad-font-size-base, 12px)';
+
+    if (size === 'large') {
+      height = 'var(--cad-height-large, 32px)';
+      padding = 'var(--cad-padding-large, 4px 12px)';
+      fontSize = '13px';
+    } else if (size === 'mini') {
+      height = 'var(--cad-height-mini, 20px)';
+      padding = '1px 6px';
+      fontSize = '11px';
+    }
 
     let bg = 'var(--cad-color-bg-white, #FFFFFF)';
     let color = 'var(--cad-color-text-main, #1F2329)';
@@ -1774,6 +2044,12 @@ class CadButton extends HTMLElement {
       border = '1px solid transparent';
       hoverBg = 'var(--cad-color-primary-hover, #4785FF)';
       activeBg = 'var(--cad-color-primary-active, #1D58DB)';
+    } else if (type === 'danger') {
+      bg = disabled ? '#FFA39E' : 'var(--cad-color-danger, #F5222D)';
+      color = 'var(--cad-color-text-white, #FFFFFF)';
+      border = '1px solid transparent';
+      hoverBg = '#FF4D4F';
+      activeBg = '#CF1322';
     } else if (type === 'text') {
       bg = 'transparent';
       border = '1px solid transparent';
@@ -1802,7 +2078,7 @@ class CadButton extends HTMLElement {
           gap: var(--cad-gap-sm, 6px);
           height: ${height};
           padding: ${padding};
-          font-size: var(--cad-font-size-base, 12px);
+          font-size: ${fontSize};
           font-family: var(--cad-font-family, sans-serif);
           font-weight: 500;
           color: ${color};
@@ -1811,18 +2087,18 @@ class CadButton extends HTMLElement {
           border-radius: var(--cad-radius-base, 4px);
           cursor: ${disabled ? 'not-allowed' : 'pointer'};
           user-select: none;
-          transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+          transition: background 0.15s, border-color 0.15s, color 0.15s;
           white-space: nowrap;
         }
-        button:hover:not(:disabled) {
+        button:hover:not([disabled]) {
           background: ${hoverBg};
         }
-        button:active:not(:disabled) {
+        button:active:not([disabled]) {
           background: ${activeBg};
         }
         ${COMMON_DRAFT_STYLE}
       </style>
-      <button ${disabled ? 'disabled' : ''}>
+      <button type="button" ${disabled ? 'disabled' : ''}>
         <slot></slot>
       </button>
       ${renderDraftBadge(isDraft)}
@@ -1830,12 +2106,1232 @@ class CadButton extends HTMLElement {
   }
 }
 customElements.define('cad-button', CadButton);
+    if (typeof window !== 'undefined') window.CadButton = CadButton;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-button> 失败，已熔断跳过:', err);
+}
 
+// ====================================================================
+// Component: <cad-checkbox> (Key: checkbox)
+// ====================================================================
+try {
+  (function() {
+class CadCheckbox extends HTMLElement {
+  static get observedAttributes() {
+    return ['checked', 'disabled', 'status', 'indeterminate'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback(name, oldVal, newVal) {
+    if (oldVal !== newVal) this.render();
+  }
+
+  get checked() {
+    return this.hasAttribute('checked');
+  }
+
+  set checked(val) {
+    if (val) this.setAttribute('checked', '');
+    else this.removeAttribute('checked');
+  }
+
+  render() {
+    const checked = this.hasAttribute('checked');
+    const disabled = this.hasAttribute('disabled');
+    const indeterminate = this.hasAttribute('indeterminate');
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+          align-items: center;
+          vertical-align: middle;
+          position: relative;
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          user-select: none;
+          gap: var(--cad-gap-sm, 6px);
+          font-size: var(--cad-font-size-base, 12px);
+          font-family: var(--cad-font-family, sans-serif);
+          color: ${disabled ? 'var(--cad-color-text-placeholder, #A6A9AD)' : 'var(--cad-color-text-main, #1F2329)'};
+        }
+        .box {
+          width: 14px;
+          height: 14px;
+          border-radius: var(--cad-radius-small, 2px);
+          border: 1px solid ${checked || indeterminate ? 'var(--cad-color-primary, #266EFF)' : 'var(--cad-color-border-default, #E3E5E7)'};
+          background: ${checked || indeterminate ? (disabled ? 'var(--cad-color-primary-disabled, #BFD3FE)' : 'var(--cad-color-primary, #266EFF)') : (disabled ? 'var(--cad-color-bg-disabled, #F5F7FA)' : '#FFFFFF')};
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s;
+          box-sizing: border-box;
+        }
+        :host(:hover:not([disabled])) .box {
+          border-color: var(--cad-color-primary, #266EFF);
+        }
+        .check-icon {
+          width: 9px;
+          height: 9px;
+          fill: none;
+          stroke: #FFFFFF;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          display: ${checked ? 'block' : 'none'};
+        }
+        .indeterminate-bar {
+          width: 8px;
+          height: 2px;
+          background: #FFFFFF;
+          display: ${indeterminate && !checked ? 'block' : 'none'};
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="box">
+        <svg class="check-icon" viewBox="0 0 12 12">
+          <polyline points="2 6 5 9 10 3"></polyline>
+        </svg>
+        <div class="indeterminate-bar"></div>
+      </div>
+      <span><slot></slot></span>
+      ${renderDraftBadge(isDraft)}
+    `;
+
+    this.onclick = (e) => {
+      if (disabled) return;
+      this.checked = !this.checked;
+      this.removeAttribute('indeterminate');
+      this.dispatchEvent(new CustomEvent('change', { detail: { checked: this.checked }, bubbles: true, composed: true }));
+    };
+  }
+}
+customElements.define('cad-checkbox', CadCheckbox);
+    if (typeof window !== 'undefined') window.CadCheckbox = CadCheckbox;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-checkbox> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-color-picker> (Key: color_picker)
+// ====================================================================
+try {
+  (function() {
 /**
  * --------------------------------------------------------------------
- * 2. <cad-input> 文本与数字输入框 (映射自 Figma ComponentSet 380:2224)
+ * <cad-color-picker> CAD 颜色选择器 (映射自 Figma ColorPicker Page 252:53)
  * --------------------------------------------------------------------
  */
+class CadColorPicker extends HTMLElement {
+  static get observedAttributes() {
+    return ['value', 'disabled', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  get value() {
+    return this.getAttribute('value') || 'ByLayer';
+  }
+
+  set value(v) {
+    this.setAttribute('value', v);
+  }
+
+  render() {
+    const val = this.getAttribute('value') || 'ByLayer';
+    const disabled = this.hasAttribute('disabled');
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    const colorMap = {
+      'ByLayer': '#FFFFFF',
+      'ByBlock': '#FFFFFF',
+      'Red': '#FF0000',
+      'Yellow': '#FFFF00',
+      'Green': '#00FF00',
+      'Cyan': '#00FFFF',
+      'Blue': '#0000FF',
+      'Magenta': '#FF00FF',
+      'White': '#FFFFFF'
+    };
+    const swatchColor = colorMap[val] || (val.startsWith('#') ? val : '#1F2329');
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+          align-items: center;
+          position: relative;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+          height: var(--cad-height-small, 24px);
+        }
+        .picker-box {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          height: 100%;
+          padding: 2px 6px;
+          background: var(--cad-color-bg-white, #FFFFFF);
+          border: 1px solid var(--cad-color-border-default, #D0D3D6);
+          border-radius: var(--cad-border-radius-base, 4px);
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          opacity: ${disabled ? '0.6' : '1'};
+          user-select: none;
+        }
+        .swatch {
+          width: 14px;
+          height: 14px;
+          border-radius: 2px;
+          background: ${swatchColor};
+          border: 1px solid rgba(0,0,0,0.2);
+          flex-shrink: 0;
+        }
+        .color-label {
+          color: var(--cad-color-text-main, #1F2329);
+          min-width: 50px;
+        }
+        .arrow {
+          font-size: 9px;
+          color: #8F959E;
+        }
+        select {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          opacity: 0;
+          cursor: pointer;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="picker-box">
+        <span class="swatch"></span>
+        <span class="color-label">${val}</span>
+        <span class="arrow">▼</span>
+      </div>
+      <select ${disabled ? 'disabled' : ''}>
+        <option value="ByLayer" ${val==='ByLayer'?'selected':''}>随层 ByLayer</option>
+        <option value="ByBlock" ${val==='ByBlock'?'selected':''}>随块 ByBlock</option>
+        <option value="Red" ${val==='Red'?'selected':''}>红 1 (Red)</option>
+        <option value="Yellow" ${val==='Yellow'?'selected':''}>黄 2 (Yellow)</option>
+        <option value="Green" ${val==='Green'?'selected':''}>绿 3 (Green)</option>
+        <option value="Cyan" ${val==='Cyan'?'selected':''}>青 4 (Cyan)</option>
+        <option value="Blue" ${val==='Blue'?'selected':''}>蓝 5 (Blue)</option>
+        <option value="Magenta" ${val==='Magenta'?'selected':''}>洋红 6 (Magenta)</option>
+        <option value="White" ${val==='White'?'selected':''}>白 7 (White)</option>
+      </select>
+      ${renderDraftBadge(isDraft)}
+    `;
+
+    this.shadowRoot.querySelector('select').addEventListener('change', (e) => {
+      this.setAttribute('value', e.target.value);
+      this.dispatchEvent(new CustomEvent('change', { detail: { value: e.target.value } }));
+    });
+  }
+}
+customElements.define('cad-color-picker', CadColorPicker);
+
+    if (typeof window !== 'undefined') window.CadColorPicker = CadColorPicker;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-color-picker> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-command-tool> (Key: command_tool)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-command-tool> CAD 命令行输入栏 (映射自 Figma CommandTool Page 7823:839)
+ * --------------------------------------------------------------------
+ */
+class CadCommandTool extends HTMLElement {
+  static get observedAttributes() {
+    return ['prompt', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const prompt = this.getAttribute('prompt') || '命令:';
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          background: #1E1F22;
+          color: #D3D5D9;
+          border: 1px solid #363B42;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Consolas", monospace);
+          font-size: 12px;
+          padding: 4px 6px;
+        }
+        .history {
+          color: #8F959E;
+          line-height: 1.4;
+          max-height: 36px;
+          overflow: hidden;
+        }
+        .prompt-line {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 2px;
+        }
+        .prompt-label {
+          color: #266EFF;
+          font-weight: bold;
+        }
+        input {
+          flex: 1;
+          background: transparent;
+          border: none;
+          outline: none;
+          color: #FFFFFF;
+          font-family: inherit;
+          font-size: 12px;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="history">正在初始化图形数据库... 完成。<br>输入 TABLE 进入创建表格向导。</div>
+      <div class="prompt-line">
+        <span class="prompt-label">${prompt}</span>
+        <input type="text" placeholder="输入命令或按回车重复上次操作">
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-command-tool', CadCommandTool);
+
+    if (typeof window !== 'undefined') window.CadCommandTool = CadCommandTool;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-command-tool> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-composite-input> (Key: composite_input)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-composite-input> 单选+图片+输入复合参数行 (映射自 Figma 253:56)
+ * --------------------------------------------------------------------
+ */
+class CadCompositeInput extends HTMLElement {
+  static get observedAttributes() {
+    return ['label', 'value', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const label = this.getAttribute('label') || '复合参数';
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: 12px;
+        }
+        .label {
+          width: 80px;
+          color: #646A73;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <span class="label">${label}</span>
+      <cad-radio name="comp_radio" checked>模式A</cad-radio>
+      <cad-input size="small" style="width: 100px;"></cad-input>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-composite-input', CadCompositeInput);
+
+    if (typeof window !== 'undefined') window.CadCompositeInput = CadCompositeInput;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-composite-input> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-divider> (Key: divider)
+// ====================================================================
+try {
+  (function() {
+class CadDivider extends HTMLElement {
+  static get observedAttributes() {
+    return ['direction', 'dashed', 'type'];
+  }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+  connectedCallback() { this.render(); }
+  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
+  render() {
+    const dir = this.getAttribute('direction') || 'horizontal';
+    const dashed = this.hasAttribute('dashed') && this.getAttribute('dashed') !== 'false';
+    const type = this.getAttribute('type') || 'divider'; // 'divider' (#EBECEE) | 'border' (#E4E5E7)
+    const color = type === 'border' ? '#E4E5E7' : '#EBECEE';
+    const style = dashed ? 'dashed' : 'solid';
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: ${dir === 'vertical' ? 'inline-block' : 'block'};
+          width: ${dir === 'vertical' ? '1px' : '100%'};
+          height: ${dir === 'vertical' ? '100%' : '1px'};
+          margin: ${dir === 'vertical' ? '0 8px' : '6px 0'};
+          border-top: ${dir === 'horizontal' ? `1px ${style} ${color}` : 'none'};
+          border-left: ${dir === 'vertical' ? `1px ${style} ${color}` : 'none'};
+          box-sizing: border-box;
+        }
+      </style>
+    `;
+  }
+}
+customElements.define('cad-divider', CadDivider);
+    if (typeof window !== 'undefined') window.CadDivider = CadDivider;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-divider> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-door-tool> (Key: door_tool)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-door-tool> 门窗构件翻转设置卡 (映射自 Figma DoorTool Page 253:59)
+ * --------------------------------------------------------------------
+ */
+class CadDoorTool extends HTMLElement {
+  static get observedAttributes() {
+    return ['status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const isDraft = this.getAttribute('status') === 'draft';
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 4px 8px;
+          background: #FFFFFF;
+          border: 1px solid #D0D3D6;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-size: 12px;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <span>🚪 门开向:</span>
+      <cad-button size="small">内/外翻转 🔄</cad-button>
+      <cad-button size="small">左/右翻转 ↔️</cad-button>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-door-tool', CadDoorTool);
+
+    if (typeof window !== 'undefined') window.CadDoorTool = CadDoorTool;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-door-tool> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-dropdown> (Key: dropdown)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-dropdown> 下拉菜单容器 (映射自 Figma Dropdown Page 252:12)
+ * --------------------------------------------------------------------
+ */
+class CadDropdown extends HTMLElement {
+  static get observedAttributes() {
+    return ['title', 'disabled', 'placement', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.isOpen = false;
+    this._onDocClick = this._onDocClick.bind(this);
+  }
+
+  connectedCallback() {
+    this.render();
+    document.addEventListener('click', this._onDocClick);
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('click', this._onDocClick);
+  }
+
+  _onDocClick(e) {
+    if (!this.contains(e.target)) {
+      if (this.isOpen) {
+        this.isOpen = false;
+        this.updatePopupState();
+      }
+    }
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  toggle() {
+    if (this.hasAttribute('disabled')) return;
+    this.isOpen = !this.isOpen;
+    this.updatePopupState();
+  }
+
+  updatePopupState() {
+    const popup = this.shadowRoot.querySelector('.dropdown-popup');
+    if (popup) {
+      popup.style.display = this.isOpen ? 'block' : 'none';
+    }
+  }
+
+  render() {
+    const title = this.getAttribute('title') || '下拉操作';
+    const disabled = this.hasAttribute('disabled');
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-block;
+          position: relative;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+        }
+        .trigger-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          height: var(--cad-height-small, 24px);
+          padding: 2px 8px;
+          background: var(--cad-color-bg-white, #FFFFFF);
+          border: 1px solid var(--cad-color-border-default, #D0D3D6);
+          border-radius: var(--cad-border-radius-base, 4px);
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          opacity: ${disabled ? '0.6' : '1'};
+          color: var(--cad-color-text-main, #1F2329);
+          user-select: none;
+        }
+        .trigger-btn:hover {
+          border-color: ${disabled ? 'var(--cad-color-border-default, #D0D3D6)' : 'var(--cad-color-primary, #266EFF)'};
+        }
+        .arrow {
+          font-size: 10px;
+          transition: transform 0.2s;
+        }
+        .dropdown-popup {
+          display: ${this.isOpen ? 'block' : 'none'};
+          position: absolute;
+          top: calc(100% + 4px);
+          left: 0;
+          z-index: 1000;
+          background: #FFFFFF;
+          border: 1px solid var(--cad-color-border-default, #D0D3D6);
+          border-radius: 4px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          min-width: 120px;
+          padding: 4px 0;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="trigger-btn">
+        <slot name="trigger">
+          <span>${title}</span>
+          <span class="arrow">▼</span>
+        </slot>
+      </div>
+      <div class="dropdown-popup">
+        <slot></slot>
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+
+    this.shadowRoot.querySelector('.trigger-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggle();
+    });
+  }
+}
+customElements.define('cad-dropdown', CadDropdown);
+
+    if (typeof window !== 'undefined') window.CadDropdown = CadDropdown;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-dropdown> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-family-mgr> (Key: family_mgr)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-family-mgr> 族库管理选择面板 (映射自 Figma FamilyMgr Page 253:57)
+ * --------------------------------------------------------------------
+ */
+class CadFamilyMgr extends HTMLElement {
+  static get observedAttributes() {
+    return ['status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const isDraft = this.getAttribute('status') === 'draft';
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          padding: 8px;
+          background: #FFFFFF;
+          border: 1px solid #D0D3D6;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-size: 12px;
+        }
+        .bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 6px;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="bar">
+        <b>BIM 族库分类</b>
+        <cad-button size="small" type="primary">载入族...</cad-button>
+      </div>
+      <cad-tree></cad-tree>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-family-mgr', CadFamilyMgr);
+
+    if (typeof window !== 'undefined') window.CadFamilyMgr = CadFamilyMgr;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-family-mgr> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-file-loader> (Key: file_loader)
+// ====================================================================
+try {
+  (function() {
+class CadFileLoader extends HTMLElement {
+  static get observedAttributes() {
+    return ['value', 'placeholder', 'disabled'];
+  }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+  connectedCallback() { this.render(); }
+  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
+  get value() { return this.getAttribute('value') || ''; }
+  set value(val) { this.setAttribute('value', val); }
+  render() {
+    const val = this.getAttribute('value') || '';
+    const placeholder = this.getAttribute('placeholder') || '选择或载入本地表格文件 (.xlsx / .csv)';
+    const disabled = this.hasAttribute('disabled');
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-block;
+          width: 100%;
+          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
+          box-sizing: border-box;
+        }
+        .loader-wrap {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          height: 24px;
+          box-sizing: border-box;
+        }
+        .loader-input {
+          flex: 1;
+          height: 24px;
+          padding: 0 8px;
+          font-size: 12px;
+          color: ${disabled ? '#A6A9AD' : '#202327'};
+          background: ${disabled ? '#F2F3F5' : '#FFFFFF'};
+          border: 1px solid #E4E5E7;
+          border-right: none;
+          border-radius: 4px 0 0 4px;
+          outline: none;
+          box-sizing: border-box;
+          min-width: 0;
+        }
+        .loader-input::placeholder {
+          color: #A6A9AD;
+        }
+        .loader-btn {
+          width: 24px;
+          height: 24px;
+          background: ${disabled ? '#F2F3F5' : '#FFFFFF'};
+          border: 1px solid #E4E5E7;
+          border-radius: 0 4px 4px 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: ${disabled ? '#A6A9AD' : '#606266'};
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          box-sizing: border-box;
+          flex-shrink: 0;
+          transition: background 0.15s, color 0.15s;
+        }
+        .loader-btn:hover:not(.disabled) {
+          background: #F2F3F5;
+          color: #266EFF;
+        }
+      </style>
+      <div class="loader-wrap">
+        <input class="loader-input" type="text" value="${val}" placeholder="${placeholder}" readonly ${disabled ? 'disabled' : ''} />
+        <button type="button" class="loader-btn ${disabled ? 'disabled' : ''}" title="载入本地文件">
+          ${CAD_ICON_PATHS.folder}
+        </button>
+      </div>
+    `;
+
+    const btn = this.shadowRoot.querySelector('.loader-btn');
+    if (btn && !disabled) {
+      btn.onclick = () => {
+        this.dispatchEvent(new CustomEvent('load-file', { bubbles: true, composed: true }));
+      };
+    }
+  }
+}
+customElements.define('cad-file-loader', CadFileLoader);
+    if (typeof window !== 'undefined') window.CadFileLoader = CadFileLoader;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-file-loader> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-file-picker-input> (Key: file_picker_input)
+// ====================================================================
+try {
+  (function() {
+class CadFilePickerInput extends HTMLElement {
+  static get observedAttributes() {
+    return ['value', 'placeholder', 'button-text', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback(name, oldVal, newVal) {
+    if (oldVal !== newVal) this.render();
+  }
+
+  get value() {
+    return this.getAttribute('value') || '';
+  }
+
+  set value(val) {
+    this.setAttribute('value', val);
+  }
+
+  render() {
+    const isDraft = this.getAttribute('status') === 'draft' || !this.hasAttribute('status');
+    const val = this.getAttribute('value') || '';
+    const btnText = this.getAttribute('button-text') || '浏览...';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          width: 100%;
+          position: relative;
+        }
+        .input-box {
+          flex: 1;
+          height: var(--cad-height-small, 24px);
+          background: var(--cad-color-bg-white, #FFFFFF);
+          border: 1px solid var(--cad-color-border-default, #E3E5E7);
+          border-radius: var(--cad-radius-base, 4px);
+          padding: 0 8px;
+          font-size: var(--cad-font-size-base, 12px);
+          font-family: var(--cad-font-family, sans-serif);
+          color: var(--cad-color-text-main, #1F2329);
+          outline: none;
+          box-sizing: border-box;
+        }
+        button {
+          height: var(--cad-height-small, 24px);
+          padding: 2px 10px;
+          background: var(--cad-color-bg-white, #FFFFFF);
+          border: 1px solid var(--cad-color-border-default, #E3E5E7);
+          border-radius: var(--cad-radius-base, 4px);
+          font-size: var(--cad-font-size-base, 12px);
+          color: var(--cad-color-text-main, #1F2329);
+          cursor: pointer;
+          white-space: nowrap;
+          transition: background 0.15s;
+        }
+        button:hover {
+          background: var(--cad-color-bg-hover, #F2F4F6);
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <input type="text" class="input-box" value="${val}" readonly />
+      <button type="button">${btnText}</button>
+      ${renderDraftBadge(isDraft, "PM自造草稿组件: CAD文件路径拾取复合组件 (待反哺 Figma 入库)")}
+    `;
+
+    const btn = this.shadowRoot.querySelector('button');
+    btn.onclick = () => {
+      this.dispatchEvent(new CustomEvent('pick-click', { bubbles: true, composed: true }));
+    };
+  }
+}
+customElements.define('cad-file-picker-input', CadFilePickerInput);
+    if (typeof window !== 'undefined') window.CadFilePickerInput = CadFilePickerInput;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-file-picker-input> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-filter> (Key: filter)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-filter> 多条件属性筛选条 (映射自 Figma Filter Page 7477:26492)
+ * --------------------------------------------------------------------
+ */
+class CadFilter extends HTMLElement {
+  static get observedAttributes() {
+    return ['placeholder', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const placeholder = this.getAttribute('placeholder') || '过滤构件特性或图层...';
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          width: 100%;
+          height: var(--cad-height-small, 24px);
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+        }
+        .filter-box {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          height: 100%;
+          padding: 2px 6px;
+          background: #FFFFFF;
+          border: 1px solid var(--cad-color-border-default, #D0D3D6);
+          border-radius: var(--cad-border-radius-base, 4px);
+        }
+        input {
+          border: none;
+          outline: none;
+          background: transparent;
+          width: 100%;
+          font-size: 12px;
+          color: #1F2329;
+        }
+        .filter-icon {
+          font-size: 11px;
+          color: #8F959E;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="filter-box">
+        <span class="filter-icon">🔍</span>
+        <input type="text" placeholder="${placeholder}">
+      </div>
+      <slot name="extra"></slot>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-filter', CadFilter);
+
+    if (typeof window !== 'undefined') window.CadFilter = CadFilter;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-filter> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-form> (Key: form)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-form> 表单根容器 (映射自 Figma Form Page 252:35)
+ * --------------------------------------------------------------------
+ */
+class CadForm extends HTMLElement {
+  static get observedAttributes() {
+    return ['layout', 'label-width', 'disabled', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const layout = this.getAttribute('layout') || 'horizontal'; // 'horizontal' | 'vertical' | 'inline'
+    const labelWidth = this.getAttribute('label-width') || '80px';
+    const disabled = this.hasAttribute('disabled');
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    let displayMode = 'flex';
+    let flexDirection = layout === 'vertical' ? 'column' : 'column';
+    let gap = '8px';
+
+    if (layout === 'inline') {
+      flexDirection = 'row';
+      gap = '12px';
+    }
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          position: relative;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+          --cad-form-label-width: ${labelWidth};
+        }
+        form {
+          display: ${displayMode};
+          flex-direction: ${flexDirection};
+          gap: ${gap};
+          width: 100%;
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <form onsubmit="return false;">
+        <slot></slot>
+      </form>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-form', CadForm);
+
+    if (typeof window !== 'undefined') window.CadForm = CadForm;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-form> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-form-group> (Key: form_group)
+// ====================================================================
+try {
+  (function() {
+class CadFormGroup extends HTMLElement {
+  static get observedAttributes() {
+    return ['title', 'bg', 'collapsible', 'collapsed', 'size'];
+  }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+  connectedCallback() { this.render(); }
+  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
+  render() {
+    const title = this.getAttribute('title') || '分组标题';
+    const hasBg = this.getAttribute('bg') === 'true';
+    const collapsible = this.getAttribute('collapsible') === 'true';
+    const collapsed = collapsible && this.hasAttribute('collapsed') && this.getAttribute('collapsed') !== 'false';
+    const size = this.getAttribute('size') || 'medium'; // 'medium' (24px) | 'large' (36px)
+    const headerHeight = size === 'large' ? '36px' : '24px';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          width: 100%;
+          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
+          box-sizing: border-box;
+        }
+        .group-header {
+          height: ${headerHeight};
+          background: ${hasBg ? '#F6F7F9' : 'transparent'};
+          border-radius: 4px;
+          padding: ${hasBg ? '2px 8px 2px 6px' : '2px 4px 2px 0'};
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          cursor: ${collapsible ? 'pointer' : 'default'};
+          user-select: none;
+          box-sizing: border-box;
+        }
+        .blue-bar {
+          width: 3px;
+          height: 12px;
+          background: #266EFF;
+          border-radius: 3px;
+          flex-shrink: 0;
+        }
+        .title-wrap {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 12px;
+          line-height: 16px;
+          font-weight: 700;
+          color: #202327;
+        }
+        .chevron {
+          width: 16px;
+          height: 16px;
+          display: ${collapsible ? 'flex' : 'none'};
+          align-items: center;
+          justify-content: center;
+          transition: transform 0.15s;
+          transform: rotate(${collapsed ? '-90deg' : '0deg'});
+        }
+        .group-body {
+          display: ${collapsed ? 'none' : 'flex'};
+          flex-direction: column;
+          gap: 8px;
+          padding: 6px 4px 4px 9px;
+          box-sizing: border-box;
+        }
+      </style>
+      <div class="group-header">
+        <span class="blue-bar"></span>
+        <div class="title-wrap">
+          <span>${title}</span>
+          <slot name="header-extra"></slot>
+        </div>
+        <span class="chevron">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M5 6.5L8 9.5L11 6.5" stroke="#606266" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+      <div class="group-body">
+        <slot></slot>
+      </div>
+    `;
+
+    if (collapsible) {
+      this.shadowRoot.querySelector('.group-header').onclick = (e) => {
+        // 若点击的是 slot 内的复选框等控件，不触发折叠
+        if (e.target !== this.shadowRoot.querySelector('.group-header') && e.target.slot === 'header-extra') return;
+        if (collapsed) this.removeAttribute('collapsed');
+        else this.setAttribute('collapsed', '');
+      };
+    }
+  }
+}
+customElements.define('cad-form-group', CadFormGroup);
+    if (typeof window !== 'undefined') window.CadFormGroup = CadFormGroup;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-form-group> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-icon> (Key: icon)
+// ====================================================================
+try {
+  (function() {
+class CadIcon extends HTMLElement {
+  static get observedAttributes() {
+    return ['name', 'size', 'color'];
+  }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+  connectedCallback() { this.render(); }
+  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
+  render() {
+    const name = this.getAttribute('name') || 'edit';
+    const size = this.getAttribute('size') || '16px';
+    const color = this.getAttribute('color') || 'inherit';
+    const svg = CAD_ICON_PATHS[name] || CAD_ICON_PATHS.edit;
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: ${size};
+          height: ${size};
+          color: ${color};
+          vertical-align: middle;
+          flex-shrink: 0;
+        }
+        svg { width: 100%; height: 100%; display: block; }
+      </style>
+      ${svg}
+    `;
+  }
+}
+customElements.define('cad-icon', CadIcon);
+    if (typeof window !== 'undefined') window.CadIcon = CadIcon;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-icon> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-input> (Key: input)
+// ====================================================================
+try {
+  (function() {
 class CadInput extends HTMLElement {
   static get observedAttributes() {
     return ['value', 'placeholder', 'type', 'size', 'disabled', 'status', 'prefix-label', 'suffix-label', 'min', 'max', 'step'];
@@ -2023,15 +3519,25 @@ class CadInput extends HTMLElement {
   }
 }
 customElements.define('cad-input', CadInput);
+    if (typeof window !== 'undefined') window.CadInput = CadInput;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-input> 失败，已熔断跳过:', err);
+}
 
+// ====================================================================
+// Component: <cad-link> (Key: link)
+// ====================================================================
+try {
+  (function() {
 /**
  * --------------------------------------------------------------------
- * 3. <cad-checkbox> 复选框 (映射自 Figma ComponentSet 372:2402)
+ * <cad-link> 超链接组件 (映射自 Figma Link Page 252:5)
  * --------------------------------------------------------------------
  */
-class CadCheckbox extends HTMLElement {
+class CadLink extends HTMLElement {
   static get observedAttributes() {
-    return ['checked', 'disabled', 'status', 'indeterminate'];
+    return ['href', 'target', 'disabled', 'underline', 'status'];
   }
 
   constructor() {
@@ -2043,23 +3549,166 @@ class CadCheckbox extends HTMLElement {
     this.render();
   }
 
-  attributeChangedCallback(name, oldVal, newVal) {
-    if (oldVal !== newVal) this.render();
-  }
-
-  get checked() {
-    return this.hasAttribute('checked');
-  }
-
-  set checked(val) {
-    if (val) this.setAttribute('checked', '');
-    else this.removeAttribute('checked');
+  attributeChangedCallback() {
+    this.render();
   }
 
   render() {
-    const checked = this.hasAttribute('checked');
+    const href = this.getAttribute('href') || 'javascript:void(0)';
+    const target = this.getAttribute('target') || '_self';
     const disabled = this.hasAttribute('disabled');
-    const indeterminate = this.hasAttribute('indeterminate');
+    const underline = this.getAttribute('underline') || 'hover'; // 'always' | 'hover' | 'none'
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    let textDecoration = 'none';
+    if (underline === 'always') textDecoration = 'underline';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-block;
+          position: relative;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+        }
+        a {
+          color: ${disabled ? 'var(--cad-color-text-disabled, #A4ABB5)' : 'var(--cad-color-primary, #266EFF)'};
+          text-decoration: ${textDecoration};
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          transition: color 0.15s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+        a:hover {
+          color: ${disabled ? 'var(--cad-color-text-disabled, #A4ABB5)' : 'var(--cad-color-primary-hover, #4B88FF)'};
+          text-decoration: ${underline !== 'none' && !disabled ? 'underline' : textDecoration};
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <a href="${disabled ? 'javascript:void(0)' : href}" target="${target}">
+        <slot></slot>
+      </a>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-link', CadLink);
+
+    if (typeof window !== 'undefined') window.CadLink = CadLink;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-link> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-main-toolbar> (Key: main_toolbar)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-main-toolbar> CAD 绘图修改主工具栏 (映射自 Figma MainToolbar Page 7930:2104)
+ * --------------------------------------------------------------------
+ */
+class CadMainToolbar extends HTMLElement {
+  static get observedAttributes() {
+    return ['direction', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const dir = this.getAttribute('direction') || 'horizontal';
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+          flex-direction: ${dir === 'vertical' ? 'column' : 'row'};
+          gap: 2px;
+          padding: 3px;
+          background: #F2F3F5;
+          border: 1px solid #D0D3D6;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+        .btn {
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 12px;
+        }
+        .btn:hover {
+          background: #E5E7EB;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="btn" title="直线 (L)">📏</div>
+      <div class="btn" title="圆 (C)">⭕</div>
+      <div class="btn" title="矩形 (REC)">⬜</div>
+      <div class="btn" title="偏移 (O)">➿</div>
+      <div class="btn" title="修剪 (TR)">✂️</div>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-main-toolbar', CadMainToolbar);
+
+    if (typeof window !== 'undefined') window.CadMainToolbar = CadMainToolbar;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-main-toolbar> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-material-select> (Key: material_select)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-material-select> BIM 材质选择器 (映射自 Figma MaterialSelect Page 252:54)
+ * --------------------------------------------------------------------
+ */
+class CadMaterialSelect extends HTMLElement {
+  static get observedAttributes() {
+    return ['value', 'disabled', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const val = this.getAttribute('value') || 'C30 混凝土';
+    const disabled = this.hasAttribute('disabled');
     const isDraft = this.getAttribute('status') === 'draft';
 
     this.shadowRoot.innerHTML = `
@@ -2067,73 +3716,1465 @@ class CadCheckbox extends HTMLElement {
         :host {
           display: inline-flex;
           align-items: center;
-          vertical-align: middle;
           position: relative;
-          cursor: ${disabled ? 'not-allowed' : 'pointer'};
-          user-select: none;
-          gap: var(--cad-gap-sm, 6px);
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
           font-size: var(--cad-font-size-base, 12px);
-          font-family: var(--cad-font-family, sans-serif);
-          color: ${disabled ? 'var(--cad-color-text-placeholder, #A6A9AD)' : 'var(--cad-color-text-main, #1F2329)'};
+          height: var(--cad-height-small, 24px);
+          min-width: 140px;
         }
         .box {
-          width: 14px;
-          height: 14px;
-          border-radius: var(--cad-radius-small, 2px);
-          border: 1px solid ${checked || indeterminate ? 'var(--cad-color-primary, #266EFF)' : 'var(--cad-color-border-default, #E3E5E7)'};
-          background: ${checked || indeterminate ? (disabled ? 'var(--cad-color-primary-disabled, #BFD3FE)' : 'var(--cad-color-primary, #266EFF)') : (disabled ? 'var(--cad-color-bg-disabled, #F5F7FA)' : '#FFFFFF')};
           display: flex;
           align-items: center;
-          justify-content: center;
-          transition: all 0.15s;
-          box-sizing: border-box;
+          gap: 6px;
+          height: 100%;
+          width: 100%;
+          padding: 2px 8px;
+          background: var(--cad-color-bg-white, #FFFFFF);
+          border: 1px solid var(--cad-color-border-default, #D0D3D6);
+          border-radius: var(--cad-border-radius-base, 4px);
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          opacity: ${disabled ? '0.6' : '1'};
+          user-select: none;
         }
-        :host(:hover:not([disabled])) .box {
-          border-color: var(--cad-color-primary, #266EFF);
+        .texture-preview {
+          width: 14px;
+          height: 14px;
+          border-radius: 2px;
+          background: #A0A5AA;
+          background-image: repeating-linear-gradient(45deg, #888E94 25%, transparent 25%, transparent 75%, #888E94 75%, #888E94), repeating-linear-gradient(45deg, #888E94 25%, #A0A5AA 25%, #A0A5AA 75%, #888E94 75%, #888E94);
+          background-position: 0 0, 4px 4px;
+          background-size: 8px 8px;
+          border: 1px solid rgba(0,0,0,0.2);
+          flex-shrink: 0;
         }
-        .check-icon {
-          width: 9px;
-          height: 9px;
-          fill: none;
-          stroke: #FFFFFF;
-          stroke-width: 2;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-          display: ${checked ? 'block' : 'none'};
+        .mat-name {
+          flex: 1;
+          color: var(--cad-color-text-main, #1F2329);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
-        .indeterminate-bar {
-          width: 8px;
-          height: 2px;
-          background: #FFFFFF;
-          display: ${indeterminate && !checked ? 'block' : 'none'};
+        select {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          opacity: 0;
+          cursor: pointer;
         }
         ${COMMON_DRAFT_STYLE}
       </style>
       <div class="box">
-        <svg class="check-icon" viewBox="0 0 12 12">
-          <polyline points="2 6 5 9 10 3"></polyline>
-        </svg>
-        <div class="indeterminate-bar"></div>
+        <span class="texture-preview"></span>
+        <span class="mat-name">${val}</span>
+        <span style="font-size: 9px; color: #8F959E;">▼</span>
       </div>
-      <span><slot></slot></span>
+      <select ${disabled ? 'disabled' : ''}>
+        <option value="C30 混凝土" ${val==='C30 混凝土'?'selected':''}>C30 混凝土</option>
+        <option value="HRB400 螺纹钢筋" ${val==='HRB400 螺纹钢筋'?'selected':''}>HRB400 螺纹钢筋</option>
+        <option value="加气混凝土砌块" ${val==='加气混凝土砌块'?'selected':''}>加气混凝土砌块</option>
+        <option value="普通平板中空玻璃 6+12A+6" ${val==='普通平板中空玻璃 6+12A+6'?'selected':''}>普通平板中空玻璃 6+12A+6</option>
+        <option value="结构铝合金 6063-T5" ${val==='结构铝合金 6063-T5'?'selected':''}>结构铝合金 6063-T5</option>
+      </select>
       ${renderDraftBadge(isDraft)}
     `;
 
-    this.onclick = (e) => {
-      if (disabled) return;
-      this.checked = !this.checked;
-      this.removeAttribute('indeterminate');
-      this.dispatchEvent(new CustomEvent('change', { detail: { checked: this.checked }, bubbles: true, composed: true }));
-    };
+    this.shadowRoot.querySelector('select').addEventListener('change', (e) => {
+      this.setAttribute('value', e.target.value);
+      this.dispatchEvent(new CustomEvent('change', { detail: { value: e.target.value } }));
+    });
   }
 }
-customElements.define('cad-checkbox', CadCheckbox);
+customElements.define('cad-material-select', CadMaterialSelect);
 
+    if (typeof window !== 'undefined') window.CadMaterialSelect = CadMaterialSelect;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-material-select> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-menu> (Key: menu)
+// ====================================================================
+try {
+  (function() {
 /**
  * --------------------------------------------------------------------
- * 4. <cad-radio> 单选框 (映射自 Figma ComponentSet 328:2196)
+ * <cad-menu> 级联/上下文菜单组件 (映射自 Figma Menu Page 252:8)
  * --------------------------------------------------------------------
  */
+class CadMenu extends HTMLElement {
+  static get observedAttributes() {
+    return ['open', 'trigger', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const isDraft = this.getAttribute('status') === 'draft';
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-block;
+          position: relative;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+        }
+        .menu-list {
+          min-width: 140px;
+          background: var(--cad-color-bg-white, #FFFFFF);
+          border: 1px solid var(--cad-color-border-default, #D0D3D6);
+          border-radius: var(--cad-border-radius-base, 4px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          padding: 4px 0;
+          margin: 0;
+          list-style: none;
+          box-sizing: border-box;
+        }
+        ::slotted(cad-menu-item), ::slotted(div.menu-item) {
+          padding: 6px 12px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          cursor: pointer;
+          color: var(--cad-color-text-main, #1F2329);
+          transition: background 0.15s ease;
+        }
+        ::slotted(cad-menu-item:hover), ::slotted(div.menu-item:hover) {
+          background: var(--cad-color-bg-hover, #F2F3F5);
+          color: var(--cad-color-primary, #266EFF);
+        }
+        ::slotted(cad-divider), ::slotted(hr) {
+          margin: 4px 0;
+          border: none;
+          border-top: 1px solid var(--cad-color-border-divider, #E5E6EB);
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="menu-list">
+        <slot></slot>
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-menu', CadMenu);
+
+    if (typeof window !== 'undefined') window.CadMenu = CadMenu;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-menu> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-message> (Key: message)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-message> 全局轻提示 Toast (映射自 Figma Message Page 252:43)
+ * --------------------------------------------------------------------
+ */
+class CadMessage extends HTMLElement {
+  static get observedAttributes() {
+    return ['type', 'duration', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  static show(text, type = 'info', duration = 3000) {
+    let container = document.getElementById('cad-message-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'cad-message-container';
+      container.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;';
+      document.body.appendChild(container);
+    }
+    const msg = document.createElement('cad-message');
+    msg.setAttribute('type', type);
+    msg.innerText = text;
+    msg.style.pointerEvents = 'auto';
+    container.appendChild(msg);
+
+    setTimeout(() => {
+      msg.style.opacity = '0';
+      msg.style.transition = 'opacity 0.3s, transform 0.3s';
+      msg.style.transform = 'translateY(-10px)';
+      setTimeout(() => msg.remove(), 300);
+    }, duration);
+  }
+
+  static success(text, duration) { CadMessage.show(text, 'success', duration); }
+  static warning(text, duration) { CadMessage.show(text, 'warning', duration); }
+  static error(text, duration) { CadMessage.show(text, 'error', duration); }
+  static info(text, duration) { CadMessage.show(text, 'info', duration); }
+
+  render() {
+    const type = this.getAttribute('type') || 'info'; // 'info' | 'success' | 'warning' | 'error'
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    const colors = {
+      info: { bg: '#EBF4FF', border: '#BAD9FF', text: '#266EFF' },
+      success: { bg: '#E8FFEA', border: '#AFF0B5', text: '#00B42A' },
+      warning: { bg: '#FFF7E8', border: '#FFDCA3', text: '#FF7D00' },
+      error: { bg: '#FFECE8', border: '#FFC5BC', text: '#F53F3F' }
+    };
+    const c = colors[type] || colors.info;
+    const iconSvg = CAD_ALERT_SVGS[type] || CAD_ALERT_SVGS.info;
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+          position: relative;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+        }
+        .toast {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 14px;
+          background: #FFFFFF;
+          border: 1px solid ${c.border};
+          border-radius: 4px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+          color: var(--cad-color-text-main, #1F2329);
+        }
+        .icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          height: 16px;
+          flex-shrink: 0;
+        }
+        .icon svg {
+          width: 16px;
+          height: 16px;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="toast">
+        <span class="icon">${iconSvg}</span>
+        <span><slot></slot></span>
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-message', CadMessage);
+window.CadMessage = CadMessage;
+
+    if (typeof window !== 'undefined') window.CadMessage = CadMessage;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-message> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-dialog> (Key: modal)
+// ====================================================================
+try {
+  (function() {
+class CadDialog extends HTMLElement {
+  static get observedAttributes() {
+    return ['title', 'subtitle', 'size', 'width', 'height', 'confirm-text', 'cancel-text', 'help-text', 'show-help', 'show-footer-help'];
+  }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+  connectedCallback() { this.render(); }
+  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
+  render() {
+    const title = this.getAttribute('title') || '标题';
+    const subtitle = this.getAttribute('subtitle') || '';
+    const confirmText = this.getAttribute('confirm-text') || '确定';
+    const cancelText = this.getAttribute('cancel-text') || '取消';
+    const helpText = this.getAttribute('help-text') || '帮助';
+    const showHelp = this.getAttribute('show-help') !== 'false';
+    const showFooterHelp = this.getAttribute('show-footer-help') === 'true';
+
+    // 100% 对齐 Figma Page 252:45 对话框官方尺寸规格 (AutoLayout: VERTICAL FIXED x FIXED)
+    const FIGMA_SIZES = {
+      '480x240': { w: '480px', h: '240px' },
+      '480x360': { w: '480px', h: '360px' },
+      '600x360': { w: '600px', h: '360px' },
+      '720x600': { w: '720px', h: '600px' },
+      '840x600': { w: '840px', h: '600px' },
+      '960x600': { w: '960px', h: '600px' },
+      '920x600': { w: '960px', h: '600px' }
+    };
+
+    const sizeAttr = this.getAttribute('size');
+    let width = this.getAttribute('width');
+    let height = this.getAttribute('height');
+
+    if (sizeAttr && FIGMA_SIZES[sizeAttr]) {
+      width = FIGMA_SIZES[sizeAttr].w;
+      height = FIGMA_SIZES[sizeAttr].h;
+    } else {
+      width = width || '720px';
+      height = height || 'auto';
+    }
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          width: ${width};
+          ${height !== 'auto' ? `height: ${height};` : ''}
+          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
+          box-sizing: border-box;
+        }
+        .modal-shell {
+          width: 100%;
+          height: 100%;
+          background: #FFFFFF;
+          border: 1px solid var(--cad-color-border-default, #E4E5E7);
+          border-radius: 8px;
+          box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.20);
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          box-sizing: border-box;
+        }
+        .modal-header {
+          height: 36px;
+          padding: 10px 8px 10px 12px;
+          border-bottom: 1px solid #EBECEE;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          box-sizing: border-box;
+          background: #FFFFFF;
+          flex-shrink: 0;
+        }
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          min-width: 0;
+        }
+        .header-title {
+          font-size: 14px;
+          line-height: 20px;
+          font-weight: 700;
+          color: #202327;
+          white-space: nowrap;
+        }
+        .header-subtitle {
+          font-size: 12px;
+          line-height: 16px;
+          font-weight: 400;
+          color: #8A8D91;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+        }
+        .icon-btn {
+          width: 24px;
+          height: 24px;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #606266;
+          cursor: pointer;
+          transition: background 0.15s;
+        }
+        .icon-btn:hover {
+          background: #F2F4F6;
+          color: #202327;
+        }
+        .modal-body {
+          padding: 12px;
+          background: #FFFFFF;
+          box-sizing: border-box;
+          flex: 1;
+          min-height: 0;
+          overflow: auto;
+        }
+        .modal-footer {
+          height: 44px;
+          padding: 10px 12px 10px 12px;
+          border-top: 1px solid #EBECEE;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: #FFFFFF;
+          box-sizing: border-box;
+          flex-shrink: 0;
+        }
+        .footer-left {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .footer-right {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-left: auto;
+        }
+        .btn {
+          all: unset;
+          box-sizing: border-box;
+          min-width: 56px;
+          height: 24px;
+          padding: 2px 10px;
+          border-radius: 4px;
+          font-size: 12px;
+          line-height: 16px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          user-select: none;
+          transition: background 0.15s;
+        }
+        .btn-primary {
+          background: #266EFF;
+          color: #FFFFFF;
+        }
+        .btn-primary:hover {
+          background: #4785FF;
+        }
+        .btn-secondary {
+          background: #FFFFFF;
+          color: #202327;
+          border: 1px solid #E4E5E7;
+        }
+        .btn-secondary:hover {
+          background: #F2F4F6;
+        }
+      </style>
+      <div class="modal-shell">
+        <div class="modal-header">
+          <div class="header-left">
+            <span class="header-title">${title}</span>
+            ${subtitle ? `<span class="header-subtitle">${subtitle}</span>` : ''}
+          </div>
+          <div class="header-actions">
+            ${showHelp ? `<div class="icon-btn btn-help" title="帮助">${CAD_ICON_PATHS.help}</div>` : ''}
+            <div class="icon-btn btn-close" title="关闭">${CAD_ICON_PATHS.close}</div>
+          </div>
+        </div>
+        <div class="modal-body">
+          <slot></slot>
+        </div>
+        <div class="modal-footer">
+          <div class="footer-left">
+            <slot name="footer-left"></slot>
+          </div>
+          <div class="footer-right">
+            <button type="button" class="btn btn-primary">${confirmText}</button>
+            <button type="button" class="btn btn-secondary btn-cancel">${cancelText}</button>
+            ${showFooterHelp ? `<button type="button" class="btn btn-secondary btn-footer-help">${helpText}</button>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+
+    const helpBtn = this.shadowRoot.querySelector('.btn-help');
+    if (helpBtn) helpBtn.onclick = () => this.dispatchEvent(new CustomEvent('help', { bubbles: true, composed: true }));
+    const footerHelpBtn = this.shadowRoot.querySelector('.btn-footer-help');
+    if (footerHelpBtn) footerHelpBtn.onclick = () => this.dispatchEvent(new CustomEvent('help', { bubbles: true, composed: true }));
+    this.shadowRoot.querySelector('.btn-close').onclick = () => this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
+    this.shadowRoot.querySelector('.btn-primary').onclick = () => this.dispatchEvent(new CustomEvent('confirm', { bubbles: true, composed: true }));
+    this.shadowRoot.querySelector('.btn-cancel').onclick = () => this.dispatchEvent(new CustomEvent('cancel', { bubbles: true, composed: true }));
+  }
+}
+customElements.define('cad-dialog', CadDialog);
+    if (typeof window !== 'undefined') window.CadDialog = CadDialog;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-dialog> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-options-dialog> (Key: options_dialog)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-options-dialog> CAD 系统选项配置面板 (映射自 Figma OptionsDialog Page 843:3979)
+ * --------------------------------------------------------------------
+ */
+class CadOptionsDialog extends HTMLElement {
+  static get observedAttributes() {
+    return ['open', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const isDraft = this.getAttribute('status') === 'draft';
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <cad-dialog title="选项 (Options)" size="840x600">
+        <cad-tabs>
+          <div data-tab="文件与系统">文件路径与系统支持搜索路径设定</div>
+          <div data-tab="显示">窗口元素、颜色主题与十字光标大小</div>
+          <div data-tab="打开和保存">文件保存类型 DWG 2018、自动保存时间间隔</div>
+          <div data-tab="用户系统配置">右键单击自定义、线宽设置</div>
+        </cad-tabs>
+      </cad-dialog>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-options-dialog', CadOptionsDialog);
+
+    if (typeof window !== 'undefined') window.CadOptionsDialog = CadOptionsDialog;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-options-dialog> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-panel> (Key: panel)
+// ====================================================================
+try {
+  (function() {
+class CadPanel extends HTMLElement {
+  static get observedAttributes() {
+    return ['title', 'width', 'dock', 'collapsed', 'collapsible', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const title = this.getAttribute('title') || '面板';
+    const width = this.getAttribute('width') || '260px';
+    const dock = this.getAttribute('dock'); // 'left' | 'right' | null
+    const isCollapsed = this.hasAttribute('collapsed');
+    const collapsible = this.hasAttribute('collapsible');
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    const dockBorder = dock === 'left' ? 'border-right: 1px solid var(--cad-color-border-default, #D0D3D6);' :
+                       dock === 'right' ? 'border-left: 1px solid var(--cad-color-border-default, #D0D3D6);' :
+                       'border: 1px solid var(--cad-color-border-default, #D0D3D6); border-radius: 4px;';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          position: relative;
+          width: ${width};
+          background: var(--cad-color-bg-white, #FFFFFF);
+          ${dockBorder}
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
+          font-size: 12px;
+          overflow: hidden;
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 28px;
+          padding: 0 8px;
+          background: var(--cad-color-bg-light, #F8FAFC);
+          border-bottom: 1px solid var(--cad-color-border-default, #E3E5E7);
+          user-select: none;
+          font-weight: 600;
+          color: var(--cad-color-text-main, #1F2329);
+        }
+        .header-title {
+          font-size: 12px;
+        }
+        .collapse-icon {
+          cursor: pointer;
+          font-size: 10px;
+          color: var(--cad-color-text-regular, #8A8D91);
+          transition: transform 0.2s;
+        }
+        .body {
+          padding: 8px;
+          display: ${isCollapsed ? 'none' : 'block'};
+          background: #FFFFFF;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="header">
+        <span class="header-title">${title}</span>
+        ${collapsible ? `<span class="collapse-icon">${isCollapsed ? '▶' : '▼'}</span>` : ''}
+      </div>
+      <div class="body">
+        <slot></slot>
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+
+    if (collapsible) {
+      const header = this.shadowRoot.querySelector('.header');
+      if (header) {
+        header.onclick = () => {
+          if (this.hasAttribute('collapsed')) this.removeAttribute('collapsed');
+          else this.setAttribute('collapsed', '');
+        };
+      }
+    }
+  }
+}
+customElements.define('cad-panel', CadPanel);
+
+    if (typeof window !== 'undefined') window.CadPanel = CadPanel;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-panel> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-picker> (Key: picker)
+// ====================================================================
+try {
+  (function() {
+class CadPicker extends HTMLElement {
+  static get observedAttributes() {
+    return ['value', 'placeholder', 'disabled'];
+  }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+  connectedCallback() { this.render(); }
+  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
+  render() {
+    const val = this.getAttribute('value') || '';
+    const placeholder = this.getAttribute('placeholder') || '在图面拾取坐标点';
+    const disabled = this.hasAttribute('disabled');
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-block;
+          width: 100%;
+          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
+          box-sizing: border-box;
+        }
+        .picker-wrap {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          height: 24px;
+          box-sizing: border-box;
+        }
+        .picker-input {
+          flex: 1;
+          height: 24px;
+          padding: 0 8px;
+          font-size: 12px;
+          color: ${disabled ? '#A6A9AD' : '#202327'};
+          background: ${disabled ? '#F2F3F5' : '#FFFFFF'};
+          border: 1px solid #E4E5E7;
+          border-right: none;
+          border-radius: 4px 0 0 4px;
+          outline: none;
+          box-sizing: border-box;
+          min-width: 0;
+        }
+        .picker-btn {
+          width: 24px;
+          height: 24px;
+          background: ${disabled ? '#F2F3F5' : '#FFFFFF'};
+          border: 1px solid #E4E5E7;
+          border-radius: 0 4px 4px 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: ${disabled ? '#A6A9AD' : '#266EFF'};
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          box-sizing: border-box;
+          flex-shrink: 0;
+          transition: background 0.15s;
+        }
+        .picker-btn:hover:not(.disabled) {
+          background: #EBF3FF;
+        }
+      </style>
+      <div class="picker-wrap">
+        <input class="picker-input" type="text" value="${val}" placeholder="${placeholder}" ${disabled ? 'disabled' : ''} />
+        <button type="button" class="picker-btn ${disabled ? 'disabled' : ''}" title="图面拾取">
+          ${CAD_ICON_PATHS.pick}
+        </button>
+      </div>
+    `;
+
+    const btn = this.shadowRoot.querySelector('.picker-btn');
+    if (btn && !disabled) {
+      btn.onclick = () => {
+        this.dispatchEvent(new CustomEvent('pick', { bubbles: true, composed: true }));
+      };
+    }
+  }
+}
+customElements.define('cad-picker', CadPicker);
+    if (typeof window !== 'undefined') window.CadPicker = CadPicker;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-picker> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-picture> (Key: picture)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-picture> CAD 视口缩略图/图元预览容器 (映射自 Figma Picture Page 252:38)
+ * --------------------------------------------------------------------
+ */
+class CadPicture extends HTMLElement {
+  static get observedAttributes() {
+    return ['src', 'alt', 'width', 'height', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const src = this.getAttribute('src');
+    const alt = this.getAttribute('alt') || 'CAD图元预览';
+    const w = this.getAttribute('width') || '100%';
+    const h = this.getAttribute('height') || '120px';
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-block;
+          position: relative;
+          box-sizing: border-box;
+          width: ${w};
+          height: ${h};
+          background: #18191B; /* CAD 经典深黑视口背景 */
+          border: 1px solid var(--cad-color-border-default, #363B42);
+          border-radius: var(--cad-border-radius-base, 4px);
+          overflow: hidden;
+        }
+        .grid-bg {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+          background-size: 16px 16px;
+        }
+        img {
+          max-width: 90%;
+          max-height: 90%;
+          object-fit: contain;
+        }
+        .empty-hint {
+          color: #646A73;
+          font-size: 11px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="grid-bg">
+        ${src ? `<img src="${src}" alt="${alt}">` : `<div class="empty-hint"><span>📐</span><span>${alt}</span></div>`}
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-picture', CadPicture);
+
+    if (typeof window !== 'undefined') window.CadPicture = CadPicture;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-picture> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-popconfirm> (Key: popconfirm)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-popconfirm> 气泡确认框 (映射自 Figma Popconfirm Page 615:61944)
+ * --------------------------------------------------------------------
+ */
+class CadPopconfirm extends HTMLElement {
+  static get observedAttributes() {
+    return ['title', 'ok-text', 'cancel-text', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.isOpen = false;
+    this._onDoc = this._onDoc.bind(this);
+  }
+
+  connectedCallback() {
+    this.render();
+    document.addEventListener('click', this._onDoc);
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('click', this._onDoc);
+  }
+
+  _onDoc(e) {
+    if (!this.contains(e.target)) {
+      if (this.isOpen) {
+        this.isOpen = false;
+        this.updatePopup();
+      }
+    }
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  updatePopup() {
+    const p = this.shadowRoot.querySelector('.confirm-card');
+    if (p) p.style.display = this.isOpen ? 'block' : 'none';
+  }
+
+  render() {
+    const title = this.getAttribute('title') || '确认要执行此操作吗？';
+    const okText = this.getAttribute('ok-text') || '确定';
+    const cancelText = this.getAttribute('cancel-text') || '取消';
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-block;
+          position: relative;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+        }
+        .confirm-card {
+          display: ${this.isOpen ? 'block' : 'none'};
+          position: absolute;
+          bottom: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%);
+          width: 180px;
+          background: #FFFFFF;
+          border: 1px solid var(--cad-color-border-default, #D0D3D6);
+          border-radius: 4px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+          z-index: 1500;
+          padding: 8px;
+        }
+        .msg-line {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 8px;
+          color: var(--cad-color-text-main, #1F2329);
+        }
+        .btn-line {
+          display: flex;
+          justify-content: flex-end;
+          gap: 6px;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="trigger" style="display:inline-block; cursor:pointer;">
+        <slot></slot>
+      </div>
+      <div class="confirm-card">
+        <div class="msg-line">
+          <span style="color:#FF7D00;">⚠️</span>
+          <span>${title}</span>
+        </div>
+        <div class="btn-line">
+          <cad-button size="small" type="secondary" class="btn-cancel">${cancelText}</cad-button>
+          <cad-button size="small" type="primary" class="btn-ok">${okText}</cad-button>
+        </div>
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+
+    this.shadowRoot.querySelector('.trigger').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.isOpen = !this.isOpen;
+      this.updatePopup();
+    });
+
+    this.shadowRoot.querySelector('.btn-cancel').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.isOpen = false;
+      this.updatePopup();
+      this.dispatchEvent(new CustomEvent('cancel'));
+    });
+
+    this.shadowRoot.querySelector('.btn-ok').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.isOpen = false;
+      this.updatePopup();
+      this.dispatchEvent(new CustomEvent('confirm'));
+    });
+  }
+}
+customElements.define('cad-popconfirm', CadPopconfirm);
+
+    if (typeof window !== 'undefined') window.CadPopconfirm = CadPopconfirm;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-popconfirm> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-popover> (Key: popover)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-popover> 气泡卡片 (映射自 Figma Popover Page 252:46)
+ * --------------------------------------------------------------------
+ */
+class CadPopover extends HTMLElement {
+  static get observedAttributes() {
+    return ['title', 'trigger', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.isOpen = false;
+    this._onDoc = this._onDoc.bind(this);
+  }
+
+  connectedCallback() {
+    this.render();
+    document.addEventListener('click', this._onDoc);
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('click', this._onDoc);
+  }
+
+  _onDoc(e) {
+    if (!this.contains(e.target)) {
+      if (this.isOpen) {
+        this.isOpen = false;
+        this.updatePopup();
+      }
+    }
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  updatePopup() {
+    const p = this.shadowRoot.querySelector('.pop-card');
+    if (p) p.style.display = this.isOpen ? 'block' : 'none';
+  }
+
+  render() {
+    const title = this.getAttribute('title') || '';
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-block;
+          position: relative;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+        }
+        .pop-card {
+          display: ${this.isOpen ? 'block' : 'none'};
+          position: absolute;
+          bottom: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%);
+          width: 200px;
+          background: #FFFFFF;
+          border: 1px solid var(--cad-color-border-default, #D0D3D6);
+          border-radius: 4px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+          z-index: 1500;
+          padding: 8px 10px;
+        }
+        .pop-card::after {
+          content: "";
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          margin-left: -5px;
+          border-width: 5px;
+          border-style: solid;
+          border-color: #FFFFFF transparent transparent transparent;
+        }
+        .title {
+          font-weight: 600;
+          margin-bottom: 4px;
+          color: var(--cad-color-text-main, #1F2329);
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="trigger" style="display:inline-block; cursor:pointer;">
+        <slot name="trigger"><cad-button size="small">展开卡片</cad-button></slot>
+      </div>
+      <div class="pop-card">
+        ${title ? `<div class="title">${title}</div>` : ''}
+        <div class="content"><slot></slot></div>
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+
+    this.shadowRoot.querySelector('.trigger').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.isOpen = !this.isOpen;
+      this.updatePopup();
+    });
+  }
+}
+customElements.define('cad-popover', CadPopover);
+
+    if (typeof window !== 'undefined') window.CadPopover = CadPopover;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-popover> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-progress> (Key: progress)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-progress> 工业级进度指示器 (映射自 Figma Bar Page 253:55)
+ * --------------------------------------------------------------------
+ */
+class CadProgress extends HTMLElement {
+  static get observedAttributes() {
+    return ['percent', 'status', 'stroke-width', 'show-info', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const percent = Math.min(100, Math.max(0, parseFloat(this.getAttribute('percent') || '0')));
+    const status = this.getAttribute('status') || 'normal'; // 'normal' | 'success' | 'exception'
+    const strokeWidth = this.getAttribute('stroke-width') || '6px';
+    const showInfo = this.getAttribute('show-info') !== 'false';
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    let barColor = 'var(--cad-color-primary, #266EFF)';
+    if (status === 'success' || percent >= 100) barColor = '#00B42A';
+    if (status === 'exception') barColor = '#F53F3F';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          width: 100%;
+          min-width: 100px;
+          position: relative;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+        }
+        .track {
+          flex: 1;
+          height: ${strokeWidth};
+          background: #E5E6EB;
+          border-radius: 3px;
+          overflow: hidden;
+          position: relative;
+        }
+        .fill {
+          height: 100%;
+          width: ${percent}%;
+          background: ${barColor};
+          border-radius: 3px;
+          transition: width 0.3s ease;
+        }
+        .text {
+          font-size: 11px;
+          color: var(--cad-color-text-main, #1F2329);
+          min-width: 32px;
+          text-align: right;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="track">
+        <div class="fill"></div>
+      </div>
+      ${showInfo ? `<span class="text">${percent}%</span>` : ''}
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-progress', CadProgress);
+
+    if (typeof window !== 'undefined') window.CadProgress = CadProgress;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-progress> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-project-browser> (Key: project_browser)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-project-browser> BIM 项目浏览器面板 (映射自 Figma ProjectBrowser Page 6376:55263)
+ * --------------------------------------------------------------------
+ */
+class CadProjectBrowser extends HTMLElement {
+  static get observedAttributes() {
+    return ['title', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const title = this.getAttribute('title') || '项目浏览器 - 建筑1号楼';
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: flex;
+          flex-direction: column;
+          width: 240px;
+          height: 360px;
+          background: #FFFFFF;
+          border: 1px solid #D0D3D6;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: 12px;
+          overflow: hidden;
+        }
+        .header {
+          padding: 6px 8px;
+          background: #F2F3F5;
+          font-weight: 600;
+          border-bottom: 1px solid #D0D3D6;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .body {
+          flex: 1;
+          overflow-y: auto;
+          padding: 4px;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="header">
+        <span>${title}</span>
+        <span style="cursor:pointer; color:#8F959E;">🔍</span>
+      </div>
+      <div class="body">
+        <cad-tree></cad-tree>
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-project-browser', CadProjectBrowser);
+
+    if (typeof window !== 'undefined') window.CadProjectBrowser = CadProjectBrowser;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-project-browser> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-property-panel> (Key: property_panel)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-property-panel> 属性编辑面板 PropertyGrid (映射自 Figma PropertyPanel Page 7462:11469)
+ * --------------------------------------------------------------------
+ */
+class CadPropertyPanel extends HTMLElement {
+  static get observedAttributes() {
+    return ['title', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const title = this.getAttribute('title') || '特性 Properties';
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          width: 260px;
+          background: #FFFFFF;
+          border: 1px solid #D0D3D6;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: 12px;
+          overflow: hidden;
+        }
+        .header {
+          padding: 6px 8px;
+          background: #F2F3F5;
+          font-weight: 600;
+          border-bottom: 1px solid #D0D3D6;
+        }
+        .grid-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .grid-table td {
+          padding: 4px 6px;
+          border-bottom: 1px solid #F0F2F5;
+        }
+        .label-col {
+          width: 40%;
+          color: #646A73;
+          background: #FAFAFA;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="header">${title}</div>
+      <table class="grid-table">
+        <tr><td class="label-col">图层</td><td>0 图层</td></tr>
+        <tr><td class="label-col">颜色</td><td>ByLayer</td></tr>
+        <tr><td class="label-col">线型</td><td>ByLayer</td></tr>
+        <tr><td class="label-col">线宽</td><td>默认 (0.25mm)</td></tr>
+        <tr><td class="label-col">标高</td><td>±0.000 (首层)</td></tr>
+      </table>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-property-panel', CadPropertyPanel);
+
+    if (typeof window !== 'undefined') window.CadPropertyPanel = CadPropertyPanel;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-property-panel> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-quick-nav> (Key: quick_nav)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-quick-nav> 快速访问工具栏 (映射自 Figma QuickNav Page 1712:473)
+ * --------------------------------------------------------------------
+ */
+class CadQuickNav extends HTMLElement {
+  static get observedAttributes() {
+    return ['status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const isDraft = this.getAttribute('status') === 'draft';
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+          align-items: center;
+          gap: 2px;
+          height: 28px;
+          padding: 0 4px;
+          background: #2C2D30;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+        }
+        .tool-btn {
+          width: 22px;
+          height: 22px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          color: #D3D5D9;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 13px;
+          transition: background 0.15s;
+        }
+        .tool-btn:hover {
+          background: rgba(255, 255, 255, 0.15);
+          color: #FFFFFF;
+        }
+        .sep {
+          width: 1px;
+          height: 14px;
+          background: #464A50;
+          margin: 0 2px;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <span class="tool-btn" title="新建图纸">📄</span>
+      <span class="tool-btn" title="打开图纸">📂</span>
+      <span class="tool-btn" title="保存 (Ctrl+S)">💾</span>
+      <span class="sep"></span>
+      <span class="tool-btn" title="放弃/撤销 (Ctrl+Z)">↩️</span>
+      <span class="tool-btn" title="重做 (Ctrl+Y)">↪️</span>
+      <span class="sep"></span>
+      <span class="tool-btn" title="打印/发布 (Ctrl+P)">🖨️</span>
+      <slot></slot>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-quick-nav', CadQuickNav);
+
+    if (typeof window !== 'undefined') window.CadQuickNav = CadQuickNav;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-quick-nav> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-radio> (Key: radio)
+// ====================================================================
+try {
+  (function() {
 class CadRadio extends HTMLElement {
   static get observedAttributes() {
     return ['checked', 'disabled', 'status', 'name', 'value'];
@@ -2226,12 +5267,220 @@ class CadRadio extends HTMLElement {
   }
 }
 customElements.define('cad-radio', CadRadio);
+    if (typeof window !== 'undefined') window.CadRadio = CadRadio;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-radio> 失败，已熔断跳过:', err);
+}
 
+// ====================================================================
+// Component: <cad-ribbon> (Key: ribbon)
+// ====================================================================
+try {
+  (function() {
 /**
  * --------------------------------------------------------------------
- * 5. <cad-select> 下拉选择器 (映射自 Figma ComponentSet 483:5106)
+ * <cad-ribbon> CAD Ribbon 顶部多功能命令带 (映射自 Figma Ribbon Page 1461:34231)
  * --------------------------------------------------------------------
  */
+class CadRibbon extends HTMLElement {
+  static get observedAttributes() {
+    return ['active-tab', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const activeTab = this.getAttribute('active-tab') || '常用';
+    const tabs = ['常用', '插入', '注释', '参数化', '视图', '管理', '协作'];
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          position: relative;
+          background: #F0F2F5;
+          border-bottom: 1px solid #D0D3D6;
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: 12px;
+          user-select: none;
+        }
+        .tab-bar {
+          display: flex;
+          align-items: center;
+          height: 28px;
+          background: #E5E7EB;
+          padding-left: 8px;
+          border-bottom: 1px solid #D0D3D6;
+        }
+        .tab {
+          padding: 4px 12px;
+          cursor: pointer;
+          color: #4E5969;
+          font-weight: 500;
+          border-top-left-radius: 4px;
+          border-top-right-radius: 4px;
+          transition: background 0.15s, color 0.15s;
+        }
+        .tab:hover {
+          color: #1D2129;
+        }
+        .tab.active {
+          background: #F0F2F5;
+          color: #266EFF;
+          font-weight: 600;
+          box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
+        }
+        .panel-area {
+          display: flex;
+          align-items: stretch;
+          height: 72px;
+          padding: 4px 8px;
+          gap: 6px;
+          overflow-x: auto;
+        }
+        .group-box {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          border-right: 1px solid #D8DCE0;
+          padding: 0 8px;
+        }
+        .group-title {
+          font-size: 10px;
+          color: #86909C;
+          text-align: center;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="tab-bar">
+        ${tabs.map(t => `<span class="tab ${t === activeTab ? 'active' : ''}">${t}</span>`).join('')}
+      </div>
+      <div class="panel-area">
+        <slot>
+          <div class="group-box">
+            <div style="display:flex; gap:6px;">
+              <cad-button size="small">直线</cad-button>
+              <cad-button size="small">圆弧</cad-button>
+              <cad-button size="small">矩形</cad-button>
+            </div>
+            <div class="group-title">绘图</div>
+          </div>
+          <div class="group-box">
+            <div style="display:flex; gap:6px;">
+              <cad-button size="small">移动</cad-button>
+              <cad-button size="small">复制</cad-button>
+              <cad-button size="small">镜像</cad-button>
+            </div>
+            <div class="group-title">修改</div>
+          </div>
+        </slot>
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-ribbon', CadRibbon);
+
+    if (typeof window !== 'undefined') window.CadRibbon = CadRibbon;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-ribbon> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-scrollbar> (Key: scrollbar)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-scrollbar> 滚动条容器 (映射自 Figma Scrollbar Page 252:22)
+ * --------------------------------------------------------------------
+ */
+class CadScrollbar extends HTMLElement {
+  static get observedAttributes() {
+    return ['orientation', 'theme', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const orientation = this.getAttribute('orientation') || 'vertical';
+    const theme = this.getAttribute('theme') || 'dark'; // 'dark' | 'light'
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    const thumbBg = theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.25)';
+    const thumbHover = theme === 'dark' ? 'rgba(255, 255, 255, 0.35)' : 'rgba(0, 0, 0, 0.4)';
+    const trackBg = theme === 'dark' ? '#1E1E1E' : '#F5F6F7';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          position: relative;
+          overflow: auto;
+          box-sizing: border-box;
+        }
+        :host::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+          background: ${trackBg};
+        }
+        :host::-webkit-scrollbar-thumb {
+          background: ${thumbBg};
+          border-radius: 4px;
+        }
+        :host::-webkit-scrollbar-thumb:hover {
+          background: ${thumbHover};
+        }
+        :host::-webkit-scrollbar-corner {
+          background: ${trackBg};
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <slot></slot>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-scrollbar', CadScrollbar);
+
+    if (typeof window !== 'undefined') window.CadScrollbar = CadScrollbar;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-scrollbar> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-select> (Key: select)
+// ====================================================================
+try {
+  (function() {
 class CadSelect extends HTMLElement {
   static get observedAttributes() {
     return ['value', 'placeholder', 'disabled', 'status', 'size'];
@@ -2339,217 +5588,25 @@ class CadSelect extends HTMLElement {
   }
 }
 customElements.define('cad-select', CadSelect);
-
-/**
- * --------------------------------------------------------------------
- * 6. <cad-switch> 开关切换器 (映射自 Figma ComponentSet 252:31)
- * --------------------------------------------------------------------
- */
-class CadSwitch extends HTMLElement {
-  static get observedAttributes() {
-    return ['checked', 'disabled', 'status'];
-  }
-
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-  }
-
-  connectedCallback() {
-    this.render();
-  }
-
-  attributeChangedCallback(name, oldVal, newVal) {
-    if (oldVal !== newVal) this.render();
-  }
-
-  get checked() {
-    return this.hasAttribute('checked');
-  }
-
-  set checked(val) {
-    if (val) this.setAttribute('checked', '');
-    else this.removeAttribute('checked');
-  }
-
-  render() {
-    const checked = this.hasAttribute('checked');
-    const disabled = this.hasAttribute('disabled');
-    const isDraft = this.getAttribute('status') === 'draft';
-
-    this.shadowRoot.innerHTML = `
-      <style>
-        :host {
-          display: inline-flex;
-          align-items: center;
-          vertical-align: middle;
-          position: relative;
-          cursor: ${disabled ? 'not-allowed' : 'pointer'};
-          user-select: none;
-          gap: 6px;
-        }
-        .track {
-          width: 32px;
-          height: 18px;
-          border-radius: 9px;
-          background: ${checked ? (disabled ? 'var(--cad-color-primary-disabled, #BFD3FE)' : 'var(--cad-color-primary, #266EFF)') : '#DCDFE6'};
-          position: relative;
-          transition: background 0.2s;
-        }
-        .thumb {
-          width: 14px;
-          height: 14px;
-          border-radius: 50%;
-          background: #FFFFFF;
-          position: absolute;
-          top: 2px;
-          left: ${checked ? '16px' : '2px'};
-          transition: left 0.2s;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-        ${COMMON_DRAFT_STYLE}
-      </style>
-      <div class="track">
-        <div class="thumb"></div>
-      </div>
-      <span><slot></slot></span>
-      ${renderDraftBadge(isDraft)}
-    `;
-
-    this.onclick = () => {
-      if (disabled) return;
-      this.checked = !this.checked;
-      this.dispatchEvent(new CustomEvent('change', { detail: { checked: this.checked }, bubbles: true, composed: true }));
-    };
-  }
+    if (typeof window !== 'undefined') window.CadSelect = CadSelect;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-select> 失败，已熔断跳过:', err);
 }
-customElements.define('cad-switch', CadSwitch);
 
+// ====================================================================
+// Component: <cad-slider> (Key: slider)
+// ====================================================================
+try {
+  (function() {
 /**
  * --------------------------------------------------------------------
- * 7. <cad-table-viewport> CAD 视口表格实时智能预览器 (Level 3 PM 自造草稿组件)
+ * <cad-slider> 滑块调节器 (映射自 Figma Slider Page 252:33)
  * --------------------------------------------------------------------
  */
-class CadTableViewport extends HTMLElement {
+class CadSlider extends HTMLElement {
   static get observedAttributes() {
-    return ['cols', 'rows', 'title-text', 'status'];
-  }
-
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-  }
-
-  connectedCallback() {
-    this.render();
-  }
-
-  attributeChangedCallback(name, oldVal, newVal) {
-    if (oldVal !== newVal) this.render();
-  }
-
-  render() {
-    const isDraft = this.getAttribute('status') === 'draft' || !this.hasAttribute('status');
-    const cols = parseInt(this.getAttribute('cols') || '4', 10);
-    const rows = parseInt(this.getAttribute('rows') || '5', 10);
-    const title = this.getAttribute('title-text') || 'CAD 表格图元实时视口';
-
-    let tableHtml = `<tr><td colspan="${cols}" class="cell-title">${title}</td></tr>`;
-    tableHtml += `<tr>`;
-    for (let c = 1; c <= cols; c++) {
-      tableHtml += `<td class="cell-header">表头 ${c}</td>`;
-    }
-    tableHtml += `</tr>`;
-
-    for (let r = 1; r <= Math.min(rows, 10); r++) {
-      tableHtml += `<tr>`;
-      for (let c = 1; c <= cols; c++) {
-        tableHtml += `<td class="cell-data">数据</td>`;
-      }
-      tableHtml += `</tr>`;
-    }
-
-    this.shadowRoot.innerHTML = `
-      <style>
-        :host {
-          display: block;
-          position: relative;
-          width: 100%;
-          border-radius: 4px;
-          overflow: hidden;
-        }
-        .viewport {
-          background-color: #18191c;
-          background-image: 
-            linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
-          background-size: 16px 16px;
-          min-height: 240px;
-          padding: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          box-sizing: border-box;
-        }
-        .cad-grid-table {
-          border-collapse: collapse;
-          color: #E2E8F0;
-          font-family: var(--cad-font-family, sans-serif);
-          font-size: 11px;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-          background: rgba(30, 32, 38, 0.95);
-        }
-        .cad-grid-table td {
-          border: 1px solid #4A5568;
-          padding: 4px 8px;
-          text-align: center;
-          min-width: 48px;
-        }
-        .cell-title {
-          background: #2B6CB0;
-          color: #FFFFFF;
-          font-weight: bold;
-          font-size: 12px;
-          letter-spacing: 0.5px;
-        }
-        .cell-header {
-          background: #2D3748;
-          color: #CBD5E0;
-          font-weight: 500;
-        }
-        .cell-data {
-          color: #A0AEC0;
-        }
-        .viewport-footer {
-          position: absolute;
-          bottom: 6px;
-          right: 10px;
-          font-size: 10px;
-          color: #718096;
-        }
-        ${COMMON_DRAFT_STYLE}
-      </style>
-      <div class="viewport">
-        <table class="cad-grid-table">
-          ${tableHtml}
-        </table>
-        <div class="viewport-footer">视口网格: 16mm | 列: ${cols} | 行: ${rows}</div>
-      </div>
-      ${renderDraftBadge(isDraft, "PM自造草稿组件: CAD视口表格实时智能预览器 (待反哺 Figma 入库)")}
-    `;
-  }
-}
-customElements.define('cad-table-viewport', CadTableViewport);
-
-/**
- * --------------------------------------------------------------------
- * 8. <cad-file-picker-input> 文件路径拾取复合组件 (Level 3 PM 自造草稿组件)
- * --------------------------------------------------------------------
- */
-class CadFilePickerInput extends HTMLElement {
-  static get observedAttributes() {
-    return ['value', 'placeholder', 'button-text', 'status'];
+    return ['value', 'min', 'max', 'step', 'disabled', 'show-input', 'status'];
   }
 
   constructor() {
@@ -2566,96 +5623,278 @@ class CadFilePickerInput extends HTMLElement {
   }
 
   get value() {
-    return this.getAttribute('value') || '';
+    return parseFloat(this.getAttribute('value') || '0');
   }
 
-  set value(val) {
-    this.setAttribute('value', val);
+  set value(v) {
+    this.setAttribute('value', v);
   }
 
   render() {
-    const isDraft = this.getAttribute('status') === 'draft' || !this.hasAttribute('status');
-    const val = this.getAttribute('value') || '';
-    const btnText = this.getAttribute('button-text') || '浏览...';
+    const min = parseFloat(this.getAttribute('min') || '0');
+    const max = parseFloat(this.getAttribute('max') || '100');
+    const step = parseFloat(this.getAttribute('step') || '1');
+    const val = parseFloat(this.getAttribute('value') || min);
+    const disabled = this.hasAttribute('disabled');
+    const showInput = this.hasAttribute('show-input');
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    const percent = Math.min(100, Math.max(0, ((val - min) / (max - min)) * 100));
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          position: relative;
+          width: 100%;
+          min-width: 120px;
+          height: var(--cad-height-small, 24px);
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+        }
+        .track-wrap {
+          flex: 1;
+          position: relative;
+          height: 4px;
+          background: var(--cad-color-border-default, #E5E6EB);
+          border-radius: 2px;
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+        }
+        .fill-bar {
+          position: absolute;
+          left: 0;
+          top: 0;
+          height: 100%;
+          width: ${percent}%;
+          background: ${disabled ? '#C9CDD4' : 'var(--cad-color-primary, #266EFF)'};
+          border-radius: 2px;
+        }
+        input[type="range"] {
+          position: absolute;
+          top: -6px;
+          left: 0;
+          width: 100%;
+          height: 16px;
+          opacity: 0;
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          margin: 0;
+          z-index: 2;
+        }
+        .thumb {
+          position: absolute;
+          top: 50%;
+          left: ${percent}%;
+          transform: translate(-50%, -50%);
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: #FFFFFF;
+          border: 2px solid ${disabled ? '#C9CDD4' : 'var(--cad-color-primary, #266EFF)'};
+          box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+          pointer-events: none;
+          z-index: 1;
+          transition: transform 0.1s;
+        }
+        .val-display {
+          font-size: 11px;
+          color: var(--cad-color-text-main, #1F2329);
+          min-width: 28px;
+          text-align: right;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="track-wrap">
+        <div class="fill-bar"></div>
+        <div class="thumb"></div>
+        <input type="range" min="${min}" max="${max}" step="${step}" value="${val}" ${disabled ? 'disabled' : ''}>
+      </div>
+      ${showInput ? `<span class="val-display">${val}</span>` : ''}
+      ${renderDraftBadge(isDraft)}
+    `;
+
+    const inp = this.shadowRoot.querySelector('input');
+    inp.addEventListener('input', (e) => {
+      this.setAttribute('value', e.target.value);
+      this.dispatchEvent(new CustomEvent('change', { detail: { value: parseFloat(e.target.value) } }));
+    });
+  }
+}
+customElements.define('cad-slider', CadSlider);
+
+    if (typeof window !== 'undefined') window.CadSlider = CadSlider;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-slider> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-stair-tool> (Key: stair_tool)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-stair-tool> 双跑楼梯计算卡 (映射自 Figma StairTool Page 843:3972)
+ * --------------------------------------------------------------------
+ */
+class CadStairTool extends HTMLElement {
+  static get observedAttributes() {
+    return ['status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const isDraft = this.getAttribute('status') === 'draft';
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          padding: 8px;
+          background: #FFFFFF;
+          border: 1px solid #D0D3D6;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-size: 12px;
+        }
+        .row { display: flex; align-items: center; justify-content: space-between; }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <b>🪜 双跑楼梯参数</b>
+      <div class="row"><span>梯段宽度:</span><cad-input size="small" value="1200" suffix-label="mm" style="width:80px;"></cad-input></div>
+      <div class="row"><span>踏步高度:</span><cad-input size="small" value="150" suffix-label="mm" style="width:80px;"></cad-input></div>
+      <div class="row"><span>踏步宽度:</span><cad-input size="small" value="300" suffix-label="mm" style="width:80px;"></cad-input></div>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-stair-tool', CadStairTool);
+
+    if (typeof window !== 'undefined') window.CadStairTool = CadStairTool;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-stair-tool> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-status-bar> (Key: status_bar)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-status-bar> CAD 底部状态栏 (映射自 Figma StatusBar Page 2342:27138)
+ * --------------------------------------------------------------------
+ */
+class CadStatusBar extends HTMLElement {
+  static get observedAttributes() {
+    return ['coords', 'scale', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const coords = this.getAttribute('coords') || 'X: 1204.50  Y: 850.25  Z: 0.00';
+    const scale = this.getAttribute('scale') || '1:100';
+    const isDraft = this.getAttribute('status') === 'draft';
 
     this.shadowRoot.innerHTML = `
       <style>
         :host {
           display: flex;
           align-items: center;
-          gap: 6px;
-          width: 100%;
-          position: relative;
-        }
-        .input-box {
-          flex: 1;
-          height: var(--cad-height-small, 24px);
-          background: var(--cad-color-bg-white, #FFFFFF);
-          border: 1px solid var(--cad-color-border-default, #E3E5E7);
-          border-radius: var(--cad-radius-base, 4px);
+          justify-content: space-between;
+          height: 24px;
+          background: #252628;
+          color: #B2B6BD;
           padding: 0 8px;
-          font-size: var(--cad-font-size-base, 12px);
-          font-family: var(--cad-font-family, sans-serif);
-          color: var(--cad-color-text-main, #1F2329);
-          outline: none;
           box-sizing: border-box;
+          font-family: var(--cad-font-family, "Consolas", monospace);
+          font-size: 11px;
+          border-top: 1px solid #363B42;
+          user-select: none;
         }
-        button {
-          height: var(--cad-height-small, 24px);
-          padding: 2px 10px;
-          background: var(--cad-color-bg-white, #FFFFFF);
-          border: 1px solid var(--cad-color-border-default, #E3E5E7);
-          border-radius: var(--cad-radius-base, 4px);
-          font-size: var(--cad-font-size-base, 12px);
-          color: var(--cad-color-text-main, #1F2329);
+        .left-group {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .right-group {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .status-btn {
+          padding: 2px 6px;
+          border-radius: 2px;
           cursor: pointer;
-          white-space: nowrap;
-          transition: background 0.15s;
+          font-size: 11px;
+          color: #B2B6BD;
         }
-        button:hover {
-          background: var(--cad-color-bg-hover, #F2F4F6);
+        .status-btn.active {
+          background: #266EFF;
+          color: #FFFFFF;
+        }
+        .status-btn:hover:not(.active) {
+          background: rgba(255,255,255,0.1);
         }
         ${COMMON_DRAFT_STYLE}
       </style>
-      <input type="text" class="input-box" value="${val}" readonly />
-      <button type="button">${btnText}</button>
-      ${renderDraftBadge(isDraft, "PM自造草稿组件: CAD文件路径拾取复合组件 (待反哺 Figma 入库)")}
+      <div class="left-group">
+        <span>${coords}</span>
+        <span style="color:#646A73;">|</span>
+        <span style="cursor:pointer;" title="比例尺">${scale}</span>
+      </div>
+      <div class="right-group">
+        <span class="status-btn active" title="模型空间">模型</span>
+        <span class="status-btn active" title="正交模式 (F8)">正交</span>
+        <span class="status-btn" title="极轴追踪 (F10)">极轴</span>
+        <span class="status-btn active" title="对象捕捉 (F3)">捕捉</span>
+        <span class="status-btn active" title="动态输入 (F12)">动入</span>
+      </div>
+      ${renderDraftBadge(isDraft)}
     `;
-
-    const btn = this.shadowRoot.querySelector('button');
-    btn.onclick = () => {
-      this.dispatchEvent(new CustomEvent('pick-click', { bubbles: true, composed: true }));
-    };
   }
 }
-customElements.define('cad-file-picker-input', CadFilePickerInput);
+customElements.define('cad-status-bar', CadStatusBar);
 
-/**
- * --------------------------------------------------------------------
- * 9. <cad-alert> 弹窗提示 SweetAlert (映射自 Figma Page 252:44 / ComponentSet 615:64052)
- *    1:1 像素级复刻 Figma 原始矢量 SVG 图标、阴影、字重与间距
- * --------------------------------------------------------------------
- */
-const CAD_ALERT_SVGS = {
-  info: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.93652 1.31348C14.769 1.31348 18.6865 5.23098 18.6865 10.0635C18.6865 14.896 14.769 18.8135 9.93652 18.8135C5.10403 18.8135 1.18652 14.896 1.18652 10.0635C1.18652 5.23098 5.10403 1.31348 9.93652 1.31348ZM9.93652 8.36209C10.3392 8.36209 10.6657 8.68855 10.6657 9.09125V14.1954C10.6657 14.5981 10.3392 14.9246 9.93652 14.9246C9.53382 14.9246 9.20736 14.5981 9.20736 14.1954V9.09125C9.20736 8.68855 9.53382 8.36209 9.93652 8.36209ZM9.93652 5.20237C10.4735 5.20237 10.9087 5.63764 10.9087 6.17459C10.9087 6.71153 10.4735 7.14681 9.93652 7.14681C9.39958 7.14681 8.9643 6.71153 8.9643 6.17459C8.9643 5.63764 9.39958 5.20237 9.93652 5.20237Z" fill-rule="evenodd" clip-rule="evenodd" fill="#266EFF"/></svg>`,
-  success: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.93774 1.31226C14.7702 1.31226 18.6877 5.22976 18.6877 10.0623C18.6877 14.8947 14.7702 18.8123 9.93774 18.8123C5.10525 18.8123 1.18774 14.8947 1.18774 10.0623C1.18774 5.22976 5.10525 1.31226 9.93774 1.31226ZM13.9543 7.35913C13.6696 7.07447 13.2078 7.07441 12.9231 7.35913L8.45337 11.8269L6.5647 9.93726L6.46313 9.85229C6.17902 9.65571 5.78647 9.68435 5.53345 9.93726C5.24869 10.222 5.24869 10.6837 5.53345 10.9685L7.9397 13.3748L8.04028 13.4587C8.32433 13.6555 8.71684 13.6275 8.96997 13.3748L13.9543 8.39038L14.0393 8.28979C14.2362 8.00561 14.2075 7.61225 13.9543 7.35913Z" fill="#00B42A"/></svg>`,
-  warning: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.93652 1.31348C14.769 1.31348 18.6865 5.23098 18.6865 10.0635C18.6865 14.896 14.769 18.8135 9.93652 18.8135C5.10403 18.8135 1.18652 14.896 1.18652 10.0635C1.18652 5.23098 5.10403 1.31348 9.93652 1.31348ZM9.93652 12.9801C10.4735 12.9801 10.9087 13.4154 10.9087 13.9524C10.9087 14.4893 10.4735 14.9246 9.93652 14.9246C9.39958 14.9246 8.9643 14.4893 8.9643 13.9524C8.9643 13.4154 9.39958 12.9801 9.93652 12.9801ZM9.93652 5.20237C10.3392 5.20237 10.6657 5.52882 10.6657 5.93153V11.0357C10.6657 11.4384 10.3392 11.7649 9.93652 11.7649C9.53382 11.7649 9.20736 11.4384 9.20736 11.0357V5.93153C9.20736 5.52882 9.53382 5.20237 9.93652 5.20237Z" fill-rule="evenodd" clip-rule="evenodd" fill="#F98A00"/></svg>`,
-  danger: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 1.25C14.8325 1.25 18.75 5.16751 18.75 10C18.75 14.8325 14.8325 18.75 10 18.75C5.16751 18.75 1.25 14.8325 1.25 10C1.25 5.16751 5.16751 1.25 10 1.25ZM6.56767 6.56775C6.28291 6.85251 6.28291 7.31419 6.56767 7.59895L8.97376 10.0049L6.53487 12.4462C6.28338 12.7326 6.29431 13.169 6.56767 13.4424C6.85244 13.7271 7.31411 13.7271 7.59888 13.4424L10.0048 11.0362L12.4461 13.4753C12.7325 13.7268 13.169 13.7157 13.4424 13.4424C13.7271 13.1576 13.7271 12.696 13.4424 12.4112L11.0361 10.0049L13.4751 7.56395C13.7266 7.27754 13.7157 6.84111 13.4424 6.56775C13.1576 6.28299 12.6959 6.28299 12.4111 6.56775L10.0048 8.97384L7.56387 6.53495L7.52731 6.50487C7.24137 6.28481 6.82965 6.30578 6.56767 6.56775Z" fill-rule="evenodd" clip-rule="evenodd" fill="#EF4A4A"/></svg>`,
-  close: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 3.49999L12.5 12.5" stroke-linecap="round" stroke="#606266"/><path d="M3.49999 12.5L12.5 3.5" stroke-linecap="round" stroke="#606266"/></svg>`
-};
+    if (typeof window !== 'undefined') window.CadStatusBar = CadStatusBar;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-status-bar> 失败，已熔断跳过:', err);
+}
 
-const CAD_ALERT_DEFAULT_TITLES = {
-  info: '普通消息',
-  success: '成功通知',
-  warning: '警告通知',
-  danger: '危险通知'
-};
-
-const CAD_ALERT_MULTILINE_DEFAULT = `场地特殊地貌处理（A030205）采暖（A0404）、样板房（A050502）、销售区域临时绿化（A050504）、检测费（A0506）、室内水电工程（A0601）、消防工程（A0602）、电梯工程（A0604）、采暖（A0404）、样板房（A050502）、销售区域临时绿化（A050504）、检测费（A0506）、室内水电工程（A0601）、消防工程（A0602）、电梯工程（A0604）、采暖（A0404）、样板房（A050502）、销售区域临时绿化（A050504）、检测费（A0506）、室内水电工程（A0601）、消防工程（A0602）、电梯工程（A0604）、人防设备工程（A0606）科目的产品
-人防设备工程（A0606）科目的产品（A0604）、人防设备工程（A0606）科目的产品、人防设备工程（A0606）科目的产品
-人防设备工程（A0606）科目的产品（A0604）、人防设备工程（A0606）科目的产品、人防设备工程（A0606）科目的产品
-人防设备工程（A0606）科目的产品（A0604）、人防设备工程（A0606）科目的产品`;
-
+// ====================================================================
+// Component: <cad-alert> (Key: sweetalert)
+// ====================================================================
+try {
+  (function() {
 class CadAlert extends HTMLElement {
   static get observedAttributes() {
     return ['type', 'title', 'description', 'multiline', 'confirm-text', 'cancel-text', 'status'];
@@ -2871,417 +6110,114 @@ class CadAlert extends HTMLElement {
   }
 }
 customElements.define('cad-alert', CadAlert);
+    if (typeof window !== 'undefined') window.CadAlert = CadAlert;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-alert> 失败，已熔断跳过:', err);
+}
 
-/**
- * --------------------------------------------------------------------
- * 10. <cad-icon> 全局矢量图标组件 (映射自 Figma Page 252:3 图标 icon)
- * --------------------------------------------------------------------
- */
-const CAD_ICON_PATHS = {
-  edit: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9.8 3.2L12.8 6.2M2.5 13.5H5.5L13 6C13.4 5.6 13.4 5 13 4.6L11.4 3C11 2.6 10.4 2.6 10 3L2.5 10.5V13.5Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  link: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6.5 9.5L9.5 6.5M5.5 7.5L3.8 9.2C2.7 10.3 2.7 12 3.8 13.1C4.9 14.2 6.6 14.2 7.7 13.1L9.4 11.4M7.5 5.5L9.2 3.8C10.3 2.7 12 2.7 13.1 3.8C14.2 4.9 14.2 6.6 13.1 7.7L11.4 9.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
-  help: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.1"/><path d="M6.5 6.3C6.5 5.4 7.2 4.8 8.1 4.8C8.9 4.8 9.6 5.4 9.6 6.2C9.6 6.9 9.1 7.3 8.5 7.7C8.1 8 8 8.3 8 8.9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="11.2" r="0.75" fill="currentColor"/></svg>`,
-  close: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 3.5L12.5 12.5M3.5 12.5L12.5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
-  columns: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2.5" width="12" height="11" rx="1" stroke="currentColor" stroke-width="1.2"/><line x1="6" y1="2.5" x2="6" y2="13.5" stroke="currentColor" stroke-width="1.2"/><line x1="10" y1="2.5" x2="10" y2="13.5" stroke="currentColor" stroke-width="1.2"/></svg>`,
-  rows: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2.5" width="12" height="11" rx="1" stroke="currentColor" stroke-width="1.2"/><line x1="2" y1="6.2" x2="14" y2="6.2" stroke="currentColor" stroke-width="1.2"/><line x1="2" y1="9.8" x2="14" y2="9.8" stroke="currentColor" stroke-width="1.2"/></svg>`,
-  file_blank: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2H9.5L12.5 5V13.5C12.5 13.8 12.3 14 12 14H4C3.7 14 3.5 13.8 3.5 13.5V2.5C3.5 2.2 3.7 2 4 2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9.5 2V5H12.5" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><line x1="5.5" y1="8" x2="10.5" y2="8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><line x1="5.5" y1="10.5" x2="10.5" y2="10.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>`,
-  folder_import: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4C2 3.45 2.45 3 3 3H6.2L7.7 4.5H13C13.55 4.5 14 4.95 14 5.5V12.5C14 13.05 13.55 13.5 13 13.5H3C2.45 13.5 2 13.05 2 12.5V4Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M8 7V11M8 11L6.3 9.3M8 11L9.7 9.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  data_extract: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="5" y1="10.5" x2="5" y2="7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="10.5" x2="8" y2="5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="11" y1="10.5" x2="11" y2="8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
-  zoom_fit: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 5.5V3C2.5 2.7 2.7 2.5 3 2.5H5.5M10.5 2.5H13C13.3 2.5 13.5 2.7 13.5 3V5.5M13.5 10.5V13C13.5 13.3 13.3 13.5 13 13.5H10.5M5.5 13.5H3C2.7 13.5 2.5 13.3 2.5 13V10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="5.5" y="5.5" width="5" height="5" rx="0.5" stroke="currentColor" stroke-width="1.1"/></svg>`,
-  zoom_1to1: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7.2" cy="7.2" r="4.7" stroke="currentColor" stroke-width="1.2"/><path d="M10.8 10.8L13.5 13.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M5.7 5.5V8.9M8.7 5.5V8.9M7.2 6.5V6.6M7.2 8.0V8.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
-  pick: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="4.5" stroke="currentColor" stroke-width="1.2"/><line x1="8" y1="1.5" x2="8" y2="4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="8" y1="11.5" x2="8" y2="14.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="1.5" y1="8" x2="4.5" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="11.5" y1="8" x2="14.5" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
-  folder: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4.2C2 3.65 2.45 3.2 3 3.2H6.2L7.7 4.7H13C13.55 4.7 14 5.15 14 5.7V12.2C14 12.75 13.55 13.2 13 13.2H3C2.45 13.2 2 12.75 2 12.2V4.2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>`
-};
-
-class CadIcon extends HTMLElement {
+// ====================================================================
+// Component: <cad-switch> (Key: switch)
+// ====================================================================
+try {
+  (function() {
+class CadSwitch extends HTMLElement {
   static get observedAttributes() {
-    return ['name', 'size', 'color'];
+    return ['checked', 'disabled', 'status'];
   }
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
   }
-  connectedCallback() { this.render(); }
-  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback(name, oldVal, newVal) {
+    if (oldVal !== newVal) this.render();
+  }
+
+  get checked() {
+    return this.hasAttribute('checked');
+  }
+
+  set checked(val) {
+    if (val) this.setAttribute('checked', '');
+    else this.removeAttribute('checked');
+  }
+
   render() {
-    const name = this.getAttribute('name') || 'edit';
-    const size = this.getAttribute('size') || '16px';
-    const color = this.getAttribute('color') || 'inherit';
-    const svg = CAD_ICON_PATHS[name] || CAD_ICON_PATHS.edit;
+    const checked = this.hasAttribute('checked');
+    const disabled = this.hasAttribute('disabled');
+    const isDraft = this.getAttribute('status') === 'draft';
+
     this.shadowRoot.innerHTML = `
       <style>
         :host {
           display: inline-flex;
           align-items: center;
-          justify-content: center;
-          width: ${size};
-          height: ${size};
-          color: ${color};
           vertical-align: middle;
-          flex-shrink: 0;
-        }
-        svg { width: 100%; height: 100%; display: block; }
-      </style>
-      ${svg}
-    `;
-  }
-}
-customElements.define('cad-icon', CadIcon);
-
-/**
- * --------------------------------------------------------------------
- * 11. <cad-divider> 分割线组件 (映射自 Figma Page 252:21 / Node 260:137)
- * --------------------------------------------------------------------
- */
-class CadDivider extends HTMLElement {
-  static get observedAttributes() {
-    return ['direction', 'dashed', 'type'];
-  }
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-  }
-  connectedCallback() { this.render(); }
-  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
-  render() {
-    const dir = this.getAttribute('direction') || 'horizontal';
-    const dashed = this.hasAttribute('dashed') && this.getAttribute('dashed') !== 'false';
-    const type = this.getAttribute('type') || 'divider'; // 'divider' (#EBECEE) | 'border' (#E4E5E7)
-    const color = type === 'border' ? '#E4E5E7' : '#EBECEE';
-    const style = dashed ? 'dashed' : 'solid';
-    this.shadowRoot.innerHTML = `
-      <style>
-        :host {
-          display: ${dir === 'vertical' ? 'inline-block' : 'block'};
-          width: ${dir === 'vertical' ? '1px' : '100%'};
-          height: ${dir === 'vertical' ? '100%' : '1px'};
-          margin: ${dir === 'vertical' ? '0 8px' : '6px 0'};
-          border-top: ${dir === 'horizontal' ? `1px ${style} ${color}` : 'none'};
-          border-left: ${dir === 'vertical' ? `1px ${style} ${color}` : 'none'};
-          box-sizing: border-box;
-        }
-      </style>
-    `;
-  }
-}
-customElements.define('cad-divider', CadDivider);
-
-/**
- * --------------------------------------------------------------------
- * 12. <cad-form-group> 表单无框分组组件 (映射自 Figma Page 252:35 Node 541:18087 & Page 843:3979 Node 2748:38502)
- *     默认态 (对话框内常规分组): 背景=false (透明无灰底), collapsible=false (无折叠箭头, 仅左侧 3×12px #266EFF 蓝条 + 12px 粗体标题)
- *     折叠面板态 (属性面板长列表): 可传 bg="true" collapsible="true" 开启灰底与右侧折叠箭头
- * --------------------------------------------------------------------
- */
-class CadFormGroup extends HTMLElement {
-  static get observedAttributes() {
-    return ['title', 'bg', 'collapsible', 'collapsed', 'size'];
-  }
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-  }
-  connectedCallback() { this.render(); }
-  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
-  render() {
-    const title = this.getAttribute('title') || '分组标题';
-    const hasBg = this.getAttribute('bg') === 'true';
-    const collapsible = this.getAttribute('collapsible') === 'true';
-    const collapsed = collapsible && this.hasAttribute('collapsed') && this.getAttribute('collapsed') !== 'false';
-    const size = this.getAttribute('size') || 'medium'; // 'medium' (24px) | 'large' (36px)
-    const headerHeight = size === 'large' ? '36px' : '24px';
-
-    this.shadowRoot.innerHTML = `
-      <style>
-        :host {
-          display: block;
-          width: 100%;
-          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
-          box-sizing: border-box;
-        }
-        .group-header {
-          height: ${headerHeight};
-          background: ${hasBg ? '#F6F7F9' : 'transparent'};
-          border-radius: 4px;
-          padding: ${hasBg ? '2px 8px 2px 6px' : '2px 4px 2px 0'};
-          display: flex;
-          align-items: center;
+          position: relative;
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          user-select: none;
           gap: 6px;
-          cursor: ${collapsible ? 'pointer' : 'default'};
-          user-select: none;
-          box-sizing: border-box;
         }
-        .blue-bar {
-          width: 3px;
-          height: 12px;
-          background: #266EFF;
-          border-radius: 3px;
-          flex-shrink: 0;
+        .track {
+          width: 32px;
+          height: 18px;
+          border-radius: 9px;
+          background: ${checked ? (disabled ? 'var(--cad-color-primary-disabled, #BFD3FE)' : 'var(--cad-color-primary, #266EFF)') : '#DCDFE6'};
+          position: relative;
+          transition: background 0.2s;
         }
-        .title-wrap {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 12px;
-          line-height: 16px;
-          font-weight: 700;
-          color: #202327;
+        .thumb {
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: #FFFFFF;
+          position: absolute;
+          top: 2px;
+          left: ${checked ? '16px' : '2px'};
+          transition: left 0.2s;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
-        .chevron {
-          width: 16px;
-          height: 16px;
-          display: ${collapsible ? 'flex' : 'none'};
-          align-items: center;
-          justify-content: center;
-          transition: transform 0.15s;
-          transform: rotate(${collapsed ? '-90deg' : '0deg'});
-        }
-        .group-body {
-          display: ${collapsed ? 'none' : 'flex'};
-          flex-direction: column;
-          gap: 8px;
-          padding: 6px 4px 4px 9px;
-          box-sizing: border-box;
-        }
+        ${COMMON_DRAFT_STYLE}
       </style>
-      <div class="group-header">
-        <span class="blue-bar"></span>
-        <div class="title-wrap">
-          <span>${title}</span>
-          <slot name="header-extra"></slot>
-        </div>
-        <span class="chevron">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M5 6.5L8 9.5L11 6.5" stroke="#606266" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
+      <div class="track">
+        <div class="thumb"></div>
       </div>
-      <div class="group-body">
-        <slot></slot>
-      </div>
+      <span><slot></slot></span>
+      ${renderDraftBadge(isDraft)}
     `;
 
-    if (collapsible) {
-      this.shadowRoot.querySelector('.group-header').onclick = (e) => {
-        // 若点击的是 slot 内的复选框等控件，不触发折叠
-        if (e.target !== this.shadowRoot.querySelector('.group-header') && e.target.slot === 'header-extra') return;
-        if (collapsed) this.removeAttribute('collapsed');
-        else this.setAttribute('collapsed', '');
-      };
-    }
+    this.onclick = () => {
+      if (disabled) return;
+      this.checked = !this.checked;
+      this.dispatchEvent(new CustomEvent('change', { detail: { checked: this.checked }, bubbles: true, composed: true }));
+    };
   }
 }
-customElements.define('cad-form-group', CadFormGroup);
-
-/**
- * --------------------------------------------------------------------
- * 13. <cad-dialog> 模态对话框容器组件 (映射自 Figma Page 252:45 对话框 Modal Node 327:2318 / 611:61456)
- *     100% 遵循 Vela/Nova 规范：无左上角软件Logo，顶栏 36px (左 14px 粗体标题 + 12px 灰副标题，右 帮助? + 关闭×)，
- *     底栏 44px (右对齐 确定 #266EFF + 取消 #FFFFFF + 可选 帮助 #FFFFFF)
- * --------------------------------------------------------------------
- */
-class CadDialog extends HTMLElement {
-  static get observedAttributes() {
-    return ['title', 'subtitle', 'width', 'confirm-text', 'cancel-text', 'help-text', 'show-help', 'show-footer-help'];
-  }
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-  }
-  connectedCallback() { this.render(); }
-  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
-  render() {
-    const title = this.getAttribute('title') || '标题';
-    const subtitle = this.getAttribute('subtitle') || '';
-    const width = this.getAttribute('width') || '720px';
-    const confirmText = this.getAttribute('confirm-text') || '确定';
-    const cancelText = this.getAttribute('cancel-text') || '取消';
-    const helpText = this.getAttribute('help-text') || '帮助';
-    const showHelp = this.getAttribute('show-help') !== 'false';
-    const showFooterHelp = this.getAttribute('show-footer-help') === 'true';
-
-    this.shadowRoot.innerHTML = `
-      <style>
-        :host {
-          display: block;
-          width: ${width};
-          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
-          box-sizing: border-box;
-        }
-        .modal-shell {
-          width: 100%;
-          background: #FFFFFF;
-          border: 1px solid #E4E5E7;
-          border-radius: 8px;
-          box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.10);
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
-          box-sizing: border-box;
-        }
-        .modal-header {
-          height: 36px;
-          padding: 10px 8px 10px 12px;
-          border-bottom: 1px solid #EBECEE;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          box-sizing: border-box;
-          background: #FFFFFF;
-        }
-        .header-left {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          min-width: 0;
-        }
-        .header-title {
-          font-size: 14px;
-          line-height: 20px;
-          font-weight: 700;
-          color: #202327;
-          white-space: nowrap;
-        }
-        .header-subtitle {
-          font-size: 12px;
-          line-height: 16px;
-          font-weight: 400;
-          color: #8A8D91;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .header-actions {
-          display: flex;
-          align-items: center;
-          gap: 2px;
-        }
-        .icon-btn {
-          width: 24px;
-          height: 24px;
-          border-radius: 4px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #606266;
-          cursor: pointer;
-          transition: background 0.15s;
-        }
-        .icon-btn:hover {
-          background: #F2F4F6;
-          color: #202327;
-        }
-        .modal-body {
-          padding: 12px;
-          background: #FFFFFF;
-          box-sizing: border-box;
-          flex: 1;
-        }
-        .modal-footer {
-          height: 44px;
-          padding: 10px 12px 10px 12px;
-          border-top: 1px solid #EBECEE;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          background: #FFFFFF;
-          box-sizing: border-box;
-        }
-        .footer-left {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .footer-right {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-left: auto;
-        }
-        .btn {
-          all: unset;
-          box-sizing: border-box;
-          min-width: 56px;
-          height: 24px;
-          padding: 2px 10px;
-          border-radius: 4px;
-          font-size: 12px;
-          line-height: 16px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          user-select: none;
-          transition: background 0.15s;
-        }
-        .btn-primary {
-          background: #266EFF;
-          color: #FFFFFF;
-        }
-        .btn-primary:hover {
-          background: #4785FF;
-        }
-        .btn-secondary {
-          background: #FFFFFF;
-          color: #202327;
-          border: 1px solid #E4E5E7;
-        }
-        .btn-secondary:hover {
-          background: #F2F4F6;
-        }
-      </style>
-      <div class="modal-shell">
-        <div class="modal-header">
-          <div class="header-left">
-            <span class="header-title">${title}</span>
-            ${subtitle ? `<span class="header-subtitle">${subtitle}</span>` : ''}
-          </div>
-          <div class="header-actions">
-            ${showHelp ? `<div class="icon-btn btn-help" title="帮助">${CAD_ICON_PATHS.help}</div>` : ''}
-            <div class="icon-btn btn-close" title="关闭">${CAD_ICON_PATHS.close}</div>
-          </div>
-        </div>
-        <div class="modal-body">
-          <slot></slot>
-        </div>
-        <div class="modal-footer">
-          <div class="footer-left">
-            <slot name="footer-left"></slot>
-          </div>
-          <div class="footer-right">
-            <button type="button" class="btn btn-primary">${confirmText}</button>
-            <button type="button" class="btn btn-secondary btn-cancel">${cancelText}</button>
-            ${showFooterHelp ? `<button type="button" class="btn btn-secondary btn-footer-help">${helpText}</button>` : ''}
-          </div>
-        </div>
-      </div>
-    `;
-
-    const helpBtn = this.shadowRoot.querySelector('.btn-help');
-    if (helpBtn) helpBtn.onclick = () => this.dispatchEvent(new CustomEvent('help', { bubbles: true, composed: true }));
-    const footerHelpBtn = this.shadowRoot.querySelector('.btn-footer-help');
-    if (footerHelpBtn) footerHelpBtn.onclick = () => this.dispatchEvent(new CustomEvent('help', { bubbles: true, composed: true }));
-    this.shadowRoot.querySelector('.btn-close').onclick = () => this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
-    this.shadowRoot.querySelector('.btn-primary').onclick = () => this.dispatchEvent(new CustomEvent('confirm', { bubbles: true, composed: true }));
-    this.shadowRoot.querySelector('.btn-cancel').onclick = () => this.dispatchEvent(new CustomEvent('cancel', { bubbles: true, composed: true }));
-  }
+customElements.define('cad-switch', CadSwitch);
+    if (typeof window !== 'undefined') window.CadSwitch = CadSwitch;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-switch> 失败，已熔断跳过:', err);
 }
-customElements.define('cad-dialog', CadDialog);
 
-/**
- * --------------------------------------------------------------------
- * 14. <cad-table> 标准表格组件 (映射自 Figma Page 252:41 表格 Table Node 606:9099 / 606:8652 / 611:46865)
- *     100% 遵循 Vela/Nova 规范：表头 #F6F7F9 / 24px 行高，边框 #EBECEE，数据行 #FFFFFF (悬停 #F2F3F5 / 选中 #EBF3FF)
- *     支持单元层级结构 (Title 主标题行 / Header 列表头行 / Data 数据行 / Summary 汇总底行)、滚轮缩放与 3 大数据源模式
- * --------------------------------------------------------------------
- */
+// ====================================================================
+// Component: <cad-table> (Key: table)
+// ====================================================================
+try {
+  (function() {
 class CadTable extends HTMLElement {
   static get observedAttributes() {
     return [
       'cols', 'rows', 'col-width', 'row-height',
       'show-title', 'show-header', 'show-summary',
-      'title-text', 'mode', 'zoom', 'row1-style', 'row2-style', 'row-other-style', 'empty'
+      'title-text', 'headers', 'data', 'zoom',
+      'row1-style', 'row2-style', 'row-other-style', 'empty'
     ];
   }
   constructor() {
@@ -3301,7 +6237,6 @@ class CadTable extends HTMLElement {
     const colWidthVal = parseFloat(this.getAttribute('col-width') || '50.0');
     const rowHeightVal = parseFloat(this.getAttribute('row-height') || '8.0');
     const zoom = Math.max(50, Math.min(180, parseInt(this.getAttribute('zoom') || '100', 10)));
-    const mode = this.getAttribute('mode') || 'blank'; // 'blank' | 'import' | 'extract'
 
     // 兼容旧版属性与新版结构化布尔属性
     const hasLegacy = this.hasAttribute('row1-style') || this.hasAttribute('row2-style');
@@ -3312,28 +6247,16 @@ class CadTable extends HTMLElement {
       ? (this.getAttribute('row2-style') === '表头')
       : (this.getAttribute('show-header') !== 'false');
     const showSummary = this.getAttribute('show-summary') === 'true';
-    const titleText = this.getAttribute('title-text') || (
-      mode === 'import' ? '工程材料 BOM 清单 (Excel 导入)' :
-      mode === 'extract' ? '图面图块属性统计表 (数据提取)' : '主 标 题'
-    );
+    const titleText = this.getAttribute('title-text') || '标题';
 
-    // 针对三种模式生成示例表头与单元格内容
-    const importHeaders = ['序号', '构件编码', '材料名称', '规格型号', '单位', '数量', '备注', '单价'];
-    const importRows = [
-      ['01', 'C-101', 'HRB400螺纹钢', 'Φ22mm', 't', '14.5', '主梁配筋', '4120'],
-      ['02', 'C-102', '商品混凝土', 'C35抗渗P6', 'm³', '128.0', '地下室底板', '460'],
-      ['03', 'M-201', '断桥铝合金窗', '1800×1500', '樘', '36', 'Low-E中空', '1380'],
-      ['04', 'M-202', '防火钢质门', 'FM甲1221', '樘', '12', '疏散楼梯间', '1650'],
-      ['05', 'P-301', '热镀锌钢管', 'DN100', 'm', '240.0', '消防立管', '85']
-    ];
-    const extractHeaders = ['图块名称', '图层 (Layer)', '构件类别', '标高', '统计数量', '长度(mm)', '面积(m²)', '状态'];
-    const extractRows = [
-      ['ZW_DOOR_SINGLE', 'A-DOOR', '单扇平开门', '±0.000', '24', '900', '1.89', '已校验'],
-      ['ZW_WIN_STD', 'A-GLAZ', '标准推拉窗', '+3.200', '48', '1500', '2.25', '已校验'],
-      ['ZW_COL_RECT', 'S-COLS', '矩形钢筋砼柱', '±0.000', '32', '600', '0.36', '已校验'],
-      ['ZW_BEAM_MAIN', 'S-BEAM', '框架主梁 KL1', '+3.200', '64', '7200', '1.80', '已校验'],
-      ['ZW_EQUIP_PUMP', 'M-PUMP', '离心水泵机组', '-4.500', '4', '1200', '1.44', '已校验']
-    ];
+    let customHeaders = null;
+    let customData = null;
+    try {
+      if (this.hasAttribute('headers')) customHeaders = JSON.parse(this.getAttribute('headers'));
+    } catch (e) {}
+    try {
+      if (this.hasAttribute('data')) customData = JSON.parse(this.getAttribute('data'));
+    } catch (e) {}
 
     let rowsHtml = '';
     if (!isEmpty) {
@@ -3360,8 +6283,9 @@ class CadTable extends HTMLElement {
       if (showHeader) {
         let hCells = `<td class="idx-cell">${rowIdx++}</td>`;
         for (let c = 0; c < cols; c++) {
-          const hText = mode === 'import' ? (importHeaders[c] || `列 ${c+1}`) :
-                        mode === 'extract' ? (extractHeaders[c] || `属性 ${c+1}`) : `表头 ${c+1}`;
+          const hText = (Array.isArray(customHeaders) && customHeaders[c] !== undefined)
+            ? customHeaders[c]
+            : '表头';
           hCells += `<td>${hText}</td>`;
         }
         rowsHtml += `<tr class="row-header">${hCells}</tr>`;
@@ -3372,8 +6296,9 @@ class CadTable extends HTMLElement {
         const cls = r === 0 ? 'row-data selected' : 'row-data';
         let dCells = `<td class="idx-cell">${rowIdx++}</td>`;
         for (let c = 0; c < cols; c++) {
-          const dText = mode === 'import' ? (importRows[r % importRows.length][c] || '—') :
-                        mode === 'extract' ? (extractRows[r % extractRows.length][c] || '—') : '数据';
+          const dText = (Array.isArray(customData) && Array.isArray(customData[r]) && customData[r][c] !== undefined)
+            ? customData[r][c]
+            : '数据';
           dCells += `<td>${dText}</td>`;
         }
         rowsHtml += `<tr class="${cls}">${dCells}</tr>`;
@@ -3384,10 +6309,7 @@ class CadTable extends HTMLElement {
         let sCells = `<td class="idx-cell">${rowIdx++}</td>`;
         sCells += `<td class="summary-label">汇总</td>`;
         for (let c = 1; c < cols; c++) {
-          const sVal = c === cols - 1
-            ? (mode === 'import' ? '∑ 220.5' : mode === 'extract' ? '∑ 172 项' : `∑ ${rows} 行`)
-            : '—';
-          sCells += `<td class="summary-val">${sVal}</td>`;
+          sCells += `<td class="summary-val">—</td>`;
         }
         rowsHtml += `<tr class="row-summary">${sCells}</tr>`;
       }
@@ -3547,15 +6469,139 @@ class CadTable extends HTMLElement {
   }
 }
 customElements.define('cad-table', CadTable);
+    if (typeof window !== 'undefined') window.CadTable = CadTable;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-table> 失败，已熔断跳过:', err);
+}
 
-/**
- * --------------------------------------------------------------------
- * 15. <cad-tabs> 标签页/视图切换组件 (映射自 Figma Page 252:37 标签页 Tabs Node 801:10827 视图 & 589:8495 标签页)
- *     100% 遵循 Vela/Nova 规范：
- *     - type="segmented" (Node 801:10827 视图): 外框 #F2F3F5 圆角 4px 内边距 2px；选中项 #FFFFFF 圆角 3px + #266EFF 高亮字/图标
- *     - type="line" (Node 589:8495 标签页): 底边 1px #EBECEE，选中项 #266EFF + 底部 2px #266EFF 指示条
- * --------------------------------------------------------------------
- */
+// ====================================================================
+// Component: <cad-table-viewport> (Key: table_viewport)
+// ====================================================================
+try {
+  (function() {
+class CadTableViewport extends HTMLElement {
+  static get observedAttributes() {
+    return ['cols', 'rows', 'title-text', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback(name, oldVal, newVal) {
+    if (oldVal !== newVal) this.render();
+  }
+
+  render() {
+    const isDraft = this.getAttribute('status') === 'draft' || !this.hasAttribute('status');
+    const cols = parseInt(this.getAttribute('cols') || '4', 10);
+    const rows = parseInt(this.getAttribute('rows') || '5', 10);
+    const title = this.getAttribute('title-text') || 'CAD 表格图元实时视口';
+
+    let tableHtml = `<tr><td colspan="${cols}" class="cell-title">${title}</td></tr>`;
+    tableHtml += `<tr>`;
+    for (let c = 1; c <= cols; c++) {
+      tableHtml += `<td class="cell-header">表头 ${c}</td>`;
+    }
+    tableHtml += `</tr>`;
+
+    for (let r = 1; r <= Math.min(rows, 10); r++) {
+      tableHtml += `<tr>`;
+      for (let c = 1; c <= cols; c++) {
+        tableHtml += `<td class="cell-data">数据</td>`;
+      }
+      tableHtml += `</tr>`;
+    }
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          position: relative;
+          width: 100%;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        .viewport {
+          background-color: #18191c;
+          background-image: 
+            linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+          background-size: 16px 16px;
+          min-height: 240px;
+          padding: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          box-sizing: border-box;
+        }
+        .cad-grid-table {
+          border-collapse: collapse;
+          color: #E2E8F0;
+          font-family: var(--cad-font-family, sans-serif);
+          font-size: 11px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+          background: rgba(30, 32, 38, 0.95);
+        }
+        .cad-grid-table td {
+          border: 1px solid #4A5568;
+          padding: 4px 8px;
+          text-align: center;
+          min-width: 48px;
+        }
+        .cell-title {
+          background: #2B6CB0;
+          color: #FFFFFF;
+          font-weight: bold;
+          font-size: 12px;
+          letter-spacing: 0.5px;
+        }
+        .cell-header {
+          background: #2D3748;
+          color: #CBD5E0;
+          font-weight: 500;
+        }
+        .cell-data {
+          color: #A0AEC0;
+        }
+        .viewport-footer {
+          position: absolute;
+          bottom: 6px;
+          right: 10px;
+          font-size: 10px;
+          color: #718096;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="viewport">
+        <table class="cad-grid-table">
+          ${tableHtml}
+        </table>
+        <div class="viewport-footer">视口网格: 16mm | 列: ${cols} | 行: ${rows}</div>
+      </div>
+      ${renderDraftBadge(isDraft, "PM自造草稿组件: CAD视口表格实时智能预览器 (待反哺 Figma 入库)")}
+    `;
+  }
+}
+customElements.define('cad-table-viewport', CadTableViewport);
+    if (typeof window !== 'undefined') window.CadTableViewport = CadTableViewport;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-table-viewport> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-tabs> (Key: tabs)
+// ====================================================================
+try {
+  (function() {
 class CadTabs extends HTMLElement {
   static get observedAttributes() {
     return ['value', 'type', 'items'];
@@ -3722,13 +6768,17 @@ class CadTabs extends HTMLElement {
   }
 }
 customElements.define('cad-tabs', CadTabs);
+    if (typeof window !== 'undefined') window.CadTabs = CadTabs;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-tabs> 失败，已熔断跳过:', err);
+}
 
-/**
- * --------------------------------------------------------------------
- * 16. <cad-tag> 标准标签组件 (映射自 Figma Page 6906:18142 标签 Tag Node 6906:19794)
- *     100% 遵循 Vela/Nova 规范：Light/Dark 主题，灰 (#EBECEE/#606266)、蓝 (#EBF3FF/#266EFF)、橙 (#FFF7E8/#F98A00)、红 (#FFECE8/#EF4A4A)
- * --------------------------------------------------------------------
- */
+// ====================================================================
+// Component: <cad-tag> (Key: tag)
+// ====================================================================
+try {
+  (function() {
 class CadTag extends HTMLElement {
   static get observedAttributes() {
     return ['color', 'theme', 'size'];
@@ -3784,256 +6834,561 @@ class CadTag extends HTMLElement {
   }
 }
 customElements.define('cad-tag', CadTag);
+    if (typeof window !== 'undefined') window.CadTag = CadTag;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-tag> 失败，已熔断跳过:', err);
+}
 
+// ====================================================================
+// Component: <cad-tooltip> (Key: tooltip)
+// ====================================================================
+try {
+  (function() {
 /**
  * --------------------------------------------------------------------
- * 17. <cad-file-loader> 官方载入文件组件 (映射自 Figma Page 6451:56655 载入文件 File Loader Node 6451:56656)
- *     100% 遵循 Vela/Nova 规范：左侧 24px 输入框/选择器 (圆角 4,0,0,4) + 右侧 24×24px 载入图标按钮 (圆角 0,4,4,0)
+ * <cad-tooltip> 文字气泡 (映射自 Figma Tooltip Page 368:1277)
  * --------------------------------------------------------------------
  */
-class CadFileLoader extends HTMLElement {
+class CadTooltip extends HTMLElement {
   static get observedAttributes() {
-    return ['value', 'placeholder', 'disabled'];
+    return ['title', 'content', 'placement', 'status'];
   }
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
   }
-  connectedCallback() { this.render(); }
-  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
-  get value() { return this.getAttribute('value') || ''; }
-  set value(val) { this.setAttribute('value', val); }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
   render() {
-    const val = this.getAttribute('value') || '';
-    const placeholder = this.getAttribute('placeholder') || '选择或载入本地表格文件 (.xlsx / .csv)';
-    const disabled = this.hasAttribute('disabled');
+    const text = this.getAttribute('content') || this.getAttribute('title') || '提示信息';
+    const placement = this.getAttribute('placement') || 'top';
+    const isDraft = this.getAttribute('status') === 'draft';
 
     this.shadowRoot.innerHTML = `
       <style>
         :host {
           display: inline-block;
-          width: 100%;
-          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
+          position: relative;
           box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
         }
-        .loader-wrap {
-          display: flex;
-          align-items: center;
-          width: 100%;
-          height: 24px;
-          box-sizing: border-box;
+        .bubble {
+          visibility: hidden;
+          opacity: 0;
+          position: absolute;
+          background: #1F2329;
+          color: #FFFFFF;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 11px;
+          line-height: 1.3;
+          white-space: nowrap;
+          z-index: 2000;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+          pointer-events: none;
+          transition: opacity 0.2s, visibility 0.2s;
         }
-        .loader-input {
-          flex: 1;
-          height: 24px;
-          padding: 0 8px;
-          font-size: 12px;
-          color: ${disabled ? '#A6A9AD' : '#202327'};
-          background: ${disabled ? '#F2F3F5' : '#FFFFFF'};
-          border: 1px solid #E4E5E7;
-          border-right: none;
-          border-radius: 4px 0 0 4px;
-          outline: none;
-          box-sizing: border-box;
-          min-width: 0;
+        :host(:hover) .bubble {
+          visibility: visible;
+          opacity: 1;
         }
-        .loader-input::placeholder {
-          color: #A6A9AD;
+        .bubble.top {
+          bottom: calc(100% + 6px);
+          left: 50%;
+          transform: translateX(-50%);
         }
-        .loader-btn {
-          width: 24px;
-          height: 24px;
-          background: ${disabled ? '#F2F3F5' : '#FFFFFF'};
-          border: 1px solid #E4E5E7;
-          border-radius: 0 4px 4px 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: ${disabled ? '#A6A9AD' : '#606266'};
-          cursor: ${disabled ? 'not-allowed' : 'pointer'};
-          box-sizing: border-box;
-          flex-shrink: 0;
-          transition: background 0.15s, color 0.15s;
+        .bubble.top::after {
+          content: "";
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          margin-left: -4px;
+          border-width: 4px;
+          border-style: solid;
+          border-color: #1F2329 transparent transparent transparent;
         }
-        .loader-btn:hover:not(.disabled) {
-          background: #F2F3F5;
-          color: #266EFF;
+        .bubble.bottom {
+          top: calc(100% + 6px);
+          left: 50%;
+          transform: translateX(-50%);
         }
+        .bubble.bottom::after {
+          content: "";
+          position: absolute;
+          bottom: 100%;
+          left: 50%;
+          margin-left: -4px;
+          border-width: 4px;
+          border-style: solid;
+          border-color: transparent transparent #1F2329 transparent;
+        }
+        ${COMMON_DRAFT_STYLE}
       </style>
-      <div class="loader-wrap">
-        <input class="loader-input" type="text" value="${val}" placeholder="${placeholder}" readonly ${disabled ? 'disabled' : ''} />
-        <button type="button" class="loader-btn ${disabled ? 'disabled' : ''}" title="载入本地文件">
-          ${CAD_ICON_PATHS.folder}
-        </button>
+      <div class="target-wrap">
+        <slot></slot>
       </div>
+      <div class="bubble ${placement}">${text}</div>
+      ${renderDraftBadge(isDraft)}
     `;
-
-    const btn = this.shadowRoot.querySelector('.loader-btn');
-    if (btn && !disabled) {
-      btn.onclick = () => {
-        this.dispatchEvent(new CustomEvent('load-file', { bubbles: true, composed: true }));
-      };
-    }
   }
 }
-customElements.define('cad-file-loader', CadFileLoader);
+customElements.define('cad-tooltip', CadTooltip);
 
+    if (typeof window !== 'undefined') window.CadTooltip = CadTooltip;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-tooltip> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-tree> (Key: tree)
+// ====================================================================
+try {
+  (function() {
 /**
  * --------------------------------------------------------------------
- * 18. <cad-picker> 官方图面拾取组件 (映射自 Figma Page 252:36 拾取 Picker Node 6451:56183)
- *     100% 遵循 Vela/Nova 规范：左侧 24px 坐标/尺寸回显框 + 右侧 24×24px 十字拾取按钮
+ * <cad-tree> CAD/BIM 模型构件树 (映射自 Figma Tree Page 5454:66767)
  * --------------------------------------------------------------------
  */
-class CadPicker extends HTMLElement {
+class CadTree extends HTMLElement {
   static get observedAttributes() {
-    return ['value', 'placeholder', 'disabled'];
+    return ['data', 'checkable', 'status'];
   }
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
   }
-  connectedCallback() { this.render(); }
-  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
   render() {
-    const val = this.getAttribute('value') || '';
-    const placeholder = this.getAttribute('placeholder') || '在图面拾取坐标点';
-    const disabled = this.hasAttribute('disabled');
+    const isDraft = this.getAttribute('status') === 'draft';
+    const checkable = this.hasAttribute('checkable');
+    let treeData = [];
+    try {
+      const d = this.getAttribute('data');
+      if (d) treeData = JSON.parse(d);
+    } catch(e) {}
 
-    this.shadowRoot.innerHTML = `
-      <style>
-        :host {
-          display: inline-block;
-          width: 100%;
-          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
-          box-sizing: border-box;
-        }
-        .picker-wrap {
-          display: flex;
-          align-items: center;
-          width: 100%;
-          height: 24px;
-          box-sizing: border-box;
-        }
-        .picker-input {
-          flex: 1;
-          height: 24px;
-          padding: 0 8px;
-          font-size: 12px;
-          color: ${disabled ? '#A6A9AD' : '#202327'};
-          background: ${disabled ? '#F2F3F5' : '#FFFFFF'};
-          border: 1px solid #E4E5E7;
-          border-right: none;
-          border-radius: 4px 0 0 4px;
-          outline: none;
-          box-sizing: border-box;
-          min-width: 0;
-        }
-        .picker-btn {
-          width: 24px;
-          height: 24px;
-          background: ${disabled ? '#F2F3F5' : '#FFFFFF'};
-          border: 1px solid #E4E5E7;
-          border-radius: 0 4px 4px 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: ${disabled ? '#A6A9AD' : '#266EFF'};
-          cursor: ${disabled ? 'not-allowed' : 'pointer'};
-          box-sizing: border-box;
-          flex-shrink: 0;
-          transition: background 0.15s;
-        }
-        .picker-btn:hover:not(.disabled) {
-          background: #EBF3FF;
-        }
-      </style>
-      <div class="picker-wrap">
-        <input class="picker-input" type="text" value="${val}" placeholder="${placeholder}" ${disabled ? 'disabled' : ''} />
-        <button type="button" class="picker-btn ${disabled ? 'disabled' : ''}" title="图面拾取">
-          ${CAD_ICON_PATHS.pick}
-        </button>
-      </div>
-    `;
-
-    const btn = this.shadowRoot.querySelector('.picker-btn');
-    if (btn && !disabled) {
-      btn.onclick = () => {
-        this.dispatchEvent(new CustomEvent('pick', { bubbles: true, composed: true }));
-      };
+    // 默认内置 CAD 典型构件层级演示数据
+    if (!treeData.length) {
+      treeData = [
+        { id: '1', title: '地上建筑模型', expanded: true, children: [
+          { id: '1-1', title: 'F1 首层平面', expanded: true, children: [
+            { id: '1-1-1', title: '基本墙: 混凝土剪力墙 200mm' },
+            { id: '1-1-2', title: '门: 单扇平开门 900x2100mm' }
+          ]},
+          { id: '1-2', title: 'F2 二层平面', children: [
+            { id: '1-2-1', title: '基本墙: 砌块填充墙 100mm' }
+          ]}
+        ]},
+        { id: '2', title: '地下基础与结构', children: [
+          { id: '2-1', title: '承台与基础梁' }
+        ]}
+      ];
     }
-  }
-}
-customElements.define('cad-picker', CadPicker);
 
-/**
- * --------------------------------------------------------------------
- * 19. <cad-banner> 官方内嵌警告提示条 (映射自 Figma Page 6921:42395 警告提示 Alert Node 6921:42396)
- *     100% 遵循 Vela/Nova 规范：信息 #EBF3FF / 默认 #F6F7F9 / 成功 #E8FFEA / 警告 #FFF7E8，圆角 4px
- * --------------------------------------------------------------------
- */
-class CadBanner extends HTMLElement {
-  static get observedAttributes() {
-    return ['type'];
-  }
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-  }
-  connectedCallback() { this.render(); }
-  attributeChangedCallback(n, o, v) { if (o !== v) this.render(); }
-  render() {
-    const type = this.getAttribute('type') || 'info'; // 'default' | 'info' | 'success' | 'warning'
-    const bgMap = {
-      default: '#F6F7F9',
-      info: '#EBF3FF',
-      success: '#E8FFEA',
-      warning: '#FFF7E8'
+    const renderNodes = (nodes, level = 0) => {
+      return nodes.map(n => `
+        <div class="tree-node" style="padding-left: ${level * 16 + 6}px;" data-id="${n.id}">
+          <span class="expander ${n.children ? 'has-child' : ''}">${n.children ? (n.expanded ? '▼' : '▶') : '•'}</span>
+          ${checkable ? `<input type="checkbox" class="node-chk">` : ''}
+          <span class="node-icon">${n.children ? '📁' : '📄'}</span>
+          <span class="node-title">${n.title}</span>
+        </div>
+        ${n.children && n.expanded !== false ? `<div class="node-children">${renderNodes(n.children, level + 1)}</div>` : ''}
+      `).join('');
     };
-    const iconSvg = type === 'warning' ? CAD_ALERT_SVGS.warning :
-                    type === 'success' ? CAD_ALERT_SVGS.success : CAD_ALERT_SVGS.info;
 
     this.shadowRoot.innerHTML = `
       <style>
         :host {
           display: block;
-          width: 100%;
-          font-family: var(--cad-font-family, "Microsoft YaHei", sans-serif);
+          position: relative;
+          background: var(--cad-color-bg-white, #FFFFFF);
+          border: 1px solid var(--cad-color-border-default, #D0D3D6);
+          border-radius: var(--cad-border-radius-base, 4px);
+          max-height: 280px;
+          overflow-y: auto;
           box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+          user-select: none;
         }
-        .banner {
-          width: 100%;
-          min-height: 28px;
-          padding: 5px 8px;
-          background: ${bgMap[type] || bgMap.info};
-          border-radius: 4px;
+        .tree-node {
           display: flex;
           align-items: center;
-          gap: 6px;
-          box-sizing: border-box;
-          font-size: 12px;
-          line-height: 16px;
-          color: #606266;
+          gap: 4px;
+          height: 24px;
+          cursor: pointer;
+          color: var(--cad-color-text-main, #1F2329);
+          transition: background 0.15s;
         }
-        .icon {
-          width: 16px;
-          height: 16px;
-          flex-shrink: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .tree-node:hover {
+          background: var(--cad-color-bg-hover, #F2F3F5);
         }
-        .icon svg {
-          width: 15px;
-          height: 15px;
+        .tree-node.selected {
+          background: #E8F3FF;
+          color: var(--cad-color-primary, #266EFF);
         }
+        .expander {
+          width: 12px;
+          font-size: 8px;
+          color: #8F959E;
+          text-align: center;
+        }
+        .node-icon {
+          font-size: 11px;
+        }
+        .node-title {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        ${COMMON_DRAFT_STYLE}
       </style>
-      <div class="banner">
-        <span class="icon">${iconSvg}</span>
-        <span><slot></slot></span>
+      <div class="tree-container">
+        ${renderNodes(treeData)}
       </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+
+    this.shadowRoot.querySelectorAll('.tree-node').forEach(el => {
+      el.addEventListener('click', () => {
+        this.shadowRoot.querySelectorAll('.tree-node').forEach(n => n.classList.remove('selected'));
+        el.classList.add('selected');
+        this.dispatchEvent(new CustomEvent('select', { detail: { id: el.getAttribute('data-id') } }));
+      });
+    });
+  }
+}
+customElements.define('cad-tree', CadTree);
+
+    if (typeof window !== 'undefined') window.CadTree = CadTree;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-tree> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-tree-select> (Key: tree_select)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-tree-select> 树形下拉选择器 (映射自 Figma TreeSelect Page 252:39)
+ * --------------------------------------------------------------------
+ */
+class CadTreeSelect extends HTMLElement {
+  static get observedAttributes() {
+    return ['value', 'placeholder', 'disabled', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.isOpen = false;
+    this._onDoc = this._onDoc.bind(this);
+  }
+
+  connectedCallback() {
+    this.render();
+    document.addEventListener('click', this._onDoc);
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('click', this._onDoc);
+  }
+
+  _onDoc(e) {
+    if (!this.contains(e.target)) {
+      if (this.isOpen) {
+        this.isOpen = false;
+        this.updatePopup();
+      }
+    }
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  updatePopup() {
+    const pop = this.shadowRoot.querySelector('.tree-popup');
+    if (pop) pop.style.display = this.isOpen ? 'block' : 'none';
+  }
+
+  render() {
+    const val = this.getAttribute('value') || '';
+    const placeholder = this.getAttribute('placeholder') || '请选择构件层级...';
+    const disabled = this.hasAttribute('disabled');
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-block;
+          position: relative;
+          width: 100%;
+          min-width: 160px;
+          height: var(--cad-height-small, 24px);
+          box-sizing: border-box;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: var(--cad-font-size-base, 12px);
+        }
+        .selector-box {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 100%;
+          padding: 2px 8px;
+          background: var(--cad-color-bg-white, #FFFFFF);
+          border: 1px solid var(--cad-color-border-default, #D0D3D6);
+          border-radius: var(--cad-border-radius-base, 4px);
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          opacity: ${disabled ? '0.6' : '1'};
+          user-select: none;
+        }
+        .selector-box:hover {
+          border-color: ${disabled ? '#D0D3D6' : 'var(--cad-color-primary, #266EFF)'};
+        }
+        .tree-popup {
+          display: ${this.isOpen ? 'block' : 'none'};
+          position: absolute;
+          top: calc(100% + 4px);
+          left: 0;
+          width: 100%;
+          z-index: 1000;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <div class="selector-box">
+        <span style="color: ${val ? '#1F2329' : '#8F959E'}">${val || placeholder}</span>
+        <span style="font-size: 9px; color: #8F959E;">▼</span>
+      </div>
+      <div class="tree-popup">
+        <cad-tree></cad-tree>
+      </div>
+      ${renderDraftBadge(isDraft)}
+    `;
+
+    this.shadowRoot.querySelector('.selector-box').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!disabled) {
+        this.isOpen = !this.isOpen;
+        this.updatePopup();
+      }
+    });
+
+    const tree = this.shadowRoot.querySelector('cad-tree');
+    if (tree) {
+      tree.addEventListener('select', (e) => {
+        this.setAttribute('value', e.detail.id);
+        this.isOpen = false;
+        this.updatePopup();
+        this.render();
+      });
+    }
+  }
+}
+customElements.define('cad-tree-select', CadTreeSelect);
+
+    if (typeof window !== 'undefined') window.CadTreeSelect = CadTreeSelect;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-tree-select> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-typography> (Key: typography)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-typography> 字体排版组件 (映射自 Figma Typography Page 252:20)
+ * --------------------------------------------------------------------
+ */
+class CadTypography extends HTMLElement {
+  static get observedAttributes() {
+    return ['type', 'size', 'color', 'weight', 'copyable', 'status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const type = this.getAttribute('type') || 'body'; // 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'secondary'
+    const color = this.getAttribute('color');
+    const weight = this.getAttribute('weight') || (type.startsWith('h') ? '600' : 'normal');
+    const copyable = this.hasAttribute('copyable');
+    const isDraft = this.getAttribute('status') === 'draft';
+
+    let fontSize = 'var(--cad-font-size-base, 12px)';
+    let lineHeight = '1.5';
+    let defaultColor = 'var(--cad-color-text-main, #1F2329)';
+
+    if (type === 'h1') {
+      fontSize = '18px';
+      lineHeight = '1.3';
+    } else if (type === 'h2') {
+      fontSize = '15px';
+      lineHeight = '1.4';
+    } else if (type === 'h3') {
+      fontSize = '13px';
+      lineHeight = '1.4';
+      defaultColor = 'var(--cad-color-text-title, #1F2329)';
+    } else if (type === 'caption') {
+      fontSize = '11px';
+      defaultColor = 'var(--cad-color-text-placeholder, #8F959E)';
+    } else if (type === 'secondary') {
+      fontSize = '12px';
+      defaultColor = 'var(--cad-color-text-sub, #646A73)';
+    }
+
+    const finalColor = color || defaultColor;
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: inline-block;
+          position: relative;
+          font-family: var(--cad-font-family, "Segoe UI", -apple-system, sans-serif);
+          font-size: ${fontSize};
+          line-height: ${lineHeight};
+          color: ${finalColor};
+          font-weight: ${weight};
+          box-sizing: border-box;
+        }
+        .text-wrap {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .copy-btn {
+          cursor: pointer;
+          opacity: 0.6;
+          transition: opacity 0.2s;
+          display: inline-flex;
+          align-items: center;
+        }
+        .copy-btn:hover {
+          opacity: 1;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <span class="text-wrap">
+        <slot></slot>
+        ${copyable ? `<span class="copy-btn" title="点击复制" onclick="navigator.clipboard.writeText(this.parentElement.innerText)">📋</span>` : ''}
+      </span>
+      ${renderDraftBadge(isDraft)}
     `;
   }
 }
-customElements.define('cad-banner', CadBanner);
+customElements.define('cad-typography', CadTypography);
 
-console.log("%c[Nova CAD/BIM]%c Web Components 核心库已装载 (已内嵌 49 类组件清册，支持 file:// 离线直开)", "background:#266EFF;color:#fff;padding:2px 6px;border-radius:3px;", "");
+    if (typeof window !== 'undefined') window.CadTypography = CadTypography;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-typography> 失败，已熔断跳过:', err);
+}
+
+// ====================================================================
+// Component: <cad-wall-tool> (Key: wall_tool)
+// ====================================================================
+try {
+  (function() {
+/**
+ * --------------------------------------------------------------------
+ * <cad-wall-tool> 绘制墙体参数快捷卡 (映射自 Figma WallTool Page 252:48)
+ * --------------------------------------------------------------------
+ */
+class CadWallTool extends HTMLElement {
+  static get observedAttributes() {
+    return ['status'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const isDraft = this.getAttribute('status') === 'draft';
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 6px 10px;
+          background: #F8F9FA;
+          border: 1px solid #D0D3D6;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-size: 12px;
+        }
+        ${COMMON_DRAFT_STYLE}
+      </style>
+      <span>🧱 墙体厚度:</span>
+      <cad-input size="small" value="200" suffix-label="mm" style="width:90px;"></cad-input>
+      <span>定位线:</span>
+      <cad-select size="small" value="wall_center" style="width:110px;">
+        <option value="wall_center">墙中心线</option>
+        <option value="core_center">核心层中心</option>
+        <option value="finish_ext">面层外部</option>
+      </cad-select>
+      ${renderDraftBadge(isDraft)}
+    `;
+  }
+}
+customElements.define('cad-wall-tool', CadWallTool);
+
+    if (typeof window !== 'undefined') window.CadWallTool = CadWallTool;
+  })();
+} catch (err) {
+  console.error('[Nova Component Warning] 注册组件 <cad-wall-tool> 失败，已熔断跳过:', err);
+}
+
+
+/**
+ * ====================================================================
+ * End of Nova CAD/BIM Components Bundle (Total: 52 components)
+ * ====================================================================
+ */

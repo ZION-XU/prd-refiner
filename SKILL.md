@@ -8,19 +8,20 @@ disable-model-invocation: true
 
 中望 CAD 需求推演、Nova-Proto 原型驱动与分片并发 PRD 交付搭档。
 
-## 核心工作流（支持跨周、多会话并发）
+## 核心工作流（支持单文件直改与多会话分片并发）
 
-1. **取证与总览初始化**：远程来源先用 `fetch_snapshot.py`（或 `build_snapshot.py`）建立 `.assets/` 不可变快照；在工作区根目录维护 `00_需求总览.md`（背景、目标、Mermaid 业务总体流程、范围与 3.1 功能清单表）。
-2. **多会话分片并发（单功能闭环）**：每个功能在 `features/FR-xxx_<名称>/` 独立目录下推进，不同会话各改各的分片目录，互不干扰：
-   - **归零推演与方案破局**：穿透第一性归零四问，将“旧实现痛点 vs 新方案最短路径”写入该功能 `prototype.html` 顶部的 `.design-insights-card`；
-   - **Nova-Proto 原型构建**：严格使用 `<cad-*>` 官方组件编写 `prototype.html`（严禁裸 HTML；缺失组件标 `status="draft"` 并汇总至 `Missing_Components.md` 提单给设计师）；
-   - **标号截图与内聚规格提炼**：导出带 ①②③ 标号的状态帧图（`.assets/images/fr-xxx-s1.png`），直接从定稿的 `prototype.html` 与确认的 CAD 底层规则提炼生成 `features/FR-xxx_<名称>/spec.md`（内聚入口、交互卡、业务规则 BR 与验收标准 AC）。
-3. **一键合龙与校验交付**：运行 `assemble_prd.py` 审计所有原型组件覆盖率并将各 FR 分片合龙为完整主稿 `<需求名>.md` → 执行 `validate_prd.py` 与 `validate_links.py` → 对照 [下游审查清单](references/downstream-review.md) 四视角消缺 → 按需发布 Confluence。
+1. **取证与模式选择**：远程来源先用 `fetch_snapshot.py`（或 `build_snapshot.py`）建立 `.assets/` 不可变快照。
+   - **单文件直改模式**：优化已有单文件 PRD 或单会话轻量需求时，直接就地维护 `<需求名>.md`；
+   - **多会话分片并发模式**：跨周、多功能并行打磨原型时，在根目录维护 `00_需求总览.md`，每个功能在 `features/FR-xxx_<名称>/` 独立目录下推进（不同会话各改各的目录，互不干扰）：
+     - **归零推演与方案破局**：穿透第一性归零四问，将“旧实现痛点 vs 新方案最短路径”写入 `prototype.html` 顶部的 `.design-insights-card`；
+     - **Nova-Proto 原型构建**：使用内置的 50 个 `<cad-*>` 官方组件编写 `prototype.html`（缺失组件标 `status="draft"` 并汇总至 `Missing_Components.md`）；
+     - **高密度内聚规格提炼**：导出状态帧图（`.assets/images/fr-xxx-s1.png`），直接从定稿的 `prototype.html` 与确认的 CAD 底层规则提炼生成 `spec.md`（原型已自明的常规控件不写，只写特殊逻辑与增量契约，内聚入口、交互卡、BR 与 AC）。
+2. **合龙与校验交付**：分片模式下运行 `assemble_prd.py` 审计组件覆盖率并合龙生成完整 `<需求名>.md` → 执行 `validate_prd.py` 与 `validate_links.py` → 对照 [下游审查清单](references/downstream-review.md) 四视角消缺 → 按需发布 Confluence。
 
 ## 硬约束
 
 - **纯粹的 CAD 工程主体视角**：PRD 正文围绕三类核心主语展开——**`CAD 终端设计师`**、**`ZWCAD 系统`** 与 **`图纸／图元／系统变量`**，只提取定稿 `prototype.html` 与产品经理（PM）确认的 CAD 业务事实。规范见 [内容约定](references/prd-standard.md) §1。
-- **图文正交与高信息密度（一处一义）**：`prototype.html` 与状态截图承载视觉布局、控件外观与 `<cad-*>` 组件选型；PRD 正文只定义静态画面无法表达的增量工程契约。单个 FR 内部按四层正交职责归位（1. 入口与命令契约 → 2. 交互卡标号控件逻辑：数据源/取值域/联动 → 3. CAD 内核与环境边界 `BR`：DWG 持久化/特殊图层与块/ESC 与 Undo → 4. 验收判据 `AC`），每项规则只在其唯一归属处定义一次。规范见 [交互与原型设计](references/interaction-design.md) §一、§三。
+- **图文正交与高信息密度（只写特殊与增量，一处一义）**：`prototype.html` 与状态截图承载视觉布局与常规控件自明外观；**PRD 正文只定义静态画面无法表达的特殊逻辑与增量工程契约（不对常规控件逐一点名复述）**。单个 FR 内部按四层正交职责归位（1. 入口与命令契约 → 2. 交互卡重点控件逻辑：特殊数据源/校验/联动 → 3. CAD 内核与环境边界 `BR`：DWG 持久化/特殊图层与块/ESC 与 Undo → 4. 验收判据 `AC`），每项规则只在其唯一归属处定义一次。规范见 [交互与原型设计](references/interaction-design.md) §一、§三。
 - **Nova-Proto 组件库构建与缺件提单**：本地 `prototype.html` 使用内置的 `Nova-proto` `<cad-*>` 官方组件构建；缺失组件标注 `status="draft"` 并汇总至 `Missing_Components.md` 交设计师补充 Figma。规范见 [交互与原型设计](references/interaction-design.md) §二。
 - **单功能分片并发隔离**：多会话并发时，每个会话只读写所属 `features/FR-xxx/` 目录下的 `prototype.html` 与 `spec.md`，交付时由 `assemble_prd.py` 合龙。规范见 [成稿与交付](references/delivery.md)。
 - **归零推演与 CAD 防漏**：关键机制穿透第一性归零四问，方案对比洞察写入 `prototype.html` 顶部 `.design-insights-card`（见 [需求探索](references/brainstorm.md)）；逐项落实 CAD 三要素公约、命令行状态机与特殊几何边界（见 [内容约定](references/prd-standard.md) §2）。

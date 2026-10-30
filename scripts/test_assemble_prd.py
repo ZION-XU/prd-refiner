@@ -14,6 +14,9 @@ class AssemblePrdTests(unittest.TestCase):
             proto.write_text(
                 '<cad-dialog title="插入表格">\n'
                 '  <cad-input label="行数" value="4"></cad-input>\n'
+                '  <cad-tree></cad-tree>\n'
+                '  <cad-color-picker value="ByLayer"></cad-color-picker>\n'
+                '  <cad-property-panel></cad-property-panel>\n'
                 '  <cad-linetype-preview status="draft" label="线型实时预览"></cad-linetype-preview>\n'
                 '  <cad-button type="primary">确定</cad-button>\n'
                 '</cad-dialog>',
@@ -21,7 +24,7 @@ class AssemblePrdTests(unittest.TestCase):
             )
             report = assemble_prd.audit_prototype_html(proto, fr_id='FR-001')
             self.assertTrue(report['passed'])
-            self.assertEqual(report['official_count'], 3)
+            self.assertEqual(report['official_count'], 6)
             self.assertEqual(report['draft_count'], 1)
             self.assertEqual(report['raw_count'], 0)
             self.assertEqual(report['draft_components'][0]['tag'], 'cad-linetype-preview')

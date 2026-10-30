@@ -18,13 +18,46 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 BUNDLED_NOVA_DIR = SKILL_ROOT / 'assets' / 'nova-proto'
 NOVA_RUNTIME_FILES = ('cad-design-tokens.css', 'cad-components.js')
 
-OFFICIAL_TAGS = frozenset({
-    'cad-button', 'cad-input', 'cad-checkbox', 'cad-radio',
-    'cad-select', 'cad-switch', 'cad-slider', 'cad-dialog',
-    'cad-tabs', 'cad-alert', 'cad-form-group', 'cad-divider',
-    'cad-icon', 'cad-table', 'cad-tag', 'cad-file-loader',
-    'cad-picker', 'cad-banner',
+DRAFT_TAGS = frozenset({
+    'cad-table-viewport', 'cad-file-picker-input',
 })
+
+FALLBACK_OFFICIAL_TAGS = frozenset({
+    # 1. 通用基础 (6)
+    'cad-button', 'cad-typography', 'cad-divider', 'cad-scrollbar', 'cad-link', 'cad-tag',
+    # 2. 导航菜单 (4)
+    'cad-tabs', 'cad-icon', 'cad-menu', 'cad-dropdown',
+    # 3. 数据录入 (16)
+    'cad-input', 'cad-checkbox', 'cad-radio', 'cad-select', 'cad-switch', 'cad-slider',
+    'cad-color-picker', 'cad-tree-select', 'cad-material-select', 'cad-picker',
+    'cad-file-loader', 'cad-picture', 'cad-form', 'cad-form-group', 'cad-tree', 'cad-table',
+    # 4. 数据反馈 (11)
+    'cad-tooltip', 'cad-message', 'cad-dialog', 'cad-alert', 'cad-panel', 'cad-popover',
+    'cad-popconfirm', 'cad-progress', 'cad-alert-banner', 'cad-banner', 'cad-filter',
+    # 5. 业务场景 (13)
+    'cad-composite-input', 'cad-wall-tool', 'cad-family-mgr', 'cad-axis-grid',
+    'cad-door-tool', 'cad-stair-tool', 'cad-options-dialog', 'cad-quick-nav',
+    'cad-ribbon', 'cad-status-bar', 'cad-project-browser', 'cad-property-panel',
+    'cad-command-tool', 'cad-main-toolbar',
+})
+
+
+def load_official_tags() -> frozenset[str]:
+    """Dynamically load registered official <cad-*> tags from bundled cad-components.js."""
+    js_path = BUNDLED_NOVA_DIR / 'cad-components.js'
+    if not js_path.is_file():
+        return FALLBACK_OFFICIAL_TAGS
+    try:
+        text = js_path.read_text(encoding='utf-8-sig')
+        defined = set(re.findall(r"customElements\.define\('([^']+)'", text))
+        if defined:
+            return frozenset((defined | FALLBACK_OFFICIAL_TAGS) - DRAFT_TAGS)
+    except OSError:
+        pass
+    return FALLBACK_OFFICIAL_TAGS
+
+
+OFFICIAL_TAGS = load_official_tags()
 
 INSERT_MARKER = '<!-- FEATURES_INSERT_POINT -->'
 FR_DIR_PATTERN = re.compile(r'^(FR-(\d{2,4}))(?:[_-](.*))?$', re.IGNORECASE)
