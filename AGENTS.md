@@ -12,6 +12,7 @@
 - **Python 侧纯标准库**：`scripts/*.py` 仅使用 Python 标准库（Python 3.10+），命令一律在**技能仓库根目录**执行，工作区与文件路径以绝对路径显式传入。
 - **测试**：`python -B -m unittest discover -s scripts -p "test_*.py"`。改动脚本、模板或文档后均需执行回归测试验证。
 - **模板纯洁与规范隔离**：`assets/prd-template.md` 纯粹是字段骨架，严禁包含工具脚本名称（如 `*.py`）或规范要求；所有规范写在 `references/*.md`，模板只写超链接指针。
+- **Antigravity 宿主同步要求**：Antigravity 宿主不支持软链接（Junction/Symlink）加载技能目录。每次修改本仓库文件后，必须使用 `robocopy "D:\prd-refiner" "C:\Users\Administrator\.gemini\config\skills\prd-refiner" /MIR /XD .git __pycache__ .pytest_cache` 将实体文件同步至 `.gemini\config\skills\prd-refiner`（严禁将其改为软链接）。
 
 ## 脚本速查
 
