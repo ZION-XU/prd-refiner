@@ -31,7 +31,7 @@ python scripts/convert_to_storage.py <Markdown绝对路径> --output <输出XML�
 
 ## 3. 图片与图表规范
 
-- **原型帧图与流程图资产**：HTML 原型导出的带标号状态帧图（`fr-001-s1.png`）、业务流程图或快照原图统一落盘至 `<工作区>/.assets/images/`，正文以标准 Markdown 图片语法引用；`convert_to_storage.py` 会自动将其转为 `<ac:image><ri:attachment ri:filename="图片名.png"/></ac:image>`，发布时必须将 `validate_delivery.py` 报告的 `required_attachments` 全部上传至目标页面附件；严禁保留本地路径或临时 URL。
+- **原型帧图与流程图资产**：HTML 原型导出的状态截图（`fr-001-s1.png`）、业务流程图或快照原图统一落盘至 `<工作区>/.assets/images/`，正文以标准 Markdown 图片语法引用；`convert_to_storage.py` 会自动将其转为 `<ac:image><ri:attachment ri:filename="图片名.png"/></ac:image>`，发布时必须将 `validate_delivery.py` 报告的 `required_attachments` 全部上传至目标页面附件；严禁保留本地路径或临时 URL。
 - **Mermaid 流程图渲染**：若正文包含 ```mermaid 代码块，执行渲染脚本生成 PNG 并上传附件：
   ```bash
   python scripts/render_mermaid.py <Markdown路径>
