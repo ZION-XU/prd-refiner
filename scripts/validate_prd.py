@@ -20,6 +20,8 @@ CORE_HEADINGS = (
     ('## 1. 背景、用户与目标',),
     ('## 2. 范围与边界',),
     ('## 3. 功能与交互规格',),
+    ('## 4. 数据、系统变量与接口',),
+    ('## 5. 性能与非功能要求',),
     ('## 6. 风险与开放问题', '## 8. 风险与开放问题'),
     ('## 7. 来源与参考资料', '## 9. 来源与参考资料'),
 )
@@ -350,7 +352,7 @@ def validate(target: Path, profile: str = 'template', image_policy: str | None =
     defined = set(definitions)
     if profile != 'existing':
         findings = errors if profile == 'template' else warnings
-        for prefix in ('FR-', 'BR-', 'AC-'):
+        for prefix in ('FR-', 'BR-', 'AC-', 'NFR-'):
             if not any(item.startswith(prefix) for item in defined):
                 findings.append(f'no {prefix} definition; check known content and open issues')
     references = re.sub(r'\]\([^\n]*?\)', ']', body)

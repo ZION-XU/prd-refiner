@@ -257,6 +257,20 @@ def assemble(workspace: Path, output: Path | None = None,
             'audits': audits,
         }
 
+    overview_lines = [line.strip() for line in overview_path.read_text(encoding='utf-8-sig').splitlines()]
+    required_sections = (
+        ('## 1. 背景、用户与目标',),
+        ('## 2. 范围与边界',),
+        ('## 3. 功能与交互规格',),
+        ('## 4. 数据、系统变量与接口',),
+        ('## 5. 性能与非功能要求',),
+        ('## 6. 风险与开放问题',),
+        ('## 7. 来源与参考资料',),
+    )
+    for alternatives in required_sections:
+        if not any(line.startswith(h) for line in overview_lines for h in alternatives):
+            errors.append(f'00_需求总览.md 缺少必要核心章节: "{alternatives[0]}"，请依据 assets/prd-template.md 补全')
+
     shards = discover_shards(workspace)
     if not shards:
         errors.append('no FR shard directories found under <workspace>/features/ (expected e.g. features/FR-001_name/)')
