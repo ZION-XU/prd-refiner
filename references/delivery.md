@@ -57,7 +57,7 @@
 
 合龙生成完整 Markdown 主稿后，依次执行静态校验与下游审查：
 
-1. **分片合龙与静态检查**：
+1. **分片合龙与基础检查**：
 
 ```bash
 python scripts/assemble_prd.py --workspace <工作区绝对路径> --output <稿件绝对路径>
@@ -66,8 +66,8 @@ python scripts/validate_links.py <稿件绝对路径> --format markdown --profil
 ```
 
 - `assemble_prd.py` 检查所有 `features/*/prototype.html` 是否满足 **0 裸 HTML 标签**（`<input>/<button>/<select>/<textarea>` 为 0），统计 `<cad-*>` 官方组件与 `status="draft"` 草稿组件覆盖率，并将草稿组件自动汇总至 `Missing_Components.md`，随后拼合生成完整主稿。
-- `validate_prd.py` 检查核心章节、模板占位清理、本地图片存在性、竞品名禁用、元话语污染拦截，以及每个 FR 的交互卡覆盖率。
-- `validate_links.py` 检查条目单一定位与同页锚点跳转。
+- `validate_prd.py` 检查核心章节、模板占位符清理、条目重号与未定义引用、以及本地图片是否存在。
+- `validate_links.py` 检查条目单一定义与同页 `#anchor` 锚点跳转是否有效。
 
 | 场景 | 对应参数 | 说明 |
 |---|---|---|

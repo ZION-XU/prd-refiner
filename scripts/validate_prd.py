@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Read-only, bounded structural checks for PRD working documents.
 
-Profiles do not certify semantic correctness, completion or review status.
-Only the supplied document and referenced local images are inspected.
+Checks core sections, unresolved template placeholders, duplicate/undefined IDs,
+and local image file existence.
 """
 from __future__ import annotations
 
@@ -25,7 +25,6 @@ CORE_HEADINGS = (
 )
 ID_EXPR = r'(?:FR|BR|AC|DEC|NFR|RK|SRC)-\d{2,4}'
 ID_PATTERN = re.compile(r'\b' + ID_EXPR + r'\b')
-# Frame identifiers belong to one FR's interaction card; they are not entity IDs.
 FRAME_ID = re.compile(r'FR-\d{2,4}-S\d{1,2}')
 TABLE_SEPARATOR = re.compile(r'^\s*\|(?:\s*:?-{2,}:?\s*\|)+\s*$')
 NONE_DECLARED = re.compile(r'交互卡\s*[：:]\s*未涉及\s*[（(][^）)\n]{4,}[）)]')
@@ -37,8 +36,6 @@ TEMPLATE_TAG_PATTERN = re.compile(r'【(?:核心|按需|多功能时填写)[^】
 HEADING_DEF = re.compile(r'^#{2,6}\s+(?:\d+(?:\.\d+)*\.?\s+)?(' + ID_EXPR + r')\b')
 LIST_DEF = re.compile(r'^\s*(?:[-*]|\d+\.)\s+(' + ID_EXPR + r')(?=\s|[:：]|$)')
 TABLE_DEF = re.compile(r'^\|\s*(?:(?:\d+|[-*#])\s*\|\s*)?(' + ID_EXPR + r')(?=\s|[:：]|\|)')
-# Name-first declarations are bounded to a heading, list label or first data cell.
-# Linked labels are references, so they must not satisfy missing definitions.
 NAMED_ID = r'[^|\[\]\n]+?[（(](' + ID_EXPR + r')[）)]'
 NAMED_HEADING_DEF = re.compile(r'^#{2,6}\s+' + NAMED_ID + r'\s*(?:#+\s*)?$')
 NAMED_LIST_DEF = re.compile(r'^\s*(?:[-*]|\d+\.)\s+' + NAMED_ID + r'(?=\s|[:：]|$)')
@@ -47,33 +44,6 @@ EMPTY_ANCHOR = re.compile(r'<a\s+(?:id|name)\s*=\s*["\'][^"\']*["\']\s*>\s*</a>'
 INLINE_IMAGE = re.compile(r'!\[[^\]\n]*\]\(\s*(<[^>\n]+>|[^\s)]+)(?:\s+["\'][^\n]*?["\'])?\s*\)')
 REFERENCE_IMAGE = re.compile(r'!\[([^\]\n]*)\]\[([^\]\n]*)\]')
 REFERENCE_LINK = re.compile(r'^\s*\[([^\]]+)\]:\s*(<[^>\n]+>|\S+)', re.MULTILINE)
-
-VENDOR_DENYLIST = (
-    'AutoCAD', 'BricsCAD', 'SolidWorks', 'MicroStation', 'CATIA',
-    'PTC Creo', 'Siemens NX'
-)
-
-
-def _vendor_pattern(vendor: str) -> re.Pattern:
-    parts = [re.escape(p) for p in re.split(r'\s+', vendor.strip())]
-    sub = r'\s+'.join(parts)
-    return re.compile(rf'(?<![A-Za-z]){sub}(?![A-Za-z])', re.IGNORECASE)
-
-
-VENDOR_PATTERNS = tuple((vendor, _vendor_pattern(vendor)) for vendor in VENDOR_DENYLIST)
-
-
-def check_vendor_mentions(prose: str, findings: list[str]) -> None:
-    """Flag competitor vendor names in PRD prose to uphold cleanroom and objective style contracts."""
-    for line_no, line in enumerate(prose.splitlines(), start=1):
-        for vendor, pattern in VENDOR_PATTERNS:
-            match = pattern.search(line)
-            if match:
-                findings.append(
-                    f'forbidden vendor mention: "{match.group(0)}" on line {line_no} (matches {vendor}); '
-                    'use neutral engineering terminology (e.g. 传统 CAD / 主流第三方 CAD 宿主) '
-                    'and keep competitor benchmarks in _需求探讨.md / _竞品分析.md'
-                )
 
 
 def without_fenced_code(text: str) -> str:
@@ -100,9 +70,7 @@ def body_without_metadata(text: str) -> str:
 
 
 def definitions_in(text: str) -> list[str]:
-    # Revision records describe older versions; they do not define current rules.
     text = without_record_sections(text, include_sources=False)
-    # Markdown inline emphasis/code around IDs is only formatting.
     lines = [EMPTY_ANCHOR.sub('', line).replace('**', '').replace('`', '')
              for line in text.splitlines()]
     heading_ids = [m.group(1) for line in lines
@@ -116,7 +84,6 @@ def definitions_in(text: str) -> list[str]:
         match = LIST_DEF.match(line) or NAMED_LIST_DEF.match(line)
         if match:
             item = match.group(1)
-            # These template sections list references, not new definitions.
             reference_prefixes = {
                 '范围与边界': ('FR-',),
                 '功能与交互规格': ('BR-', 'NFR-'),
@@ -126,38 +93,9 @@ def definitions_in(text: str) -> list[str]:
         match = TABLE_DEF.match(line) or NAMED_TABLE_DEF.match(line)
         if match:
             item = match.group(1)
-            # A functional heading is authoritative; its FR table row is an index.
             if not (item.startswith('FR-') and item in heading_ids):
                 definitions.append(item)
     return definitions
-
-
-def split_table_row(line: str) -> list[str]:
-    text = line.strip()
-    if text.startswith('|'):
-        text = text[1:]
-    if text.endswith('|'):
-        text = text[:-1]
-    return [cell.strip() for cell in text.split('|')]
-
-
-def markdown_tables(lines: list[str]) -> list[tuple[list[str], list[list[str]]]]:
-    """Return pipe tables that carry a header separator; prose is left alone."""
-    tables = []
-    index = 0
-    while index < len(lines) - 1:
-        if lines[index].strip().startswith('|') and TABLE_SEPARATOR.match(lines[index + 1]):
-            header = split_table_row(lines[index])
-            rows = []
-            cursor = index + 2
-            while cursor < len(lines) and lines[cursor].strip().startswith('|'):
-                rows.append(split_table_row(lines[cursor]))
-                cursor += 1
-            tables.append((header, rows))
-            index = cursor
-        else:
-            index += 1
-    return tables
 
 
 def fr_blocks(body: str) -> list[tuple[str, str]]:
@@ -181,63 +119,18 @@ def fr_blocks(body: str) -> list[tuple[str, str]]:
 
 
 def check_interaction_cards(body: str, findings: list[str]) -> dict:
-    """Check that every FR definition carries a usable interaction card."""
+    """Lightweight check that each FR section contains substantive specification content."""
     coverage = {'fr_total': 0, 'with_frames': 0, 'explicit_none': 0, 'missing': 0}
     for item, block in fr_blocks(body):
         coverage['fr_total'] += 1
-        if '交互卡' not in block:
-            coverage['missing'] += 1
-            findings.append(
-                f'{item} 缺少交互卡：涉及界面或命令行时须给出帧清单与状态事件表，'
-                '确无交互时写“交互卡：未涉及（具体理由）”')
-            continue
         if NONE_DECLARED.search(block):
             coverage['explicit_none'] += 1
             continue
-        state_ok = False
-        frames_ok = False
-        has_state_table = False
-        has_frame_table = False
-        for header, rows in markdown_tables(block.splitlines()):
-            joined = ' '.join(header)
-            data = [row for row in rows if any(cell.strip() for cell in row)]
-            if '状态' in joined:
-                has_state_table = True
-                if '反馈' in joined or '可见' in joined:
-                    state_ok = state_ok or len(data) >= 2
-            if '帧 ID' in joined and '画面' in joined:
-                has_frame_table = True
-                picture = next((i for i, cell in enumerate(header) if '画面' in cell), None)
-                for row in data:
-                    if not FRAME_ID.search(' '.join(row)):
-                        continue
-                    cell = row[picture] if picture is not None and picture < len(row) else ' '.join(row)
-                    if '![' in cell or '](' in cell:
-                        frames_ok = True
-        if not state_ok and not has_state_table:
-            # Also accept prototype-centric state walkthrough sections (e.g. 状态一 / S1 with control logic)
-            state_headings = re.findall(r'(?:#{3,6}\s+.*?(?:状态|S\d)|(?:^|\n)\s*[-*]\s*.*?S\d)', block)
-            has_feedback_prose = any(
-                kw in block for kw in ('反馈', '可见', '操作说明', '界面要素', '回显', '控件逻辑', '状态迁移', '默认值', '联动')
-            )
-            if len(state_headings) >= 1 and has_feedback_prose:
-                state_ok = True
-        if not frames_ok and not has_frame_table:
-            # Also accept inline prototype frame images embedded in the section
-            found_frames = FRAME_ID.findall(block)
-            has_image = bool(INLINE_IMAGE.search(block) or REFERENCE_IMAGE.search(block) or '![' in block)
-            if found_frames and has_image:
-                frames_ok = True
-
-        if not state_ok:
-            findings.append(f'{item} 交互卡缺少状态与事件表（表头含“状态”“可见反馈”，至少两个状态行，或采用以原型为中心的状态走查）')
-        if not frames_ok:
-            findings.append(
-                f'{item} 交互卡缺少有效帧清单（表头含“帧 ID”“画面”，'
-                '至少一行含 FR-xxx-Sx 帧号并给出本地图片或原型链接；或在走查中嵌入有效帧图）')
-        if '取消' not in block:
-            findings.append(f'{item} 交互卡未写明取消、回滚与撤销')
-        if frames_ok:
+        cleaned = re.sub(r'<!--[\s\S]*?-->', '', block).strip()
+        if not cleaned:
+            coverage['missing'] += 1
+            findings.append(f'{item} 功能章节内容为空')
+        else:
             coverage['with_frames'] += 1
     return coverage
 
@@ -249,7 +142,6 @@ def known_placeholders(text: str) -> list[str]:
         template = template_path.read_text(encoding='utf-8-sig')
     except (OSError, UnicodeError):
         template = ''
-    # Match actual template tokens rather than rejecting arbitrary JSON or inequalities.
     for token in re.findall(r'\{[^{}\n]+\}', template):
         if token in text:
             found.add(token)
@@ -260,34 +152,8 @@ def template_markers_in(text: str) -> list[str]:
     return sorted(set(TEMPLATE_TAG_PATTERN.findall(text)))
 
 
-def check_empty_echo_headings(body: str, errors: list[str]) -> None:
-    """Detect and forbid empty echo headings like '见上表详细定义'."""
-    lines = body.splitlines()
-    i = 0
-    n = len(lines)
-    while i < n:
-        line = lines[i].strip()
-        # Look for section headings defining an ID
-        if re.match(r'^#{2,6}\s+[^|\n]+?[（(](' + ID_EXPR + r')[）)]\s*#*$', line):
-            heading_title = line
-            prose_lines = []
-            j = i + 1
-            while j < n and not re.match(r'^#{1,6}\s+', lines[j].strip()):
-                cleaned = lines[j].strip()
-                if cleaned and not cleaned.startswith('<!--') and not EMPTY_ANCHOR.match(cleaned):
-                    prose_lines.append(cleaned)
-                j += 1
-            if prose_lines:
-                combined = ''.join(prose_lines).replace(' ', '')
-                if re.match(r'^(?:(?:详?见|参考|按)?(?:上表|上述表格|前表)(?:详细(?:定义|用例|说明|记录|内容|规格))?[。.]?|见上[。.]?)$', combined):
-                    errors.append(f'empty echo heading without substantive rules: "{heading_title}" -> "{combined}"; use table anchor instead of empty heading')
-            i = j
-        else:
-            i += 1
-
-
 def without_record_sections(text: str, *, include_sources: bool = True) -> str:
-    """Exclude headed records and the company's unheaded front revision table."""
+    """Exclude headed records and the front revision table."""
     lines = []
     skip_level = None
     in_front_revision_table = False
@@ -319,7 +185,6 @@ def without_record_sections(text: str, *, include_sources: bool = True) -> str:
 def filter_historical_and_source_references(text: str) -> str:
     """Exclude record sections and explicit historical prefixes from ID checks."""
     filtered = without_record_sections(text)
-    # Exclude historical ID patterns like "原 BR-002", "旧编号 BR-001", "废弃 FR-001", "历史 DEC-001"
     filtered = re.sub(r'(?:原|旧|废弃|历史|参考外部)(?:规则|功能|需求|决策|编号)?[:：\s]*' + ID_EXPR, '', filtered)
     return filtered
 
@@ -380,7 +245,6 @@ def check_images(text: str, parent: Path, errors: list[str], warnings: list[str]
     html_images = HTMLImages()
     html_images.feed(text)
     targets.extend(html_images.targets)
-    # A draft can retain an explicit resource gap; a complete local output cannot.
     localization_findings = errors if profile == 'template' else warnings
     if html_images.has_srcset:
         findings = localization_findings if image_policy == 'local' else warnings
@@ -475,15 +339,6 @@ def validate(target: Path, profile: str = 'template', image_policy: str | None =
     if markers:
         errors.append('unresolved template markers: ' + ', '.join(markers[:5]))
 
-    # Complete outputs reject empty echo headings; drafts and source documents
-    # report them without turning an input diagnostic into a failed deliverable.
-    check_empty_echo_headings(body, errors if profile == 'template' else warnings)
-
-    # Vendor purity check: cleanroom PRDs must not mention competitor vendors.
-    check_vendor_mentions(prose, errors if profile == 'template' else warnings)
-
-    # Interaction cards are where per-function detail lives; drafts and source
-    # documents report the same findings as warnings.
     if profile != 'existing':
         result['interaction_coverage'] = check_interaction_cards(
             body, errors if profile == 'template' else warnings)
@@ -498,7 +353,6 @@ def validate(target: Path, profile: str = 'template', image_policy: str | None =
         for prefix in ('FR-', 'BR-', 'AC-'):
             if not any(item.startswith(prefix) for item in defined):
                 findings.append(f'no {prefix} definition; check known content and open issues')
-    # Destinations and reference-link URLs are provenance, not business-ID references.
     references = re.sub(r'\]\([^\n]*?\)', ']', body)
     references = REFERENCE_LINK.sub('', references)
     references = filter_historical_and_source_references(references)

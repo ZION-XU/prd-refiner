@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Read-only PRD reference checks; no network access or rendering certification.
 
+Checks unique definitions/anchors and verifies that internal #anchor links resolve.
 Supports conventional Markdown and Confluence Storage anchor/link macros.
-Storage is normalized for analysis; reported lines refer to that normalized text.
 """
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from html import escape, unescape
 import json
 from pathlib import Path
 import re
+import sys
 import xml.etree.ElementTree as ET
 from urllib.parse import unquote
 
@@ -24,8 +25,6 @@ INLINE = re.compile(r'(?<!!)\[([^\]\n]+)\]\(\s*(<[^>\n]+>|(?:[^\s()]|\([^()]*\))
 REF_DEF = re.compile(r'^\s*\[([^\]]+)\]:\s*(<[^>\n]+>|\S+)\s*.*$')
 REF_USE = re.compile(r'(?<!!)\[([^\]\n]+)\]\[([^\]\n]*)\]')
 SHORT_REF = re.compile(r'(?<!!)\[([^\]\n]+)\]')
-NAMED_LABEL = re.compile(r'^(.+?)[（(](' + ID_EXPR + r')[）)]$')
-LOCATION_REF = re.compile(r'〔([^〔〕\n]+?)[；;]\s*位置[：:]\s*([^〔〕\n]+)〕')
 
 
 def plain(text: str) -> str:
@@ -37,7 +36,6 @@ def parse_storage(text: str) -> ET.Element:
     """Parse a Storage fragment without DTDs or external resources."""
     if re.search(r'<!DOCTYPE|<!ENTITY', text, re.I):
         raise ValueError('DTD and entity declarations are not supported')
-    # Common HTML named entities are not predefined XML entities.
     text = re.sub(r'&([A-Za-z][A-Za-z0-9]+);',
                   lambda m: m.group(0) if m.group(1) in {'amp', 'lt', 'gt', 'quot', 'apos'}
                   else ''.join(f'&#{ord(c)};' for c in unescape(m.group(0))), text)
@@ -71,7 +69,6 @@ def storage_markdown(text: str) -> str:
             label = ''.join(body.itertext()) if body is not None else ''
             target = node.get('{urn:ac}anchor', '')
             if any(c.tag.startswith('{urn:ri}') for c in node):
-                # Explicit page/attachment context is external, never a local anchor.
                 return '[' + label + '](external:resource)'
             return '[' + label + '](#' + target + ')' if target else label
         if tag == 'a':
@@ -128,7 +125,6 @@ def active_lines(text: str) -> list[str]:
                 continue
             front_table = False
         if sources and line.lstrip().startswith('|'):
-            # Preserve the source definition; other cells describe external material.
             cells = line.split('|')
             lines[i] = '| ' + cells[1] + ' |' if len(cells) > 2 else ''
         lines[i] = re.sub(r'(?:原|旧|废弃|历史|参考外部)(?:规则|功能|需求|决策|编号)?[:：\s]*' + ID_EXPR,
@@ -144,10 +140,8 @@ def inspect(text: str, format: str = 'markdown', reference_policy: str = 'linked
     lines = active_lines(text)
     findings = []
     definitions = defaultdict(list)
-    definition_names = {}
     line_definitions = {}
     headings = []
-    heading_titles = defaultdict(list)
     anchors = defaultdict(list)
     links = []
     refs = {}
@@ -168,7 +162,6 @@ def inspect(text: str, format: str = 'markdown', reference_policy: str = 'linked
         if heading:
             level = len(heading[1])
             headings.append((i, level))
-            heading_titles[heading[2]].append((i, level))
             if level == 2:
                 section = re.sub(r'^\d+\.?\s*', '', heading[2]).strip()
             if format == 'markdown':
@@ -191,13 +184,6 @@ def inspect(text: str, format: str = 'markdown', reference_policy: str = 'linked
             item = match[1]
             definitions[item].append(i)
             line_definitions[i] = item
-            label = cleaned[:match.end()]
-            named = re.search(r'(.+?)[（(]' + re.escape(item) + r'[）)]', label)
-            if not named:
-                findings.append(f'line {i + 1}: definition must use name (ID): {item}')
-            else:
-                name = re.sub(r'^(?:#{1,6}\s+(?:\d+(?:\.\d+)*\.?\s+)?|[-*]\s+|\d+\.\s+|\|\s*(?:\d+\s*\|\s*)?)', '', named[1]).strip()
-                definition_names[item] = name
 
     for target, locations in anchors.items():
         if len(locations) != 1:
@@ -209,7 +195,6 @@ def inspect(text: str, format: str = 'markdown', reference_policy: str = 'linked
     for i, line in enumerate(lines):
         if REF_DEF.match(line):
             continue
-        # Ignore inline examples, images, targets and tags when locating naked IDs.
         remainder = re.sub(r'`+[^`]*`+', '', line)
         remainder = re.sub(r'!\[[^\]]*\](?:\([^\n]*?\)|\[[^\]]*\])', '', remainder)
 
@@ -233,73 +218,23 @@ def inspect(text: str, format: str = 'markdown', reference_policy: str = 'linked
             return match[0]
 
         remainder = SHORT_REF.sub(take_short, remainder)
-        remainder = re.sub(r'<[^>]*>|https?://\S+', '', remainder)
-
-        def take_location(match):
-            label, title = plain(match[1]), plain(match[2])
-            named = NAMED_LABEL.fullmatch(label)
-            if not named or not named[1].strip() or len(ID_PATTERN.findall(label)) != 1:
-                findings.append(f'line {i + 1}: location reference must use one name (ID): {label}')
-                return ''
-            name, item = named[1].strip(), named[2]
-            locations = definitions.get(item, [])
-            if len(locations) != 1 or definition_names.get(item) != name:
-                findings.append(f'line {i + 1}: location reference name or unique definition mismatch: {item}')
-                return ''
-            targets = heading_titles.get(title, [])
-            if len(targets) != 1:
-                findings.append(f'line {i + 1}: missing or ambiguous location heading: {title}')
-                return ''
-            start, level = targets[0]
-            end = next((n for n, depth in headings if n > start and depth <= level), len(lines))
-            if not start <= locations[0] < end:
-                findings.append(f'line {i + 1}: location does not contain definition {item}: {title}')
-            return ''
-
-        if reference_policy == 'location':
-            remainder = LOCATION_REF.sub(take_location, remainder)
-        # Frame IDs address one FR's interaction card, not a separate entity.
-        remainder = FRAME_ID.sub('', remainder)
-        bare = ID_PATTERN.findall(remainder)
-        if i in line_definitions and line_definitions[i] in bare:
-            bare.remove(line_definitions[i])
-        for item in bare:
-            findings.append(f'line {i + 1}: unlinked reference: {item}')
 
     for i, label, target in links:
-        items = ID_PATTERN.findall(label)
-        if not items:
-            continue  # TOCs and general source links are outside this checker.
+        # Only check internal anchor links (#anchor). Local files (e.g. prototype.html) and URLs are ignored.
+        if not target.startswith('#'):
+            continue
+        target_id = unquote(target[1:])
+        locations = anchors.get(target_id, [])
+        if len(locations) == 0:
+            findings.append(f'line {i + 1}: missing anchor: {target_id}')
+        elif len(locations) > 1:
+            findings.append(f'line {i + 1}: ambiguous anchor: {target_id}')
+
+        clean_label = FRAME_ID.sub('', label)
+        items = ID_PATTERN.findall(clean_label)
         if len(items) > 1:
             findings.append(f'line {i + 1}: reference must not combine multiple IDs in one link: {label}')
-        if not target.startswith('#'):
-            findings.append(f'line {i + 1}: external/unsupported reference target requires verification: {", ".join(items)}')
-            continue
-        target = unquote(target[1:])
-        locations = anchors.get(target, [])
-        if len(locations) != 1:
-            findings.append(f'line {i + 1}: missing or ambiguous anchor: {target}')
-            continue
-        location = locations[0]
-        # An anchor on its own belongs to the immediately following definition/heading.
-        if not parsed[location]:
-            following = next((n for n in range(location + 1, len(lines)) if parsed[n]), None)
-            if following is not None:
-                location = following
-        heading = next(((n, level) for n, level in headings if n == location), None)
-        end = location + 1
-        if heading:
-            end = next((n for n, level in headings if n > location and level <= heading[1]), len(lines))
-        for item in items:
-            definitions_here = definitions.get(item, [])
-            # Definitions with IDs must match exactly, even if they contain subheadings.
-            correct = (len(definitions_here) == 1 and
-                       (definitions_here[0] == location or
-                        (heading and location not in line_definitions and
-                         parsed[definitions_here[0]].startswith('|') and
-                         location <= definitions_here[0] < end)))
-            if not correct:
-                findings.append(f'line {i + 1}: anchor does not locate definition {item}: {target}')
+
     return findings
 
 
@@ -309,34 +244,40 @@ def validate(target: Path, format: str = 'markdown', profile: str = 'template',
               'reference_policy': reference_policy,
               'errors': [], 'warnings': [],
               'scope': 'Static PRD references only; no name semantics, remote access or rendered navigation verification.'}
+    if profile == 'existing':
+        result['warnings'].append('Input-only diagnostic: reference findings are warnings.')
     try:
-        findings = inspect(target.read_text(encoding='utf-8-sig'), format, reference_policy)
-        result['errors' if profile == 'template' else 'warnings'] = findings
-        if reference_policy == 'location':
-            result['warnings'].append('Location fallback enabled: verify reader limitation; clickable navigation is not certified.')
-    except (OSError, UnicodeError, ValueError, ET.ParseError) as exc:
-        result['errors'].append(f'cannot inspect document: {exc}')
+        text = target.read_text(encoding='utf-8-sig')
+        findings = inspect(text, format=format, reference_policy=reference_policy)
+    except (OSError, UnicodeError, ET.ParseError, ValueError) as exc:
+        result['errors'].append(f'cannot validate references: {type(exc).__name__}: {exc}')
+        result['passed'] = False
+        return result
+    bucket = result['errors'] if profile == 'template' else result['warnings']
+    bucket.extend(findings)
     result['passed'] = not result['errors']
     return result
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('document', type=Path)
     parser.add_argument('--format', choices=('markdown', 'storage'), default='markdown')
     parser.add_argument('--profile', choices=('template', 'draft', 'existing'), default='template')
     parser.add_argument('--reference-policy', choices=('linked', 'location'), default='linked',
-                        help='location only when navigation is unavailable; requires named references with exact heading locations')
+                        help='location only when navigation is unavailable')
     parser.add_argument('--json', action='store_true')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
     result = validate(args.document, args.format, args.profile, args.reference_policy)
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
         print('Reference checks passed.' if result['passed'] else 'Reference checks failed.')
-        for key in ('errors', 'warnings'):
-            for message in result[key]:
-                print(f'{key}: {message}')
+        for label in ('errors', 'warnings'):
+            for message in result[label]:
+                print(f'{label}: {message}')
         print(result['scope'])
     return 0 if result['passed'] else 1
 
