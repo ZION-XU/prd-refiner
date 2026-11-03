@@ -6,10 +6,10 @@
 
 本地 Web Components 原型（`prototype.html`）与 PRD 正文（`spec.md` / 主稿第 3 章）分工明确、互不重复：
 
-| 载体 | 承载的专属信息 | 消费对象 |
+| 载体 | 承载的专属信息 | 作用 |
 |---|---|---|
-| **本地原型与状态帧图**<br>（`prototype.html` + `fr-xxx-sx.png`） | **纯粹的 CAD 视觉布局与常规控件外观**：对话框结构、控件方位、文案排布、尺寸间距、常规按钮/输入框外观及所使用的 `<cad-*>` 组件标签（原型只画纯粹界面，不塞方案说明卡片） | PM 评审、UI 设计师核对、前端/Qt 界面布局映射 |
-| **功能规格正文**<br>（交互卡与内核规则） | **静态画面看不见的特殊逻辑与增量契约**：特殊控件的数据源与默认记忆、复杂取值校验与恢复、跨控件联动算法、命令行 `-CMD` 等价流、DWG 图元数据契约、CAD 特殊环境边界与 ESC/Undo 事务 | C++/Qt 核心研发编写业务逻辑、QA 编写测试用例 |
+| **本地原型与状态帧图**<br>（`prototype.html` + `fr-xxx-sx.png`） | **纯粹的 CAD 视觉布局与常规控件外观**：对话框结构、控件方位、文案排布、尺寸间距、常规按钮/输入框外观及所使用的 `<cad-*>` 组件标签（原型只画纯粹界面，不塞方案说明卡片） | 直观展示界面布局与交互状态、对齐 UI 与 Qt 控件映射 |
+| **功能规格正文**<br>（交互卡与内核规则） | **静态画面看不见的特殊逻辑与增量契约**：特殊控件的数据源与默认记忆、复杂取值校验与恢复、跨控件联动算法、命令行 `-CMD` 等价流、DWG 图元数据契约、CAD 特殊环境边界与 ESC/Undo 事务 | 定义研发实现逻辑与 QA 测试判据 |
 
 ---
 
@@ -18,7 +18,7 @@
 本地 HTML 原型基于公司 Figma 组件库 1:1 转换的 **Nova-Proto Web Components (`<cad-*>`) 设计系统**构建。组件查询、图标检索、设计变量（Design Tokens）与原型校验已封装在 **`figma-components-web` MCP 服务**中（同时本 Skill 在 `assets/nova-proto/` 下内置了 `cad-design-tokens.css` 与 `cad-components.js` 运行时兜底）：
 
 ### 1. 标准构建流程（按需调用 MCP 工具）
-编写或修改 `prototype.html` 时，直接调用 `figma-components-web` MCP 工具，无需死记硬背组件属性：
+编写或修改 `prototype.html` 时，直接调用 `figma-components-web` MCP 工具查询最新组件与属性：
 
 1. **获取原型骨架并注入运行时**：
    - 调用 `get_prototype_scaffold(title="功能名称", workspace_dir="<工作区绝对路径>", asset_prefix="...")`（根目录原型用 `.assets/nova-proto`，`features/FR-xxx/` 子目录原型用 `../../.assets/nova-proto`；离线或无 MCP 环境时可运行 `python scripts/assemble_prd.py --workspace <工作区绝对路径> --init-only` 注入运行时）。
@@ -26,10 +26,10 @@
 2. **按需查询组件、图标与样式变量**：
    - **查组件**：调用 `search_components(query="表格/弹窗/树...")` 或 `list_cad_components(category="...")` 找到所需 `<cad-*>` 标签；
    - **查属性与调用范例**：对目标组件调用 `get_component_spec(tag_name="cad-xxx")` 获取完整支持属性（`supported_attributes`）与标准 HTML 示例（需要查看内部插槽或事件细节时可调 `get_component_module`）；
-   - **查图标与颜色变量**：需要图标时调用 `search_icons(query="...")`（从 339+ 官方 CAD/BIM 图标中获取 `<cad-icon name="...">`）；需要写局部布局样式时调用 `get_design_tokens` 使用标准 CSS 变量。
+   - **查图标与颜色变量**：需要图标时调用 `search_icons(query="...")` 获取官方 `<cad-icon name="...">` 标识；需要写局部布局样式时调用 `get_design_tokens` 使用标准 CSS 变量。
 3. **校验原型与标记缺失组件（`status="draft"`）**：
    - **零原生裸 HTML 交互控件**：界面中的按钮、输入、下拉、复选、表格、弹窗一律使用 `<cad-*>` 组件，不混写原生 `<button>`、`<input>`、`<select>`、`<textarea>`；
-   - **缺失组件标记**：当官方 50 个 `<cad-*>` 组件均无法满足某个特定 CAD 交互时，使用语义化的自定义 `<cad-*>` 标签，并显式添加 `status="draft"` 与 `label="用途说明"`（例如 `<cad-linetype-preview status="draft" label="线型实时预览"></cad-linetype-preview>`）；
+   - **缺失组件标记**：当现有官方 `<cad-*>` 组件均无法满足某个特定 CAD 交互时，使用语义化的自定义 `<cad-*>` 标签，并显式添加 `status="draft"` 与 `label="用途说明"`（例如 `<cad-linetype-preview status="draft" label="线型实时预览"></cad-linetype-preview>`）；
    - **静态自检**：生成代码后调用 MCP 的 `validate_prototype_html`（或在合龙时运行 `scripts/assemble_prd.py`），自动检查标签拼写并将 `status="draft"` 组件汇总至工作区根目录的 `Missing_Components.md` 供 UI 设计师补齐 Figma。
 
 ---
@@ -56,4 +56,4 @@
 - **中断与事务边界**：各阶段按 `ESC` 键的现场清理与回滚范围，以及 `Ctrl+Z`（Undo）的撤销分组。
 
 ### 4. 验收标准（`AC-xxx`）
-专注写清：**QA 用什么具体样本测试，以及检验什么量化结果**（Given / When / Then）。
+专注写清：**用什么具体样本测试，以及检验什么量化结果**（Given / When / Then）。

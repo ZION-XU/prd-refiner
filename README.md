@@ -7,10 +7,10 @@
 ## 核心特点
 
 1. **按需协作与深度场景思考**：
-   - 配合产品经理（PM）按需开展工作：只探讨方案、只画原型、只改某段文档或推进完整 PRD 均可；
+   - 按需开展工作：只探讨方案、只画原型、只改某段文档或推进完整 PRD 均可；
    - 探讨功能时从设计师真实场景、下一步动作与数据来源出发，识别旧做法痛点并给出更简捷的交互方案（见 `references/brainstorm.md`）。
 2. **Nova-Proto (`<cad-*>`) 纯粹界面原型**：
-   - 本地 HTML 原型使用从公司 Figma 组件库转换的 50 个 `<cad-*>` Web Components 官方组件构建；
+   - 本地 HTML 原型通过 `figma-components-web` MCP 使用从公司 Figma 组件库转换的 `<cad-*>` Web Components 官方组件与图标构建；
    - 遇到组件库缺失的控件，标记 `status="draft"` 并自动汇总至 `Missing_Components.md` 供 UI 设计师补齐；
    - 原型与 PRD 正文分工明确：原型展示界面布局与常规控件，**PRD 正文不重复罗列常规自明控件，只写特殊逻辑、跨控件联动、CAD 底层边界与量化验收标准**。
 3. **支持单文件维护与多会话分片并发**：
@@ -26,7 +26,7 @@ prd-refiner/
 ├─ AGENTS.md                仓库维护契约与脚本速查
 ├─ references/              按需查阅的参考指南
 │  ├─ brainstorm.md         头脑风暴：拆解大需求、深挖真实场景、一次一问与备选方案对比
-│  ├─ interaction-design.md 原型规范：50 个 <cad-*> 官方组件速查表、缺件标记与重点规格提炼
+│  ├─ interaction-design.md 原型规范：配合 figma-components-web MCP 构建 <cad-*> 原型、缺件标记与重点规格提炼
 │  ├─ prd-standard.md       内容规范：高信息密度原则、CAD 防漏清单、编号引用与流程图
 │  ├─ delivery.md           交付规范：单文件与分片双模式、合龙脚本、版本状态与静态校验
 │  ├─ downstream-review.md  成稿自检：研发 (C++/Qt5)／品质／交互／产品化四角度排查清单

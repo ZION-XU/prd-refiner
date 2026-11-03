@@ -5,9 +5,9 @@
 ## 关键事实
 
 - **核心定位**：
-  - 辅助产品经理（PM）针对中望 CAD 桌面软件开展需求头脑风暴、构建 `<cad-*>` 界面原型、编写高信息密度 PRD 并交付 Confluence；
+  - 针对中望 CAD 桌面软件开展需求头脑风暴、构建 `<cad-*>` 界面原型、编写高信息密度 PRD 并交付 Confluence；
   - 支持**单文件直接维护**（`<工作区>/<需求名>.md`）与**多会话分片并发**（`00_需求总览.md` + `features/FR-xxx_<名称>/{prototype.html, spec.md}`，通过 `scripts/assemble_prd.py` 合龙）；
-  - 原型使用内置 `assets/nova-proto/` 下的 50 个 `<cad-*>` 官方组件构建纯粹界面（缺失组件标 `status="draft"` 并汇总至 `Missing_Components.md`）；PRD 正文只写确认的软件行为与特殊/增量逻辑，不重复罗列原型中已自明的常规控件，也不写入聊天过程话术。
+  - 原型通过 `figma-components-web` MCP（及内置 `assets/nova-proto/` 兜底）使用 `<cad-*>` 官方组件构建纯粹界面（缺失组件标 `status="draft"` 并汇总至 `Missing_Components.md`）；PRD 正文只写特殊/增量逻辑与底层边界，不重复罗列原型中已自明的常规控件。
 - **Python 侧纯标准库**：`scripts/*.py` 仅使用 Python 标准库（Python 3.10+），命令一律在**技能仓库根目录**执行，工作区与文件路径以绝对路径显式传入。
 - **测试**：`python -B -m unittest discover -s scripts -p "test_*.py"`。改动脚本、模板或文档后均需执行回归测试验证。
 - **模板纯洁与规范隔离**：`assets/prd-template.md` 纯粹是字段骨架，严禁包含工具脚本名称（如 `*.py`）或规范要求；所有规范写在 `references/*.md`，模板只写超链接指针。

@@ -1,29 +1,27 @@
 ---
 name: prd-refiner
-description: 中望 CAD 需求探讨、原型设计与 PRD 编写辅助工具；提供需求头脑风暴指南、50 个 <cad-*> 原型组件库、高信息密度 PRD 规范、工作区文件约定与自动化交付脚本。仅在用户明确点名 prd-refiner 时启动（pi 中为 /skill:prd-refiner），不点名不得自动启用。
+description: 中望 CAD 需求探讨、原型设计与 PRD 编写辅助工具；提供需求头脑风暴指南、<cad-*> 原型组件库规范、高信息密度 PRD 标准、工作区文件约定与自动化交付脚本。仅在用户明确点名 prd-refiner 时启动（pi 中为 /skill:prd-refiner），不点名不得自动启用。
 disable-model-invocation: true
 ---
 
 # PRD Refiner
 
-辅助产品经理（PM）探讨中望 CAD 功能方案、用 `<cad-*>` 组件库构建原型、编写高信息密度 PRD 并交付 Confluence。
+用于探讨中望 CAD 功能方案、使用 `<cad-*>` 组件库构建原型、编写高信息密度 PRD 并交付 Confluence。
 
 ## 协作方式（按需执行）
 
-根据 PM 当前的指令灵活响应，只做当前需要的事：
-- **只探讨方案**：读取 `references/brainstorm.md`，帮 PM 拆解范围、理清真实使用场景、指出旧做法痛点，给出 2~3 个备选方案或带推荐答案的选择题；
+根据当前指令灵活响应，只做当前需要的事：
+- **只探讨方案**：读取 `references/brainstorm.md`，拆解范围、理清真实使用场景、指出旧做法痛点，给出 2~3 个备选方案或带推荐答案的选择题；
 - **只画/改原型**：读取 `references/interaction-design.md`，优先调用 `figma-components-web` MCP（查询组件属性、图标、获取骨架与校验）生成或修改纯粹的 `prototype.html` 界面；
 - **只写/改文档**：读取 `references/prd-standard.md`，编写或修改对应的 Markdown 文档；
-- **完整需求推进**：先通过对话与原型和 PM 对齐方案，确认后再提炼成稿、运行校验脚本或发布 Confluence。
+- **完整需求推进**：先通过对话与原型对齐方案，确认后再提炼成稿、运行校验脚本或发布 Confluence。
 
 ## 核心要求
 
 - **深度思考，不照搬旧界面**：探讨功能时，不要凭经验直接照搬传统 CAD 软件的现成弹窗。先想清楚：**设计师在什么场景下用它？数据从哪来？做完这步操作后他的下一步是什么？以前的做法笨在哪（如多层弹窗、繁琐向导、缺少预览）？** 每次提问聚焦最关键的问题并附推荐方案（见 [头脑风暴与方案探讨](references/brainstorm.md)）。
-- **原型纯粹且用标准组件**：`prototype.html` 只画纯粹的 CAD 界面，通过 `figma-components-web` MCP 查询并使用 50 个 `<cad-*>` 官方组件与 339+ 官方图标构建（内置 `assets/nova-proto/` 运行时兜底）；若现有组件满足不了某个特殊交互，用语义化 `<cad-*>` 标签加 `status="draft"` 与 `label="用途说明"`，汇总到 `Missing_Components.md` 交设计师补充 Figma（见 [交互与原型设计](references/interaction-design.md)）。
-- **PRD 高信息密度，图文不重复**：
-  - PRD 正文面向研发与品质（QA），用简洁自然的工程语言只写确认的软件行为与规则，不把聊天探讨过程写进文档；
-  - **原型上已经能看懂的常规控件（普通按钮、常规文案、布局尺寸）不在文档里重复罗列**；正文只写静态画面看不见的**特殊逻辑、跨控件联动、CAD 底层边界（命令与 `-CMD`、系统变量、特殊图层/块/UCS、ESC 回滚与 Undo）及量化验收标准**（见 [内容约定](references/prd-standard.md)）。
-- **事实取证**：能通过代码、组件表或公开资料查到的事实自己查；分析外部产品现行行为须查证当前资料并注明来源与日期（见 [竞品对标](references/prd-benchmark.md)）。以 Confluence/Jira 为输入时，先用脚本拉取 `.assets/` 快照（见 [来源快照](references/snapshot.md)）。
+- **原型纯粹且用标准组件**：`prototype.html` 只画纯粹的 CAD 界面，通过 `figma-components-web` MCP 查询并使用 `<cad-*>` 官方组件与图标构建（内置 `assets/nova-proto/` 运行时兜底）；若现有组件满足不了某个特殊交互，用语义化 `<cad-*>` 标签加 `status="draft"` 与 `label="用途说明"`，汇总到 `Missing_Components.md` 交设计师补充 Figma（见 [交互与原型设计](references/interaction-design.md)）。
+- **PRD 高信息密度，图文不重复**：**原型上已经能看懂的常规控件（普通按钮、常规文案、布局尺寸）不在文档里重复罗列**；正文只写静态画面看不见的**特殊逻辑、跨控件联动、CAD 底层边界（命令与 `-CMD`、系统变量、特殊图层/块/UCS、ESC 回滚与 Undo）及量化验收标准**（见 [内容约定](references/prd-standard.md)）。
+- **事实取证**：能通过代码、组件库或公开资料查到的事实自行查证；分析外部产品现行行为须查证当前资料并注明来源与日期（见 [竞品对标](references/prd-benchmark.md)）。以 Confluence/Jira 为输入时，先用脚本拉取 `.assets/` 快照（见 [来源快照](references/snapshot.md)）。
 
 ## 文件存放位置（防止乱放）
 
@@ -41,7 +39,7 @@ disable-model-invocation: true
 
 - **公共资源与按需文件**：
   - 组件库运行时置 `<工作区>/.assets/nova-proto/`；图片（状态截图、Mermaid 渲染图、快照原图）统一置 `<工作区>/.assets/images/`，文档内用相对路径引用；
-  - 帮助初稿仅在 PM 明确要求时生成（骨架见 `assets/help-template.md`，版式参照 `assets/help/help-demo/`），界面词条用 `lookup_term.py` 查 `assets/help/multilanguage-mapping.txt`，不自行翻译。
+  - 帮助初稿仅在明确要求时生成（骨架见 `assets/help-template.md`，版式参照 `assets/help/help-demo/`），界面词条用 `lookup_term.py` 查 `assets/help/multilanguage-mapping.txt`，不自行翻译。
 - **脚本执行位置**：所有 Python 脚本统一在本 Skill 根目录下运行，工作区与文件路径传入绝对路径。
 
 ## 参考文档（按当前任务选读）
