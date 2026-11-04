@@ -238,8 +238,32 @@ def inspect(text: str, format: str = 'markdown', reference_policy: str = 'linked
     return findings
 
 
+IGNORED_DOC_NAMES = frozenset({
+    '00_需求总览.md', 'Missing_Components.md', 'README.md', 'SUMMARY.md'
+})
+
+
+def find_primary_prd(target: Path) -> Path:
+    """Find the single primary PRD document in a directory, preferring named PRDs over generic prd.md."""
+    if not target.is_dir():
+        return target
+    candidates = [
+        p for p in target.glob('*.md')
+        if p.name not in IGNORED_DOC_NAMES
+    ]
+    named_prds = [p for p in candidates if 'prd' in p.stem.lower() and p.name.lower() != 'prd.md']
+    if named_prds:
+        return named_prds[0]
+    if (target / 'prd.md').is_file():
+        return target / 'prd.md'
+    if candidates:
+        return candidates[0]
+    return target / 'prd.md'
+
+
 def validate(target: Path, format: str = 'markdown', profile: str = 'template',
              reference_policy: str = 'linked') -> dict:
+    target = find_primary_prd(target)
     result = {'document': str(target), 'format': format, 'profile': profile,
               'reference_policy': reference_policy,
               'errors': [], 'warnings': [],

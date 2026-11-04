@@ -301,6 +301,29 @@ def check_images(text: str, parent: Path, errors: list[str], warnings: list[str]
                 errors.append(f'local image could not be inspected: {file_path}')
 
 
+IGNORED_DOC_NAMES = frozenset({
+    '00_需求总览.md', 'Missing_Components.md', 'README.md', 'SUMMARY.md'
+})
+
+
+def find_primary_prd(target: Path) -> Path:
+    """Find the single primary PRD document in a directory, preferring named PRDs over generic prd.md."""
+    if not target.is_dir():
+        return target
+    candidates = [
+        p for p in target.glob('*.md')
+        if p.name not in IGNORED_DOC_NAMES
+    ]
+    named_prds = [p for p in candidates if 'prd' in p.stem.lower() and p.name.lower() != 'prd.md']
+    if named_prds:
+        return named_prds[0]
+    if (target / 'prd.md').is_file():
+        return target / 'prd.md'
+    if candidates:
+        return candidates[0]
+    return target / 'prd.md'
+
+
 def validate(target: Path, profile: str = 'template', image_policy: str | None = None,
              *, source: Path | None = None) -> dict:
     if profile not in {'template', 'draft', 'existing'}:
@@ -309,7 +332,7 @@ def validate(target: Path, profile: str = 'template', image_policy: str | None =
         image_policy = 'external' if profile == 'existing' else 'local'
     if image_policy not in {'local', 'external'}:
         raise ValueError(f'unknown image policy: {image_policy}')
-    prd = target / 'prd.md' if target.is_dir() else target
+    prd = find_primary_prd(target)
     result = {
         'document': str(prd), 'profile': profile, 'image_policy': image_policy,
         'errors': [], 'warnings': [],
@@ -370,7 +393,7 @@ def validate(target: Path, profile: str = 'template', image_policy: str | None =
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('target', type=Path, help='PRD file, or directory containing prd.md')
+    parser.add_argument('target', type=Path, help='PRD file, or directory containing PRD document')
     parser.add_argument('--profile', choices=('template', 'draft', 'existing'), default='template',
                         help='template: new/optimized output; draft: unfinished output; existing: input-only diagnostic')
     parser.add_argument('--json', action='store_true', help='emit machine-readable results')

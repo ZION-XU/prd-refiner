@@ -224,6 +224,61 @@ def inject_specs_into_overview(overview_text: str, combined_specs: str) -> str:
     return '\n\n'.join(parts) + '\n'
 
 
+IGNORED_DOC_NAMES = frozenset({
+    '00_需求总览.md', 'Missing_Components.md', 'README.md', 'SUMMARY.md'
+})
+
+
+def resolve_assembled_output_path(workspace: Path, overview_path: Path, output: Path | None) -> Path:
+    """Resolve the definitive semantic output path for the assembled PRD.
+    
+    1. If explicit output is given, use it.
+    2. If an existing named PRD file exists in workspace (e.g. ZWCAD_表格重构_PRD.md), reuse it.
+    3. Infer from the first top-level header (# <title>) of 00_需求总览.md.
+    4. Infer from the workspace folder name (e.g. 20261029-Nova-table -> Nova-table_PRD.md).
+    5. Fallback to workspace / 'prd.md'.
+    """
+    if output:
+        return Path(output).resolve()
+
+    # 1. Check for existing named PRD in workspace
+    candidates = [
+        p for p in workspace.glob('*.md')
+        if p.name not in IGNORED_DOC_NAMES and p.name.lower() != 'prd.md'
+    ]
+    named_prds = [p for p in candidates if 'prd' in p.stem.lower()]
+    if named_prds:
+        return named_prds[0].resolve()
+    if len(candidates) == 1:
+        return candidates[0].resolve()
+
+    # 2. Infer from overview top heading
+    if overview_path.is_file():
+        try:
+            for line in overview_path.read_text(encoding='utf-8-sig').splitlines():
+                line = line.strip()
+                if line.startswith('# '):
+                    raw_title = line[2:].strip()
+                    clean = re.sub(r'\s*(?:用户)?需求规格说明书\s*$', '', raw_title).strip()
+                    clean = re.sub(r'[（(].*?[）)]', '', clean).strip()
+                    clean = re.sub(r'[\\/:*?"<>|\r\n\t]+', '_', clean).strip('_')
+                    clean = re.sub(r'\s+', '_', clean)
+                    if clean:
+                        if not clean.upper().endswith('PRD'):
+                            clean += '_PRD'
+                        return (workspace / f'{clean}.md').resolve()
+        except OSError:
+            pass
+
+    # 3. Infer from workspace directory name
+    dir_name = workspace.name
+    clean_dir = re.sub(r'^\d{8}[_-]?', '', dir_name)
+    if clean_dir:
+        return (workspace / f'{clean_dir}_PRD.md').resolve()
+
+    return (workspace / 'prd.md').resolve()
+
+
 def assemble(workspace: Path, output: Path | None = None,
              overview: Path | None = None, *, init_only: bool = False) -> dict:
     workspace = Path(workspace).resolve()
@@ -238,7 +293,7 @@ def assemble(workspace: Path, output: Path | None = None,
         }
 
     overview_path = Path(overview).resolve() if overview else workspace / '00_需求总览.md'
-    output_path = Path(output).resolve() if output else workspace / 'prd.md'
+    output_path = resolve_assembled_output_path(workspace, overview_path, output)
 
     errors: list[str] = []
     warnings: list[str] = []
@@ -318,6 +373,14 @@ def assemble(workspace: Path, output: Path | None = None,
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(merged, encoding='utf-8')
 
+        # Clean up redundant legacy prd.md if named output is used
+        legacy_prd = workspace / 'prd.md'
+        if legacy_prd.is_file() and legacy_prd.resolve() != output_path.resolve():
+            try:
+                legacy_prd.unlink()
+            except OSError:
+                pass
+
     return {
         'workspace': str(workspace),
         'overview': str(overview_path),
@@ -338,7 +401,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--workspace', required=True, type=Path,
                         help='Requirement workspace root directory (absolute path)')
     parser.add_argument('--output', type=Path,
-                        help='Assembled PRD output path (default: <workspace>/prd.md)')
+                        help='Assembled PRD output path (default: auto-detected semantic PRD or inferred from overview title)')
     parser.add_argument('--overview', type=Path,
                         help='Overview markdown file (default: <workspace>/00_需求总览.md)')
     parser.add_argument('--init-only', action='store_true',

@@ -27,14 +27,18 @@
 │   ├── nova-proto/                # 自动注入的组件库运行时 (cad-design-tokens.css, cad-components.js)
 │   ├── images/                    # 原型导出的状态帧图（fr-001-s1.png）、Mermaid 渲染图、快照原图
 │   └── source.md / manifest.json  # 远程来源不可变快照（按需，见 snapshot.md）
-└── <需求名>.md                    # 【合龙主稿】由 assemble_prd.py 自动拼接生成（未命名时用 prd.md）
+└── <需求名>.md                    # 【唯一合龙主稿】由 assemble_prd.py 自动拼接生成（自动识别或命名为 <需求名>_PRD.md，杜绝产生冗余 prd.md）
 ```
 
 - **单点修改与全量合龙**：
   - 多会话并发打磨原型时，各会话只读写各自 `features/FR-xxx/` 下的 `prototype.html` 与 `spec.md`，状态帧图统一导出至 `.assets/images/`；
-  - 需要生成或更新完整 PRD 时，运行合龙脚本自动执行 **`prototype.html` 组件覆盖率审计 + `Missing_Components.md` 同步 + 分片拼接**：
+  - 需要生成或更新完整 PRD 时，运行合龙脚本自动执行 **`prototype.html` 组件覆盖率审计 + `Missing_Components.md` 同步 + 分片拼接**（脚本自动复用具名主稿或从总览标题推断文件名，并自动清理历史遗留的 `prd.md`，保证工作区内主稿唯一）：
     ```bash
-    python scripts/assemble_prd.py --workspace <工作区绝对路径> --output <工作区绝对路径>/<需求名>.md
+    python scripts/assemble_prd.py --workspace <工作区绝对路径>
+    ```
+    若需显式指定输出路径，可传入 `--output`：
+    ```bash
+    python scripts/assemble_prd.py --workspace <工作区绝对路径> --output <工作区绝对路径>/<需求名>_PRD.md
     ```
 - **附加按需资产**：
   - `<需求名>_竞品分析.md`：仅在开展深度同类产品调研时落盘（见 [竞品对标](prd-benchmark.md)）；

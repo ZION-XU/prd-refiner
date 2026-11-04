@@ -35,7 +35,7 @@ disable-model-invocation: true
 | `<工作区>/features/FR-xxx_<名称>/prototype.html` | 该功能的 `<cad-*>` 界面原型 |
 | `<工作区>/features/FR-xxx_<名称>/spec.md` | 该功能的规格说明（命令入口、重点交互逻辑、业务规则 `BR`、验收标准 `AC`） |
 | `<工作区>/Missing_Components.md` | 各原型里标记了 `status="draft"` 的缺失组件汇总表 |
-| `<工作区>/<需求名>.md` | 由 `assemble_prd.py` 自动拼接生成的完整 PRD |
+| `<工作区>/<需求名>_PRD.md` | 由 `assemble_prd.py` 自动拼接生成的唯一 PRD 主稿（自动命名或复用具名主稿，自动清理冗余 `prd.md`） |
 
 - **公共资源与按需文件**：
   - 组件库运行时置 `<工作区>/.assets/nova-proto/`；图片（状态截图、Mermaid 渲染图、快照原图）统一置 `<工作区>/.assets/images/`，文档内用相对路径引用；
@@ -60,7 +60,7 @@ disable-model-invocation: true
 
 | 脚本 | 作用 |
 |---|---|
-| `assemble_prd.py` | 同步 `.assets/nova-proto/` 组件库；检查 `features/FR-*/prototype.html` 是否混入原生裸 HTML、汇总 `status="draft"` 缺失组件至 `Missing_Components.md`，并将 `00_需求总览.md` 与各 `spec.md` 合龙为完整 PRD |
+| `assemble_prd.py` | 同步 `.assets/nova-proto/` 组件库；检查 `features/FR-*/prototype.html` 是否混入原生裸 HTML、汇总 `status="draft"` 缺失组件至 `Missing_Components.md`，并将 `00_需求总览.md` 与各 `spec.md` 合龙为唯一具名主稿（自动清理冗余 `prd.md`） |
 | `validate_prd.py` | 检查 PRD 核心章节完整性、未清理的模板占位符、条目重号与本地图片路径是否存在 |
 | `validate_links.py` | 检查条目编号单一定义与同页 `#anchor` 锚点跳转是否有效（支持 Markdown 与 Confluence Storage） |
 | `validate_delivery.py` | 发布 Confluence 前后的组合校验（正文、锚点、目录布局与图片附件） |
